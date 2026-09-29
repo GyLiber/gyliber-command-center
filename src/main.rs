@@ -19,6 +19,7 @@ use time::Duration;
 use tower_http::{
     request_id::{MakeRequestUuid, PropagateRequestIdLayer, SetRequestIdLayer},
     services::ServeDir,
+    limit::RequestBodyLimitLayer,
     set_header::SetResponseHeaderLayer,
     trace::TraceLayer,
 };
@@ -100,6 +101,12 @@ fn build_app(state: AppState, session_key: Key, secure_cookie: bool) -> Router {
         .with_expiry(Expiry::OnInactivity(Duration::hours(8)))
         .with_private(session_key);
 
+    let hsts = if secure_cookie {
+        HeaderValue::from_static("max-age=31536000; includeSubDomains")
+    } else {
+        HeaderValue::from_static("max-age=0")
+    };
+
     Router::new()
         .route("/", get(public_home))
         .route("/about", get(public_about))
@@ -114,6 +121,7 @@ fn build_app(state: AppState, session_key: Key, secure_cookie: bool) -> Router {
         .route("/api/state", get(protected_state))
         .nest_service("/static", ServeDir::new("static"))
         .fallback(not_found)
+        .layer(RequestBodyLimitLayer::new(64 * 1024))
         .layer(SetRequestIdLayer::new(
             header::HeaderName::from_static("x-request-id"),
             MakeRequestUuid,
@@ -159,6 +167,10 @@ fn build_app(state: AppState, session_key: Key, secure_cookie: bool) -> Router {
         .layer(SetResponseHeaderLayer::if_not_present(
             header::HeaderName::from_static("cross-origin-resource-policy"),
             HeaderValue::from_static("same-origin"),
+        ))
+        .layer(SetResponseHeaderLayer::if_not_present(
+            header::STRICT_TRANSPORT_SECURITY,
+            hsts,
         ))
         .layer(sessions)
         .with_state(state)
