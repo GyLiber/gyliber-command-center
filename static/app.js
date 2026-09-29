@@ -22,8 +22,8 @@ async function refreshModules() {
       const card = document.createElement(module.status === "ACTIVE" ? "a" : "article");
       card.className = module.status === "ACTIVE" ? "module" : "module locked";
 
-      if (module.status === "ACTIVE") {
-        card.href = module.path;
+      if (module.status === "ACTIVE" && module.ui_path) {
+        card.href = module.ui_path;
       }
 
       const ordinal = document.createElement("span");
