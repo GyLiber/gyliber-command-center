@@ -64,6 +64,10 @@ mod tests {
         assert_eq!(resources.len(), 3);
         assert_eq!(resources[0].kind, ResourceKind::Repository);
         assert_eq!(resources[2].status, ResourceStatus::Planned);
-        assert!(resources.iter().all(|resource| resource.visibility == "PUBLIC"));
+        assert!(
+            resources
+                .iter()
+                .all(|resource| resource.visibility == "PUBLIC")
+        );
     }
 }
