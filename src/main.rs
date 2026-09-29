@@ -307,7 +307,11 @@ async fn logout(session: Session) -> Response {
 
 async fn protected_state(session: Session) -> Response {
     if session.get::<GitHubUser>(MEMBER_KEY).await.ok().flatten().is_none() {
-        return Redirect::to("/login").into_response();
+        return (
+            StatusCode::UNAUTHORIZED,
+            Json(serde_json::json!({"error": "authentication_required"})),
+        )
+            .into_response();
     }
     Json(serde_json::json!({
         "release": "0.1.0",
@@ -365,7 +369,7 @@ fn render_command_center(user: &GitHubUser) -> String {
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>GyLiber Command Center</title><link rel="stylesheet" href="/static/app.css">
+<title>GyLiber Command Center</title><link rel="stylesheet" href="/static/app.css"><script src="/static/app.js" defer></script>
 </head>
 <body>
 <main class="shell">
@@ -374,7 +378,8 @@ fn render_command_center(user: &GitHubUser) -> String {
 <section class="hero-grid">
 <article class="panel primary"><div class="status-line"><span class="pulse"></span>SYSTEM OPERATIONAL</div>
 <h2>Welcome, {name}</h2><p>Authenticated member surface. Sensitive company data is intentionally disabled in v0.1.0.</p>
-<div class="metrics"><div><span>Release</span><strong>0.1.0</strong></div><div><span>API</span><strong>ONLINE</strong></div><div><span>Data</span><strong>GATED</strong></div></div>
+<div class="metrics"><div><span>Release</span><strong id="release">0.1.0</strong></div><div><span>API</span><strong id="api-status">ONLINE</strong></div><div><span>Data</span><strong id="data-status">GATED</strong></div></div>
+<p class="muted live-readout">Last state observation: <span id="state-seen">checking…</span></p>
 </article>
 <article class="panel"><span class="eyebrow">MEMBER</span><div class="member"><img src="{avatar}" alt=""><div><strong>@{login}</strong><span>GitHub identity verified</span></div></div>
 <p class="muted">Authorization is enforced server-side through the configured GyLiber member allowlist.</p></article>
