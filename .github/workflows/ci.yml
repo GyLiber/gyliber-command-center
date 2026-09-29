@@ -27,6 +27,6 @@ jobs:
       - name: Tests
         run: cargo test
       - name: Advisory audit
-        uses: actions-rust-lang/audit@v1
-        with:
-          createIssues: false
+        run: |
+          cargo install cargo-audit --locked --version 0.22.2
+          cargo audit
