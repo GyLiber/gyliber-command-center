@@ -53,6 +53,8 @@ The backend authorizes every protected operation independently of UI state.
 
 ## 4. Domain modules
 
+The first runtime domain boundary is the module registry. It defines typed module identity, route, availability, data classification and live-state capability without persisting business data. The protected `/api/modules` endpoint is the contract consumed by the Command Center dashboard. New modules should be added through this registry before acquiring larger UI/backend boundaries.
+
 Planned bounded domains:
 - identity and authorization
 - resource registry
@@ -108,7 +110,11 @@ The interface should behave like an operational room:
 
 The aim is not maximum information density; it is maximum **useful information/action per attention unit**.
 
-## 9. Disaster recovery
+## 9. Transport and input hardening
+
+The HTTP boundary disables outbound redirects in the OAuth client, applies secure browser headers, disables caching, applies a 64 KiB request-body limit, and validates production transport configuration before startup. Production requires HTTPS callback URLs and secure cookies.
+
+## 10. Disaster recovery
 
 Primary hosting is not the archive.
 
@@ -116,6 +122,6 @@ Critical production data eventually requires an independently recoverable copy, 
 
 Free hosting is an early engineering environment, not automatic authorization to store critical company records.
 
-## 10. Release gates
+## 11. Release gates
 
 No release may be represented as “secure” merely because tests pass. High-impact private data requires evidence across application security, identity, infrastructure, data protection, monitoring, backups, recovery and independent review.
