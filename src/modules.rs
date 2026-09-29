@@ -21,7 +21,7 @@ pub enum ModuleStatus {
 pub struct ModuleDescriptor {
     pub id: &'static str,
     pub name: &'static str,
-    pub path: &'static str,
+    pub ui_path: Option<&'static str>,
     pub status: ModuleStatus,
     pub classification: DataClassification,
     pub live: bool,
@@ -32,7 +32,7 @@ pub fn catalog() -> &'static [ModuleDescriptor] {
         ModuleDescriptor {
             id: "live-system-state",
             name: "Live System State",
-            path: "/api/state",
+            ui_path: Some("/command/state"),
             status: ModuleStatus::Active,
             classification: DataClassification::Internal,
             live: true,
@@ -40,7 +40,7 @@ pub fn catalog() -> &'static [ModuleDescriptor] {
         ModuleDescriptor {
             id: "finance",
             name: "Finance",
-            path: "/command",
+            ui_path: None,
             status: ModuleStatus::Reserved,
             classification: DataClassification::Restricted,
             live: true,
