@@ -1,4 +1,4 @@
-# v0.1.0 Deployment Runbook
+# v0.2.0 Deployment Runbook
 
 ## Required external dependency
 
@@ -16,7 +16,7 @@ The OAuth callback URL must exactly match the GitHub application configuration.
 
 ## Security boundary
 
-v0.1.0 is not authorized to store banking records, unrestricted financial data, high-value trade secrets, personnel records, production credentials or irreplaceable company archives.
+v0.2.0 is not authorized to store banking records, unrestricted financial data, high-value trade secrets, personnel records, production credentials or irreplaceable company archives.
 
 ## First deployment checks
 
@@ -25,11 +25,12 @@ v0.1.0 is not authorized to store banking records, unrestricted financial data, 
 3. `COOKIE_SECURE=true`.
 4. GitHub OAuth callback URL is exact.
 5. Only intended GitHub usernames are allowlisted.
-6. `/api/health` reports `status=ok`.
+6. `/api/health` reports `status=ok` and the expected release version.
 7. An allowlisted account can enter `/command`.
 8. A non-allowlisted GitHub account receives HTTP 403.
 9. Logout clears the authenticated session.
 10. No sensitive company data has been loaded.
+11. The authenticated Live State Monitor reports the release and, on Render, the running Git branch and commit.
 
 ## Hosting evolution
 

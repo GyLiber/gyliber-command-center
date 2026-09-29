@@ -265,7 +265,7 @@ async fn not_found() -> impl IntoResponse {
 async fn health() -> Json<Health> {
     Json(Health {
         service: "gyliber-command-center",
-        version: "0.1.0",
+        version: RELEASE,
         status: "ok",
     })
 }
@@ -289,7 +289,7 @@ fn render_command_center(user: &auth::GitHubUser) -> String {
 <form action="/logout" method="post"><button class="ghost" type="submit">Sign out</button></form></header>
 <section class="hero-grid">
 <article class="panel primary"><div class="status-line"><span class="pulse"></span>SYSTEM OPERATIONAL</div>
-<h2>Welcome, {name}</h2><p>Authenticated member surface. Sensitive company data is intentionally disabled in v0.1.0.</p>
+<h2>Welcome, {name}</h2><p>Authenticated member surface. Sensitive company data is intentionally disabled in {release}.</p>
 <div class="metrics"><div><span>Release</span><strong id="release">{release}</strong></div><div><span>API</span><strong id="api-status">ONLINE</strong></div><div><span>Data</span><strong id="data-status">GATED</strong></div></div>
 <p class="muted live-readout">Last state observation: <span id="state-seen">checking…</span></p>
 </article>
