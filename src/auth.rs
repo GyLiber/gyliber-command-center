@@ -12,7 +12,10 @@ use serde::{Deserialize, Serialize};
 use tower_sessions::Session;
 use tracing::info;
 
-use crate::{audit, config::{self, AppState}};
+use crate::{
+    audit,
+    config::{self, AppState},
+};
 
 pub(crate) const MEMBER_KEY: &str = "member";
 const OAUTH_STATE_KEY: &str = "oauth_state";
@@ -87,7 +90,7 @@ pub(crate) async fn github_callback(
         None => {
             audit::record(audit::AuditEvent::LoginFailed, None);
             return (StatusCode::UNAUTHORIZED, "Login state was invalid").into_response();
-        },
+        }
     };
 
     let token = match config::github_client(&state.github)
@@ -183,15 +186,17 @@ impl IntoResponse for AuthFailure {
 }
 
 pub(crate) async fn require_page_member(session: &Session) -> Result<GitHubUser, AuthFailure> {
-    member_from_session(session)
-        .await
-        .ok_or_else(|| { audit::record(audit::AuditEvent::ProtectedAccessDenied, None); AuthFailure::PageLogin })
+    member_from_session(session).await.ok_or_else(|| {
+        audit::record(audit::AuditEvent::ProtectedAccessDenied, None);
+        AuthFailure::PageLogin
+    })
 }
 
 pub(crate) async fn require_api_member(session: &Session) -> Result<GitHubUser, AuthFailure> {
-    member_from_session(session)
-        .await
-        .ok_or_else(|| { audit::record(audit::AuditEvent::ProtectedAccessDenied, None); AuthFailure::ApiUnauthorized })
+    member_from_session(session).await.ok_or_else(|| {
+        audit::record(audit::AuditEvent::ProtectedAccessDenied, None);
+        AuthFailure::ApiUnauthorized
+    })
 }
 
 pub(crate) fn is_allowed_member(login: &str, allowed_logins: &[String]) -> bool {
