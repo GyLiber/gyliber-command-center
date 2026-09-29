@@ -46,6 +46,14 @@ pub fn catalog() -> &'static [ModuleDescriptor] {
             live: true,
         },
         ModuleDescriptor {
+            id: "resource-registry",
+            name: "Digital Assets",
+            ui_path: Some("/command/resources"),
+            status: ModuleStatus::Active,
+            classification: DataClassification::Internal,
+            live: false,
+        },
+        ModuleDescriptor {
             id: "finance",
             name: "Finance",
             ui_path: None,
@@ -79,7 +87,7 @@ mod tests {
     #[test]
     fn catalog_contains_only_declared_modules() {
         let modules = catalog();
-        assert_eq!(modules.len(), 5);
+        assert_eq!(modules.len(), 6);
         assert_eq!(modules[0].status, ModuleStatus::Active);
         assert_eq!(modules[1].classification, DataClassification::Restricted);
     }
