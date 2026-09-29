@@ -14,15 +14,16 @@
 - Added a protected resource registry API and browser surface.
 - Registered the resource registry as a first-class Command Center module.
 
-## Unreleased — v0.3.0 development
-
 - Added the first typed Command Center module registry.
 - Added the protected Live State Monitor with server observation timestamps.
 - Added live Repository Monitor integration for the public GyLiber Command Center GitHub repository.
 - Added bounded upstream timeouts and explicit unavailable-state handling.
 - Hardened production transport configuration, HSTS behavior and request-body limits.
 - Added architecture and deployment documentation for the new modules and hosting constraints.
+
 - Added runtime release and Render deployment commit provenance to the authenticated live-state surface.
+
+## Unreleased — v0.3.0 development
 
 ## [0.1.0] — Foundation
 
