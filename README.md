@@ -130,6 +130,7 @@ Core controls include:
 - CSP and browser security headers
 - disabled outbound HTTP redirects for the OAuth client
 - dependency/advisory checks
+- CodeQL static analysis and Gitleaks secret scanning
 - automated security-oriented tests
 - data-classification gates
 - independent backup/recovery requirements for critical data
