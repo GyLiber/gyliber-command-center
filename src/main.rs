@@ -5,7 +5,7 @@ use axum::{
     Json, Router,
     extract::State,
     http::{HeaderValue, StatusCode, header},
-    response::{Html, IntoResponse, Redirect, Response},
+    response::{Html, IntoResponse, Response},
     routing::{get, post},
 };
 use serde::Serialize;
