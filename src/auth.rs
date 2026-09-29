@@ -146,28 +146,39 @@ pub(crate) async fn member_from_session(session: &Session) -> Option<GitHubUser>
     session.get::<GitHubUser>(MEMBER_KEY).await.ok().flatten()
 }
 
-pub(crate) async fn require_page_member(session: &Session) -> Result<GitHubUser, Response> {
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum AuthFailure {
+    PageLogin,
+    ApiUnauthorized,
+}
+
+impl IntoResponse for AuthFailure {
+    fn into_response(self) -> Response {
+        match self {
+            Self::PageLogin => Redirect::to("/login").into_response(),
+            Self::ApiUnauthorized => (
+                StatusCode::UNAUTHORIZED,
+                Json(serde_json::json!({"error": "authentication_required"})),
+            )
+                .into_response(),
+        }
+    }
+}
+
+pub(crate) async fn require_page_member(
+    session: &Session,
+) -> Result<GitHubUser, AuthFailure> {
     member_from_session(session)
         .await
-        .ok_or_else(login_redirect)
+        .ok_or(AuthFailure::PageLogin)
 }
 
-pub(crate) async fn require_api_member(session: &Session) -> Result<GitHubUser, Response> {
+pub(crate) async fn require_api_member(
+    session: &Session,
+) -> Result<GitHubUser, AuthFailure> {
     member_from_session(session)
         .await
-        .ok_or_else(authentication_required)
-}
-
-pub(crate) fn login_redirect() -> Response {
-    Redirect::to("/login").into_response()
-}
-
-pub(crate) fn authentication_required() -> Response {
-    (
-        StatusCode::UNAUTHORIZED,
-        Json(serde_json::json!({"error": "authentication_required"})),
-    )
-        .into_response()
+        .ok_or(AuthFailure::ApiUnauthorized)
 }
 
 pub(crate) fn is_allowed_member(login: &str, allowed_logins: &[String]) -> bool {
@@ -179,11 +190,12 @@ pub(crate) fn is_allowed_member(login: &str, allowed_logins: &[String]) -> bool 
 
 #[cfg(test)]
 mod tests {
-    use super::is_allowed_member;
+    use axum::http::StatusCode;
+    use super::{AuthFailure, is_allowed_member};
 
     #[test]
     fn page_auth_failure_redirects_to_login() {
-        let response = login_redirect();
+        let response = AuthFailure::PageLogin.into_response();
         assert_eq!(response.status(), StatusCode::SEE_OTHER);
         assert_eq!(
             response
@@ -196,7 +208,7 @@ mod tests {
 
     #[test]
     fn api_auth_failure_returns_unauthorized() {
-        let response = authentication_required();
+        let response = AuthFailure::ApiUnauthorized.into_response();
         assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
     }
 
