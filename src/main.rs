@@ -27,6 +27,7 @@ use tower_sessions::{Expiry, MemoryStore, Session, SessionManagerLayer, cookie::
 use tracing::info;
 
 mod modules;
+mod repository;
 mod state;
 
 const MEMBER_KEY: &str = "member";
@@ -122,9 +123,11 @@ fn build_app(state: AppState, session_key: Key, secure_cookie: bool) -> Router {
         .route("/logout", post(logout))
         .route("/command", get(command_center))
         .route("/command/state", get(command_state))
+        .route("/command/repository", get(command_repository))
         .route("/api/health", get(health))
         .route("/api/state", get(protected_state))
         .route("/api/modules", get(protected_modules))
+        .route("/api/repository", get(protected_repository))
         .nest_service("/static", ServeDir::new("static"))
         .fallback(not_found)
         .layer(RequestBodyLimitLayer::new(64 * 1024))
@@ -213,6 +216,7 @@ fn load_state() -> Result<AppState> {
         http: Client::builder()
             .user_agent("GyLiber-Command-Center/0.1.0")
             .redirect(reqwest::redirect::Policy::none())
+            .timeout(std::time::Duration::from_secs(5))
             .build()?,
     })
 }
@@ -406,6 +410,31 @@ async fn protected_state(session: Session) -> Response {
     Json(state::snapshot()).into_response()
 }
 
+async fn protected_repository(State(state): State<AppState>, session: Session) -> Response {
+    if session
+        .get::<GitHubUser>(MEMBER_KEY)
+        .await
+        .ok()
+        .flatten()
+        .is_none()
+    {
+        return (
+            StatusCode::UNAUTHORIZED,
+            Json(serde_json::json!({"error": "authentication_required"})),
+        )
+            .into_response();
+    }
+
+    match repository::snapshot(&state.http).await {
+        Ok(snapshot) => Json(snapshot).into_response(),
+        Err(_) => (
+            StatusCode::BAD_GATEWAY,
+            Json(serde_json::json!({"error": "repository_source_unavailable"})),
+        )
+            .into_response(),
+    }
+}
+
 async fn protected_modules(session: Session) -> Response {
     if session
         .get::<GitHubUser>(MEMBER_KEY)
@@ -422,6 +451,20 @@ async fn protected_modules(session: Session) -> Response {
     }
 
     Json(modules::catalog()).into_response()
+}
+
+async fn command_repository(session: Session) -> Response {
+    if session
+        .get::<GitHubUser>(MEMBER_KEY)
+        .await
+        .ok()
+        .flatten()
+        .is_none()
+    {
+        return Redirect::to("/login").into_response();
+    }
+
+    Html(include_str!("../static/repository.html")).into_response()
 }
 
 async fn command_state(session: Session) -> Response {
