@@ -514,7 +514,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn live_state_redirects_anonymous_visitors() {
+    async fn live_state_rejects_anonymous_api_requests() {
         let response = test_app()
             .oneshot(
                 Request::builder()
@@ -525,11 +525,8 @@ mod tests {
             .await
             .expect("response is produced");
 
-        assert_eq!(response.status(), StatusCode::SEE_OTHER);
-        assert_eq!(
-            response.headers().get("location").and_then(|value| value.to_str().ok()),
-            Some("/login")
-        );
+        assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+        assert!(response.headers().get("location").is_none());
     }
 
     #[test]
