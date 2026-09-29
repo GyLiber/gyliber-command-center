@@ -25,6 +25,8 @@
 
 ## Unreleased — v0.3.0 development
 
+- Added safe public-only deployment bootstrap while keeping protected routes denied until GitHub OAuth is configured.
+
 ## [0.1.0] — Foundation
 
 ### Added
