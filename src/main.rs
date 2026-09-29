@@ -92,7 +92,9 @@ async fn main() -> Result<()> {
 fn build_app(state: AppState, session_key: Key, secure_cookie: bool) -> Router {
     let sessions = SessionManagerLayer::new(MemoryStore::default())
         .with_name("gyliber.sid")
+        .with_http_only(true)
         .with_secure(secure_cookie)
+        // Lax permits the top-level GET OAuth callback while blocking cross-site subrequests.
         .with_same_site(tower_sessions::cookie::SameSite::Lax)
         .with_expiry(Expiry::OnInactivity(Duration::hours(8)))
         .with_private(session_key);
@@ -452,6 +454,28 @@ mod tests {
         };
 
         build_app(state, Key::generate(), false)
+    }
+
+    #[tokio::test]
+    async fn github_login_starts_oauth_flow() {
+        let response = test_app()
+            .oneshot(
+                Request::builder()
+                    .uri("/auth/github/start")
+                    .body(Body::empty())
+                    .expect("request builds"),
+            )
+            .await
+            .expect("response is produced");
+
+        assert_eq!(response.status(), StatusCode::SEE_OTHER);
+        let location = response
+            .headers()
+            .get("location")
+            .and_then(|value| value.to_str().ok())
+            .expect("OAuth location header exists");
+        assert!(location.starts_with("https://github.com/login/oauth/authorize"));
+        assert!(response.headers().contains_key("set-cookie"));
     }
 
     #[tokio::test]
