@@ -177,36 +177,27 @@ async fn login() -> Html<&'static str> {
 }
 
 async fn protected_state(session: Session) -> Response {
-    if auth::member_from_session(&session).await.is_none() {
-        return (
-            StatusCode::UNAUTHORIZED,
-            Json(serde_json::json!({"error": "authentication_required"})),
-        )
-            .into_response();
-    }
+    let _member = match auth::require_api_member(&session).await {
+        Ok(member) => member,
+        Err(response) => return response,
+    };
     Json(state::snapshot()).into_response()
 }
 
 async fn protected_resources(session: Session) -> Response {
-    if auth::member_from_session(&session).await.is_none() {
-        return (
-            StatusCode::UNAUTHORIZED,
-            Json(serde_json::json!({"error": "authentication_required"})),
-        )
-            .into_response();
-    }
+    let _member = match auth::require_api_member(&session).await {
+        Ok(member) => member,
+        Err(response) => return response,
+    };
 
     Json(resources::catalog()).into_response()
 }
 
 async fn protected_repository(State(state): State<config::AppState>, session: Session) -> Response {
-    if auth::member_from_session(&session).await.is_none() {
-        return (
-            StatusCode::UNAUTHORIZED,
-            Json(serde_json::json!({"error": "authentication_required"})),
-        )
-            .into_response();
-    }
+    let _member = match auth::require_api_member(&session).await {
+        Ok(member) => member,
+        Err(response) => return response,
+    };
 
     match repository::snapshot(&state.http).await {
         Ok(snapshot) => Json(snapshot).into_response(),
@@ -219,48 +210,48 @@ async fn protected_repository(State(state): State<config::AppState>, session: Se
 }
 
 async fn protected_modules(session: Session) -> Response {
-    if auth::member_from_session(&session).await.is_none() {
-        return (
-            StatusCode::UNAUTHORIZED,
-            Json(serde_json::json!({"error": "authentication_required"})),
-        )
-            .into_response();
-    }
+    let _member = match auth::require_api_member(&session).await {
+        Ok(member) => member,
+        Err(response) => return response,
+    };
 
     Json(modules::catalog()).into_response()
 }
 
 async fn command_resources(session: Session) -> Response {
-    if auth::member_from_session(&session).await.is_none() {
-        return Redirect::to("/login").into_response();
-    }
+    let _member = match auth::require_page_member(&session).await {
+        Ok(member) => member,
+        Err(response) => return response,
+    };
 
     Html(include_str!("../static/resources.html")).into_response()
 }
 
 async fn command_repository(session: Session) -> Response {
-    if auth::member_from_session(&session).await.is_none() {
-        return Redirect::to("/login").into_response();
-    }
+    let _member = match auth::require_page_member(&session).await {
+        Ok(member) => member,
+        Err(response) => return response,
+    };
 
     Html(include_str!("../static/repository.html")).into_response()
 }
 
 async fn command_state(session: Session) -> Response {
-    if auth::member_from_session(&session).await.is_none() {
-        return Redirect::to("/login").into_response();
-    }
+    let _member = match auth::require_page_member(&session).await {
+        Ok(member) => member,
+        Err(response) => return response,
+    };
 
     Html(include_str!("../static/state.html")).into_response()
 }
 
 async fn command_center(session: Session) -> Response {
-    let user = auth::member_from_session(&session).await;
+    let user = match auth::require_page_member(&session).await {
+        Ok(user) => user,
+        Err(response) => return response,
+    };
 
-    match user {
-        Some(user) => Html(render_command_center(&user)).into_response(),
-        None => Redirect::to("/login").into_response(),
-    }
+    Html(render_command_center(&user)).into_response()
 }
 
 async fn not_found() -> impl IntoResponse {
