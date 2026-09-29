@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>State Monitor — GyLiber</title>
+<link rel="stylesheet" href="/static/app.css">
+<script src="/static/state.js" defer></script>
+</head>
+<body>
+<main class="shell">
+<header class="topbar">
+<div>
+<span class="eyebrow">GYLIBER / OPERATIONS</span>
+<h1>Live State Monitor</h1>
+</div>
+<nav class="internal-nav">
+<a href="/command">Command Center</a>
+<form action="/logout" method="post"><button class="ghost" type="submit">Sign out</button></form>
+</nav>
+</header>
+<section class="state-hero panel">
+<div class="status-line"><span class="pulse"></span><span id="state-status">CONNECTING</span></div>
+<h2>System observation</h2>
+<p class="muted">This page displays low-risk operational metadata produced directly by the Command Center backend.</p>
+</section>
+<section class="state-grid">
+<article class="state-card"><span>RELEASE</span><strong id="release">—</strong></article>
+<article class="state-card"><span>SCHEMA</span><strong id="schema">—</strong></article>
+<article class="state-card"><span>SENSITIVE DATA</span><strong id="sensitive">—</strong></article>
+<article class="state-card"><span>FRESHNESS</span><strong id="freshness">—</strong></article>
+</section>
+<section class="panel observation">
+<div>
+<span class="eyebrow">OBSERVATION</span>
+<h3 id="observed">Awaiting backend observation…</h3>
+</div>
+<p id="clock" class="muted">—</p>
+</section>
+<footer><span>GYLIBER / LIVE STATE</span><span>Read-only operational surface · v0.1.0</span></footer>
+</main>
+</body>
+</html>
