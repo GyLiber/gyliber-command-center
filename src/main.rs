@@ -8,7 +8,7 @@ use axum::{
     response::{Html, IntoResponse, Redirect, Response},
     routing::{get, post},
 };
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use time::Duration;
 use tower_http::{
     limit::RequestBodyLimitLayer,
@@ -28,6 +28,13 @@ mod resources;
 mod state;
 
 const RELEASE: &str = env!("CARGO_PKG_VERSION");
+
+#[derive(Serialize)]
+struct Health {
+    service: &'static str,
+    version: &'static str,
+    status: &'static str,
+}
 
 #[tokio::main]
 async fn main() -> Result<()> {
