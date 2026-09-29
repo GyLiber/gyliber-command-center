@@ -43,7 +43,6 @@ pub(crate) fn load_state() -> Result<AppState> {
     let github_configured = [
         "GITHUB_CLIENT_ID",
         "GITHUB_CLIENT_SECRET",
-        "GITHUB_REDIRECT_URL",
         "GYLIBER_ALLOWED_GITHUB_LOGINS",
     ]
     .iter()
