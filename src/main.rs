@@ -407,7 +407,7 @@ mod tests {
     use super::{
         build_app, html_escape, is_allowed_member, AppState, GitHubConfig,
     };
-    use oauth2::{basic::BasicClient, ClientId, ClientSecret, RedirectUrl};
+    use oauth2::{ClientId, ClientSecret, RedirectUrl};
 
     fn test_app() -> axum::Router {
         let github = GitHubConfig {
@@ -425,7 +425,6 @@ mod tests {
             http: Client::new(),
         };
 
-        let _client: BasicClient = super::github_client(&state.github);
         build_app(state, Key::generate(), false)
     }
 
