@@ -64,7 +64,7 @@ pub fn catalog() -> &'static [ModuleDescriptor] {
         ModuleDescriptor {
             id: "intellectual-property",
             name: "Intellectual Property",
-            path: "/command",
+            ui_path: None,
             status: ModuleStatus::Reserved,
             classification: DataClassification::Restricted,
             live: false,
