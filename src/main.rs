@@ -375,7 +375,6 @@ fn health() -> Json<Health> {
     })
 }
 
-
 fn github_client(config: &GitHubConfig) -> BasicClient {
     BasicClient::new(config.client_id.clone())
         .set_client_secret(config.client_secret.clone())
