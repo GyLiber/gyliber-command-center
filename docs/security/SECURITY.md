@@ -85,3 +85,14 @@ The future operational runbook must define:
 ## Security claims
 
 The project must describe tested scope and evidence. It must never claim immunity from compromise.
+
+
+## Continuous security analysis
+
+The repository now runs dedicated security automation on pushes, pull requests, weekly schedule and manual dispatch.
+
+- **CodeQL v4** analyzes Rust, JavaScript/TypeScript and GitHub Actions workflow code.
+- **Gitleaks Action v3** scans repository history for exposed secrets.
+- The security workflow uses least-privilege permissions and disables checkout credential persistence.
+
+The current CodeQL configuration uses the supported `none` build mode for this application source. More precise manual build configuration can be adopted if generated code or build-time behavior later makes it necessary.
