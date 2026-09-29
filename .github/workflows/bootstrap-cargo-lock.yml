@@ -27,7 +27,7 @@ jobs:
 
       - name: Commit Cargo.lock
         run: |
-          if git diff --quiet -- Cargo.lock; then
+          if git ls-files --error-unmatch Cargo.lock >/dev/null 2>&1 && git diff --quiet -- Cargo.lock; then
             echo "Cargo.lock is already current."
             exit 0
           fi
