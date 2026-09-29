@@ -55,6 +55,14 @@ pub fn catalog() -> &'static [ModuleDescriptor] {
             live: false,
         },
         ModuleDescriptor {
+            id: "contracts-engagements",
+            name: "Contracts & Engagements",
+            ui_path: None,
+            status: ModuleStatus::Reserved,
+            classification: DataClassification::Confidential,
+            live: false,
+        },
+        ModuleDescriptor {
             id: "finance",
             name: "Finance",
             ui_path: None,
@@ -88,8 +96,11 @@ mod tests {
     #[test]
     fn catalog_contains_only_declared_modules() {
         let modules = catalog();
-        assert_eq!(modules.len(), 6);
+        assert_eq!(modules.len(), 7);
         assert_eq!(modules[0].status, ModuleStatus::Active);
         assert_eq!(modules[1].classification, DataClassification::Internal);
+        assert_eq!(modules[3].id, "contracts-engagements");
+        assert_eq!(modules[3].status, ModuleStatus::Reserved);
+        assert_eq!(modules[3].classification, DataClassification::Confidential);
     }
 }
