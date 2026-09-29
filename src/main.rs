@@ -383,6 +383,53 @@ mod tests {
         assert!(response.headers().contains_key("set-cookie"));
     }
 
+    fn public_only_test_app() -> axum::Router {
+        let state = config::AppState {
+            github: None,
+            http: Client::new(),
+        };
+
+        build_app(state, Key::generate(), false)
+    }
+
+    #[tokio::test]
+    async fn member_login_reports_unavailable_when_oauth_is_unconfigured() {
+        let response = public_only_test_app()
+            .oneshot(
+                Request::builder()
+                    .uri("/auth/github/start")
+                    .body(Body::empty())
+                    .expect("request builds"),
+            )
+            .await
+            .expect("response is produced");
+
+        assert_eq!(response.status(), StatusCode::SERVICE_UNAVAILABLE);
+    }
+
+    #[tokio::test]
+    async fn public_only_login_page_is_honest_about_authentication_state() {
+        let response = public_only_test_app()
+            .oneshot(
+                Request::builder()
+                    .uri("/login")
+                    .body(Body::empty())
+                    .expect("request builds"),
+            )
+            .await
+            .expect("response is produced");
+
+        assert_eq!(response.status(), StatusCode::OK);
+
+        let body = axum::body::to_bytes(response.into_body(), 16 * 1024)
+            .await
+            .expect("body reads");
+        let body = String::from_utf8(body.to_vec()).expect("body is UTF-8");
+
+        assert!(body.contains("Member authentication is not configured for this deployment yet."));
+        assert!(!body.contains("Continue with GitHub"));
+    }
+
     #[tokio::test]
     async fn public_home_is_accessible() {
         let response = test_app()
