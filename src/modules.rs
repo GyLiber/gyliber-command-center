@@ -38,6 +38,14 @@ pub fn catalog() -> &'static [ModuleDescriptor] {
             live: true,
         },
         ModuleDescriptor {
+            id: "repository-monitor",
+            name: "Repository Monitor",
+            ui_path: Some("/command/repository"),
+            status: ModuleStatus::Active,
+            classification: DataClassification::Internal,
+            live: true,
+        },
+        ModuleDescriptor {
             id: "finance",
             name: "Finance",
             ui_path: None,
@@ -71,7 +79,7 @@ mod tests {
     #[test]
     fn catalog_contains_only_declared_modules() {
         let modules = catalog();
-        assert_eq!(modules.len(), 4);
+        assert_eq!(modules.len(), 5);
         assert_eq!(modules[0].status, ModuleStatus::Active);
         assert_eq!(modules[1].classification, DataClassification::Restricted);
     }
