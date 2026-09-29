@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased — v0.2.0 development
+
+- Added the first typed Command Center module registry.
+- Added the protected Live State Monitor with server observation timestamps.
+- Added live Repository Monitor integration for the public GyLiber Command Center GitHub repository.
+- Added bounded upstream timeouts and explicit unavailable-state handling.
+- Hardened production transport configuration, HSTS behavior and request-body limits.
+- Added architecture and deployment documentation for the new modules and hosting constraints.
+
 ## [0.1.0] — Foundation
 
 ### Added
