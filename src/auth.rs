@@ -165,17 +165,13 @@ impl IntoResponse for AuthFailure {
     }
 }
 
-pub(crate) async fn require_page_member(
-    session: &Session,
-) -> Result<GitHubUser, AuthFailure> {
+pub(crate) async fn require_page_member(session: &Session) -> Result<GitHubUser, AuthFailure> {
     member_from_session(session)
         .await
         .ok_or(AuthFailure::PageLogin)
 }
 
-pub(crate) async fn require_api_member(
-    session: &Session,
-) -> Result<GitHubUser, AuthFailure> {
+pub(crate) async fn require_api_member(session: &Session) -> Result<GitHubUser, AuthFailure> {
     member_from_session(session)
         .await
         .ok_or(AuthFailure::ApiUnauthorized)
