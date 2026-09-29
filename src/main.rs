@@ -173,8 +173,8 @@ async fn public_links() -> Html<&'static str> {
     Html(include_str!("../static/links.html"))
 }
 
-async fn login() -> Html<&'static str> {
-    Html(include_str!("../static/login.html"))
+async fn login(State(state): State<config::AppState>) -> Html<String> {
+    Html(render_login(state.github.is_some()))
 }
 
 async fn protected_state(session: Session) -> Response {
@@ -270,6 +270,23 @@ async fn health() -> Json<Health> {
     })
 }
 
+fn render_login(authentication_configured: bool) -> String {
+    let action = if authentication_configured {
+        r#"<a class="primary-btn" href="/auth/github/start">Continue with GitHub</a>"#
+    } else {
+        r#"<span class="muted">Member authentication is not configured for this deployment yet.</span>"#
+    };
+    let status = if authentication_configured {
+        "GitHub OAuth with PKCE is enabled for authorized member access."
+    } else {
+        "Public deployment mode is active. Protected routes remain unavailable until GitHub OAuth is configured."
+    };
+
+    include_str!("../static/login.html")
+        .replace("<!-- MEMBER_ACTION -->", action)
+        .replace("<!-- AUTH_STATUS -->", status)
+}
+
 fn render_command_center(user: &auth::GitHubUser) -> String {
     let name = html_escape(user.name.as_deref().unwrap_or(&user.login));
     let login = html_escape(&user.login);
@@ -337,7 +354,7 @@ mod tests {
         };
 
         let state = config::AppState {
-            github: std::sync::Arc::new(github),
+            github: Some(std::sync::Arc::new(github)),
             http: Client::new(),
         };
 
