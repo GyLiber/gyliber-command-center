@@ -25,7 +25,7 @@ It must optimize **useful workflow output per unit of human attention**: high-va
 ### Private
 - authenticated command center
 - operational/resource status
-- future modules for company knowledge, assets, finances, staff, documents and integrations
+- future modules for company knowledge, assets, finances, staff, documents, integrations and contract/engagement records
 - auditability and role-based access
 - live or near-live information with freshness metadata
 
@@ -83,8 +83,9 @@ Use OWASP ASVS 5.0 and NIST SSDF as process/verification baselines.
 - external-service credentials
 - critical backups and disaster-recovery material
 - irreplaceable company knowledge
+- active and planned client engagements, contract status, commercial terms and related agreement records
 
-v0.1/v0.2 must not contain real high-value records.
+v0.1/v0.2 must not contain real high-value records. The Contracts & Engagements module is represented in the authenticated registry as a Confidential, security-gated capability only.
 
 ## 6. Availability and recovery
 
@@ -140,6 +141,7 @@ The architecture must permit:
 - live operational panels
 - creative knowledge/trivia modules
 - documents/IP records
+- contract and engagement records with role-limited access and durable auditability
 - role and policy management
 - secure secrets integration
 - durable backups/recovery
