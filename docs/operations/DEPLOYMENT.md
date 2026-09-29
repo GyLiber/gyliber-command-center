@@ -34,3 +34,17 @@ v0.1.0 is not authorized to store banking records, unrestricted financial data, 
 ## Hosting evolution
 
 The early environment is for engineering/demo use. Introduce durable managed database/object storage and independent backup infrastructure before critical company information is onboarded.
+
+
+## Render free-tier constraints
+
+The initial Render deployment is suitable for development, demonstration and low-risk operation, not for critical company data.
+
+As of 2026-09-29, Render Free web services can be deployed with Docker, receive managed TLS, and use environment variables/secrets, but they spin down after 15 minutes without inbound traffic and their local filesystem is ephemeral. Free web services can also be suspended for unusually high service-initiated traffic. Free Render Postgres is limited to 1 GB, expires after 30 days, and does not provide backups.
+
+Therefore:
+- do not use the free service as the authoritative company archive;
+- do not use Free Postgres for critical records;
+- treat every local filesystem write as disposable;
+- keep source and infrastructure definitions in version control;
+- establish independent backups before persistent high-value information is introduced.
