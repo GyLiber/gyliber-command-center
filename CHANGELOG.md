@@ -2,6 +2,10 @@
 
 ## Unreleased — v0.2.0 development
 
+- Committed Cargo.lock for reproducible Rust dependency resolution.
+- Updated CI to enforce locked dependency resolution for check, Clippy and tests.
+- Added the reproducible dependency architecture decision record.
+
 - Added a typed Digital Assets resource registry.
 - Added a protected resource registry API and browser surface.
 - Registered the resource registry as a first-class Command Center module.
