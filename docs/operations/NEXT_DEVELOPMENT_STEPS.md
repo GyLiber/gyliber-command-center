@@ -108,7 +108,22 @@ Acceptance evidence:
 - sensitive values are not logged;
 - retention expectations are documented.
 
-### 3.4 Deployment verification
+### 3.4 Contract and engagement record boundary
+
+Introduce a security-gated internal capability for recording active and planned GyLiber client engagements. The first design should cover contract/engagement identity, lifecycle status, key dates, scope summary, commercial milestones and links to controlled agreement documents without storing real records in the current release.
+
+Default classification is **CONFIDENTIAL**. Any field containing more sensitive client, financial, credential or personnel information must be classified separately and may require **RESTRICTED** or **CRITICAL** handling.
+
+Acceptance evidence:
+
+- records are available only through authenticated, authorized member operations;
+- authorization is enforced server-side at the resource/action boundary;
+- sensitive payloads are excluded from public pages and unauthenticated APIs;
+- create/update/delete operations produce durable audit events;
+- agreement files are stored in controlled object storage rather than ordinary source-controlled assets;
+- retention, deletion and backup/recovery expectations are documented before real contracts are onboarded.
+
+### 3.5 Deployment verification
 
 Make deployment health a first-class release gate.
 
@@ -237,6 +252,8 @@ DURABLE SESSIONS
 POSTGRES FOUNDATION
       ↓
 AUDIT/EVENT PERSISTENCE
+      ↓
+CONTRACT / ENGAGEMENT RECORD BOUNDARY
       ↓
 DEPLOYMENT VERIFICATION
       ↓

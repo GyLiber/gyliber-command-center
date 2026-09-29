@@ -1,6 +1,8 @@
 # GyLiber Command Center
 
 > **GyLiber's digital headquarters:** a high-signal operational hub for systems, resources, knowledge and future company operations.
+>
+> **Ever Toward Liberation.**
 
 ![Status](https://img.shields.io/badge/release-v0.2.0--live-product-foundation-slate)
 ![Backend](https://img.shields.io/badge/backend-Rust-orange)
@@ -9,7 +11,7 @@
 
 GyLiber Command Center is being built as a long-lived **command-center hub**, not as a conventional brochure website.
 
-The public surface represents GyLiber as a company/brand. The authenticated surface is intended to become the operational control plane for GyLiber's digital resources, live system information, knowledge, documents, integrations and—only after explicit security gates—high-value company information.
+The public surface represents GyLiber as a company/brand. The authenticated surface is intended to become the operational control plane for GyLiber's digital resources, live system information, knowledge, documents, integrations, active/planned engagements and—only after explicit security gates—high-value company information.
 
 The interface is deliberately calm, dark and information-forward. Its design target is:
 
@@ -31,6 +33,7 @@ The current live-product foundation includes:
 - protected live-state API
 - protected typed module registry API
 - dynamic module rendering from the internal registry
+- reserved Contracts & Engagements capability for future secure tracking of active and planned client engagements
 - browser polling of live state every 15 seconds
 - health endpoint for deployment probes
 - security response headers

@@ -6,7 +6,7 @@ Every future Command Center data object must receive a classification before per
 |---|---|---|
 | Public | published website content, public GitHub link | public display allowed |
 | Internal | non-public operating notes, project metadata | authenticated members |
-| Confidential | contracts, pricing, strategic documents | role-limited access + audit |
+| Confidential | contracts, engagement records, pricing, strategic documents | role-limited access + audit |
 | Restricted | personnel, customer records, financial details, sensitive IP | strong identity + narrow authorization + audit |
 | Critical | bank credentials, master recovery material, irreplaceable archives | dedicated secret/storage controls + independent recovery + step-up authorization |
 
@@ -19,6 +19,12 @@ Every future Command Center data object must receive a classification before per
 5. Critical records require an independently recoverable backup strategy and tested restoration.
 6. Logs must never duplicate Restricted/Critical payloads unnecessarily.
 7. Retention and deletion rules must be defined before long-term archival.
+
+## Contract & engagement records
+
+Contract and engagement records are Confidential by default. The future module is intended to track active and planned engagements, agreement status, key dates, scope summaries, commercial terms, billing milestones and links to controlled agreement documents. More sensitive client, personnel, financial or credential material may require a higher classification.
+
+The Command Center must not expose real contract records merely because the module exists. Activation requires durable sessions, resource-level authorization, durable audit events, protected persistence, appropriate document storage and tested backup/recovery controls. Public pages and unauthenticated APIs must never expose contract data.
 
 ## v0.1 boundary
 

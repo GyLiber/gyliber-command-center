@@ -29,6 +29,10 @@
 
 ## Unreleased — v0.3.0 development
 
+- Added the reserved Contracts & Engagements module to the authenticated registry as a Confidential, security-gated capability for future active/planned client engagement tracking.
+- Added the GyLiber slogan, **Ever Toward Liberation**, to the public Command Center identity.
+- Documented contract/engagement record requirements, classification and security prerequisites without onboarding real contract data.
+
 The next development line is intentionally planned before implementation. See:
 
 `docs/operations/NEXT_DEVELOPMENT_STEPS.md`
