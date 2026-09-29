@@ -113,7 +113,7 @@ The current implementation intentionally excludes Python from the application st
 | Observability direction | tracing + OpenTelemetry-compatible architecture |
 | Browser surface | standards-based HTML/CSS/JS in v0.1 |
 
-Dependency versions are maintained in `Cargo.toml` and `Cargo.lock` when dependency resolution is generated.
+Dependency versions are maintained in `Cargo.toml` and the committed `Cargo.lock`; CI uses locked resolution for reproducible verification.
 
 ## 5. Security model
 
