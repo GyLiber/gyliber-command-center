@@ -181,6 +181,25 @@ mod tests {
     use super::is_allowed_member;
 
     #[test]
+    fn page_auth_failure_redirects_to_login() {
+        let response = login_redirect();
+        assert_eq!(response.status(), StatusCode::SEE_OTHER);
+        assert_eq!(
+            response
+                .headers()
+                .get("location")
+                .and_then(|value| value.to_str().ok()),
+            Some("/login")
+        );
+    }
+
+    #[test]
+    fn api_auth_failure_returns_unauthorized() {
+        let response = authentication_required();
+        assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+    }
+
+    #[test]
     fn member_allowlist_is_case_insensitive_and_trimmed() {
         let allowed = vec!["GyLiber".to_string(), "ExampleMember".to_string()];
         assert!(is_allowed_member("gyliber", &allowed));
