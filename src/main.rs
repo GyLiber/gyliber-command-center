@@ -80,10 +80,11 @@ async fn main() -> Result<()> {
     let state = load_state()?;
     let session_key = load_session_key()?;
     validate_runtime_security()?;
-    let secure_cookie = env::var("COOKIE_SECURE")
-        .map(|value| parse_bool("COOKIE_SECURE", &value))
-        .transpose()?
-        .unwrap_or(false);
+    let secure_cookie = match env::var("COOKIE_SECURE") {
+        Ok(value) => parse_bool("COOKIE_SECURE", &value)?,
+        Err(env::VarError::NotPresent) => false,
+        Err(error) => return Err(error.into()),
+    };
 
     let app = build_app(state, session_key, secure_cookie);
 
