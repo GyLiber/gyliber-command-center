@@ -3,6 +3,8 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use reqwest::Client;
 
+use crate::audit;
+
 const GITHUB_REPOSITORY_URL: &str = "https://api.github.com/repos/GyLiber/gyliber-command-center";
 
 #[derive(Debug, Clone, Serialize, PartialEq, Eq)]
@@ -32,14 +34,21 @@ struct GitHubRepository {
 }
 
 pub async fn snapshot(client: &Client) -> Result<RepositorySnapshot, reqwest::Error> {
-    let repository = client
+    let response = client
         .get(GITHUB_REPOSITORY_URL)
         .header(reqwest::header::ACCEPT, "application/vnd.github+json")
         .send()
-        .await?
-        .error_for_status()?
-        .json::<GitHubRepository>()
         .await?;
+
+    let response = match response.error_for_status() {
+        Ok(response) => response,
+        Err(error) => {
+            audit::record(audit::AuditEvent::ExternalSourceUnavailable, None);
+            return Err(error);
+        }
+    };
+
+    let repository = response.json::<GitHubRepository>().await?;
 
     Ok(RepositorySnapshot {
         source: GITHUB_REPOSITORY_URL,

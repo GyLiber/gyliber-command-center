@@ -96,3 +96,12 @@ The repository now runs dedicated security automation on pushes, pull requests, 
 - The security workflow uses least-privilege permissions and disables checkout credential persistence.
 
 The current CodeQL configuration uses the supported `none` build mode for this application source. More precise manual build configuration can be adopted if generated code or build-time behavior later makes it necessary.
+
+
+## Centralized access policy
+
+Protected routes consume a common authentication-policy boundary in `src/auth.rs`.
+
+Browser pages use a login redirect for anonymous requests. APIs use an explicit HTTP 401 authentication response.
+
+This is an authentication boundary, not a final authorization model. Restricted and critical domains must add resource/action/classification policy before activation.

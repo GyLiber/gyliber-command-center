@@ -2,6 +2,10 @@
 
 ## Unreleased — v0.2.0 development
 
+- Centralized authenticated-member access policy for protected browser and API surfaces.
+- Added explicit tests for page redirect and API authentication failure semantics.
+- Added ADR-0008 documenting the authentication-policy boundary.
+
 - Committed Cargo.lock for reproducible Rust dependency resolution.
 - Updated CI to enforce locked dependency resolution for check, Clippy and tests.
 - Added the reproducible dependency architecture decision record.
