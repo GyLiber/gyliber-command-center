@@ -90,6 +90,6 @@ mod tests {
         let modules = catalog();
         assert_eq!(modules.len(), 6);
         assert_eq!(modules[0].status, ModuleStatus::Active);
-        assert_eq!(modules[1].classification, DataClassification::Restricted);
+        assert_eq!(modules[1].classification, DataClassification::Internal);
     }
 }
