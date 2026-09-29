@@ -72,7 +72,7 @@ pub fn catalog() -> &'static [ModuleDescriptor] {
         ModuleDescriptor {
             id: "people",
             name: "People",
-            path: "/command",
+            ui_path: None,
             status: ModuleStatus::Reserved,
             classification: DataClassification::Restricted,
             live: false,
