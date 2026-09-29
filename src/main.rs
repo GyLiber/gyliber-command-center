@@ -71,6 +71,7 @@ async fn main() -> Result<()> {
 
     let state = load_state()?;
     let session_key = load_session_key()?;
+    validate_runtime_security()?;
     let secure_cookie = env::var("COOKIE_SECURE")
         .map(|value| value != "false")
         .unwrap_or(true);
@@ -155,6 +156,10 @@ fn build_app(state: AppState, session_key: Key, secure_cookie: bool) -> Router {
             header::HeaderName::from_static("x-permitted-cross-domain-policies"),
             HeaderValue::from_static("none"),
         ))
+        .layer(SetResponseHeaderLayer::if_not_present(
+            header::HeaderName::from_static("cross-origin-resource-policy"),
+            HeaderValue::from_static("same-origin"),
+        ))
         .layer(sessions)
         .with_state(state)
 }
@@ -189,8 +194,35 @@ fn load_state() -> Result<AppState> {
         }),
         http: Client::builder()
             .user_agent("GyLiber-Command-Center/0.1.0")
+            .redirect(reqwest::redirect::Policy::none())
             .build()?,
     })
+}
+
+fn validate_runtime_security() -> Result<()> {
+    let production = env::var("APP_ENV")
+        .map(|value| value.eq_ignore_ascii_case("production"))
+        .unwrap_or(false);
+
+    if production {
+        let cookie_secure = env::var("COOKIE_SECURE")
+            .context("COOKIE_SECURE is required in production")?;
+        anyhow::ensure!(
+            cookie_secure.eq_ignore_ascii_case("true"),
+            "COOKIE_SECURE must be true in production"
+        );
+
+        let callback = env::var("GITHUB_REDIRECT_URL")
+            .context("GITHUB_REDIRECT_URL is required in production")?;
+        let parsed = url::Url::parse(&callback)
+            .context("GITHUB_REDIRECT_URL must be a valid URL in production")?;
+        anyhow::ensure!(
+            parsed.scheme() == "https",
+            "GITHUB_REDIRECT_URL must use HTTPS in production"
+        );
+    }
+
+    Ok(())
 }
 
 fn load_session_key() -> Result<Key> {
