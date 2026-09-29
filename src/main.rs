@@ -27,6 +27,7 @@ use tower_sessions::{Expiry, MemoryStore, Session, SessionManagerLayer, cookie::
 use tracing::info;
 
 mod modules;
+mod state;
 
 const MEMBER_KEY: &str = "member";
 const OAUTH_STATE_KEY: &str = "oauth_state";
@@ -120,6 +121,7 @@ fn build_app(state: AppState, session_key: Key, secure_cookie: bool) -> Router {
         .route("/auth/github/callback", get(github_callback))
         .route("/logout", post(logout))
         .route("/command", get(command_center))
+        .route("/command/state", get(command_state))
         .route("/api/health", get(health))
         .route("/api/state", get(protected_state))
         .route("/api/modules", get(protected_modules))
@@ -401,14 +403,7 @@ async fn protected_state(session: Session) -> Response {
         )
             .into_response();
     }
-    Json(serde_json::json!({
-        "release": "0.1.0",
-        "public_surface": "operational",
-        "authenticated_surface": "protected",
-        "sensitive_data": "disabled",
-        "data_freshness": "live-process",
-    }))
-    .into_response()
+    Json(state::snapshot()).into_response()
 }
 
 async fn protected_modules(session: Session) -> Response {
@@ -427,6 +422,20 @@ async fn protected_modules(session: Session) -> Response {
     }
 
     Json(modules::catalog()).into_response()
+}
+
+async fn command_state(session: Session) -> Response {
+    if session
+        .get::<GitHubUser>(MEMBER_KEY)
+        .await
+        .ok()
+        .flatten()
+        .is_none()
+    {
+        return Redirect::to("/login").into_response();
+    }
+
+    Html(include_str!("../static/state.html")).into_response()
 }
 
 async fn command_center(session: Session) -> Response {
