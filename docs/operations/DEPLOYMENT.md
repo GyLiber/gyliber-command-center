@@ -16,7 +16,7 @@ The OAuth callback URL must exactly match the GitHub application configuration.
 
 ## Security boundary
 
-v0.1.0 is not authorized to store banking records, unrestricted financial data, high-value trade secrets, personnel records, production credentials or irreplaceable company archives.
+v0.2.0 is not authorized to store banking records, unrestricted financial data, high-value trade secrets, personnel records, production credentials or irreplaceable company archives.
 
 ## First deployment checks
 
