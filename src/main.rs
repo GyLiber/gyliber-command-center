@@ -110,6 +110,7 @@ fn build_app(state: AppState, session_key: Key, secure_cookie: bool) -> Router {
         .route("/api/health", get(health))
         .route("/api/state", get(protected_state))
         .nest_service("/static", ServeDir::new("static"))
+        .fallback(not_found)
         .layer(SetRequestIdLayer::new(
             header::HeaderName::from_static("x-request-id"),
             MakeRequestUuid,
@@ -139,6 +140,18 @@ fn build_app(state: AppState, session_key: Key, secure_cookie: bool) -> Router {
         .layer(SetResponseHeaderLayer::if_not_present(
             header::CACHE_CONTROL,
             HeaderValue::from_static("no-store"),
+        ))
+        .layer(SetResponseHeaderLayer::if_not_present(
+            header::HeaderName::from_static("permissions-policy"),
+            HeaderValue::from_static("camera=(), microphone=(), geolocation=()"),
+        ))
+        .layer(SetResponseHeaderLayer::if_not_present(
+            header::HeaderName::from_static("cross-origin-opener-policy"),
+            HeaderValue::from_static("same-origin"),
+        ))
+        .layer(SetResponseHeaderLayer::if_not_present(
+            header::HeaderName::from_static("x-permitted-cross-domain-policies"),
+            HeaderValue::from_static("none"),
         ))
         .layer(sessions)
         .with_state(state)
@@ -329,6 +342,10 @@ async fn command_center(session: Session) -> Response {
         Some(user) => Html(render_command_center(&user)).into_response(),
         None => Redirect::to("/login").into_response(),
     }
+}
+
+fn not_found() -> Html<&'static str> {
+    Html(include_str!("../static/404.html"))
 }
 
 fn health() -> Json<Health> {
