@@ -30,6 +30,7 @@ mod modules;
 mod repository;
 mod state;
 
+const RELEASE: &str = env!("CARGO_PKG_VERSION");
 const MEMBER_KEY: &str = "member";
 const OAUTH_STATE_KEY: &str = "oauth_state";
 const OAUTH_VERIFIER_KEY: &str = "oauth_pkce_verifier";
@@ -548,7 +549,7 @@ fn render_command_center(user: &GitHubUser) -> String {
 <section class="hero-grid">
 <article class="panel primary"><div class="status-line"><span class="pulse"></span>SYSTEM OPERATIONAL</div>
 <h2>Welcome, {name}</h2><p>Authenticated member surface. Sensitive company data is intentionally disabled in v0.1.0.</p>
-<div class="metrics"><div><span>Release</span><strong id="release">0.1.0</strong></div><div><span>API</span><strong id="api-status">ONLINE</strong></div><div><span>Data</span><strong id="data-status">GATED</strong></div></div>
+<div class="metrics"><div><span>Release</span><strong id="release">RELEASE</strong></div><div><span>API</span><strong id="api-status">ONLINE</strong></div><div><span>Data</span><strong id="data-status">GATED</strong></div></div>
 <p class="muted live-readout">Last state observation: <span id="state-seen">checking…</span></p>
 </article>
 <article class="panel"><span class="eyebrow">MEMBER</span><div class="member"><img src="{avatar}" alt=""><div><strong>@{login}</strong><span>GitHub identity verified</span></div></div>
@@ -760,6 +761,28 @@ mod tests {
             .expect("response is produced");
 
         assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+    }
+
+    #[tokio::test]
+    async fn repository_monitor_redirects_anonymous_visitors() {
+        let response = test_app()
+            .oneshot(
+                Request::builder()
+                    .uri("/command/repository")
+                    .body(Body::empty())
+                    .expect("request builds"),
+            )
+            .await
+            .expect("response is produced");
+
+        assert_eq!(response.status(), StatusCode::SEE_OTHER);
+        assert_eq!(
+            response
+                .headers()
+                .get("location")
+                .and_then(|value| value.to_str().ok()),
+            Some("/login")
+        );
     }
 
     #[tokio::test]
