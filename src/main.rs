@@ -26,6 +26,8 @@ use tower_http::{
 use tower_sessions::{Expiry, MemoryStore, Session, SessionManagerLayer, cookie::Key};
 use tracing::info;
 
+mod modules;
+
 const MEMBER_KEY: &str = "member";
 const OAUTH_STATE_KEY: &str = "oauth_state";
 const OAUTH_VERIFIER_KEY: &str = "oauth_pkce_verifier";
@@ -119,6 +121,7 @@ fn build_app(state: AppState, session_key: Key, secure_cookie: bool) -> Router {
         .route("/command", get(command_center))
         .route("/api/health", get(health))
         .route("/api/state", get(protected_state))
+        .route("/api/modules", get(protected_modules))
         .nest_service("/static", ServeDir::new("static"))
         .fallback(not_found)
         .layer(RequestBodyLimitLayer::new(64 * 1024))
@@ -397,6 +400,24 @@ async fn protected_state(session: Session) -> Response {
         "data_freshness": "live-process",
     }))
     .into_response()
+}
+
+async fn protected_modules(session: Session) -> Response {
+    if session
+        .get::<GitHubUser>(MEMBER_KEY)
+        .await
+        .ok()
+        .flatten()
+        .is_none()
+    {
+        return (
+            StatusCode::UNAUTHORIZED,
+            Json(serde_json::json!({"error": "authentication_required"})),
+        )
+            .into_response();
+    }
+
+    Json(modules::catalog()).into_response()
 }
 
 async fn command_center(session: Session) -> Response {
