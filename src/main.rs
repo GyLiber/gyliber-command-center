@@ -453,7 +453,6 @@ mod tests {
     }
 
     #[tokio::test]
-    #[tokio::test]
     async fn security_headers_are_present() {
         let response = test_app()
             .oneshot(
@@ -480,6 +479,7 @@ mod tests {
         assert!(response.headers().contains_key("content-security-policy"));
     }
 
+    #[tokio::test]
     async fn health_is_public() {
         let response = test_app()
             .oneshot(
