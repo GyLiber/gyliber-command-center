@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Resource Registry — GyLiber</title>
+<link rel="stylesheet" href="/static/app.css">
+<script src="/static/resources.js" defer></script>
+</head>
+<body>
+<main class="shell">
+<header class="topbar">
+<div>
+<span class="eyebrow">GYLIBER / RESOURCE REGISTRY</span>
+<h1>Digital Assets</h1>
+</div>
+<nav class="internal-nav">
+<a href="/command">Command Center</a>
+<form action="/logout" method="post"><button class="ghost" type="submit">Sign out</button></form>
+</nav>
+</header>
+<section class="panel state-hero">
+<div class="status-line"><span class="pulse"></span><span id="registry-status">LOADING</span></div>
+<h2>One place to find the systems.</h2>
+<p class="muted">The registry is the future control plane for GyLiber's digital assets. v0.2.0 begins with public resources only.</p>
+</section>
+<section>
+<div class="section-heading"><span class="eyebrow">REGISTERED RESOURCES</span><span class="muted small" id="resource-summary">loading…</span></div>
+<div class="resource-grid" id="resource-grid"></div>
+</section>
+<footer><span>GYLIBER / RESOURCE REGISTRY</span><span>Classification-aware foundation · v0.2.0</span></footer>
+</main>
+</body>
+</html>
