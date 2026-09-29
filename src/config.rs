@@ -1,7 +1,10 @@
 use std::{env, sync::Arc, time::Duration as StdDuration};
 
 use anyhow::{Context, Result};
-use oauth2::{AuthUrl, ClientId, ClientSecret, EndpointNotSet, EndpointSet, RedirectUrl, TokenUrl, basic::BasicClient};
+use oauth2::{
+    AuthUrl, ClientId, ClientSecret, EndpointNotSet, EndpointSet, RedirectUrl, TokenUrl,
+    basic::BasicClient,
+};
 use reqwest::Client;
 use tower_sessions::cookie::Key;
 
