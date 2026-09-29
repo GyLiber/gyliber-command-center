@@ -6,8 +6,11 @@ function formatObservation(unixSeconds) {
 async function refreshState() {
   const status = document.getElementById("state-status");
   const release = document.getElementById("release");
+  const branch = document.getElementById("branch");
+  const commit = document.getElementById("commit");
   const schema = document.getElementById("schema");
   const sensitive = document.getElementById("sensitive");
+  const releaseFooter = document.getElementById("release-footer");
   const freshness = document.getElementById("freshness");
   const observed = document.getElementById("observed");
   const clock = document.getElementById("clock");
@@ -30,6 +33,9 @@ async function refreshState() {
 
     const state = await response.json();
     release.textContent = state.release ?? "UNKNOWN";
+    releaseFooter.textContent = state.release ?? "UNKNOWN";
+    branch.textContent = state.deployment_branch ?? "UNAVAILABLE";
+    commit.textContent = state.deployment_commit ?? "UNAVAILABLE";
     schema.textContent = state.schema_version ?? "UNKNOWN";
     sensitive.textContent = state.sensitive_data ?? "UNKNOWN";
     freshness.textContent = state.data_freshness ?? "UNKNOWN";
