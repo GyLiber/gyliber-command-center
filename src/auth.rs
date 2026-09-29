@@ -1,11 +1,11 @@
-use anyhow::Result;
 use axum::{
-    Json,
     extract::{Query, State},
     http::StatusCode,
     response::{IntoResponse, Redirect, Response},
 };
-use oauth2::{AuthorizationCode, CsrfToken, PkceCodeChallenge, PkceCodeVerifier, Scope};
+use oauth2::{
+    AuthorizationCode, CsrfToken, PkceCodeChallenge, PkceCodeVerifier, Scope, TokenResponse,
+};
 use oauth2_reqwest::ReqwestClient;
 use serde::{Deserialize, Serialize};
 use tower_sessions::Session;
