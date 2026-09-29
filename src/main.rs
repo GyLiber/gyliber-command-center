@@ -396,13 +396,121 @@ fn html_escape(input: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::is_allowed_member;
+    use axum::{
+        body::Body,
+        http::{Request, StatusCode},
+    };
+    use reqwest::Client;
+    use tower::ServiceExt;
+    use tower_sessions::cookie::Key;
+
+    use super::{
+        build_app, html_escape, is_allowed_member, AppState, GitHubConfig,
+    };
+    use oauth2::{basic::BasicClient, ClientId, ClientSecret, RedirectUrl};
+
+    fn test_app() -> axum::Router {
+        let github = GitHubConfig {
+            client_id: ClientId::new("test-client".into()),
+            client_secret: ClientSecret::new("test-secret".into()),
+            redirect_url: RedirectUrl::new(
+                "http://localhost:3000/auth/github/callback".into(),
+            )
+            .expect("test callback URL is valid"),
+            allowed_logins: vec!["gyliber".into()],
+        };
+
+        let state = AppState {
+            github: std::sync::Arc::new(github),
+            http: Client::new(),
+        };
+
+        let _client: BasicClient = super::github_client(&state.github);
+        build_app(state, Key::generate(), false)
+    }
+
+    #[tokio::test]
+    async fn public_home_is_accessible() {
+        let response = test_app()
+            .oneshot(
+                Request::builder()
+                    .uri("/")
+                    .body(Body::empty())
+                    .expect("request builds"),
+            )
+            .await
+            .expect("response is produced");
+
+        assert_eq!(response.status(), StatusCode::OK);
+    }
+
+    #[tokio::test]
+    async fn health_is_public() {
+        let response = test_app()
+            .oneshot(
+                Request::builder()
+                    .uri("/api/health")
+                    .body(Body::empty())
+                    .expect("request builds"),
+            )
+            .await
+            .expect("response is produced");
+
+        assert_eq!(response.status(), StatusCode::OK);
+    }
+
+    #[tokio::test]
+    async fn command_center_redirects_anonymous_visitors() {
+        let response = test_app()
+            .oneshot(
+                Request::builder()
+                    .uri("/command")
+                    .body(Body::empty())
+                    .expect("request builds"),
+            )
+            .await
+            .expect("response is produced");
+
+        assert_eq!(response.status(), StatusCode::SEE_OTHER);
+        assert_eq!(
+            response.headers().get("location").and_then(|value| value.to_str().ok()),
+            Some("/login")
+        );
+    }
+
+    #[tokio::test]
+    async fn live_state_redirects_anonymous_visitors() {
+        let response = test_app()
+            .oneshot(
+                Request::builder()
+                    .uri("/api/state")
+                    .body(Body::empty())
+                    .expect("request builds"),
+            )
+            .await
+            .expect("response is produced");
+
+        assert_eq!(response.status(), StatusCode::SEE_OTHER);
+        assert_eq!(
+            response.headers().get("location").and_then(|value| value.to_str().ok()),
+            Some("/login")
+        );
+    }
 
     #[test]
-    fn member_allowlist_is_case_insensitive() {
+    fn member_allowlist_is_case_insensitive_and_trimmed() {
         let allowed = vec!["GyLiber".to_string(), "ExampleMember".to_string()];
         assert!(is_allowed_member("gyliber", &allowed));
         assert!(is_allowed_member(" EXAMPLEMEMBER ", &allowed));
         assert!(!is_allowed_member("intruder", &allowed));
+    }
+
+    #[test]
+    fn html_escape_blocks_markup_characters() {
+        let escaped = html_escape("<script>alert('x')</script>");
+        assert_eq!(
+            escaped,
+            "&lt;script&gt;alert(&#39;x&#39;)&lt;/script&gt;"
+        );
     }
 }
