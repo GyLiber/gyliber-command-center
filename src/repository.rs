@@ -3,8 +3,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use reqwest::Client;
 
-const GITHUB_REPOSITORY_URL: &str =
-    "https://api.github.com/repos/GyLiber/gyliber-command-center";
+const GITHUB_REPOSITORY_URL: &str = "https://api.github.com/repos/GyLiber/gyliber-command-center";
 
 #[derive(Debug, Clone, Serialize, PartialEq, Eq)]
 pub struct RepositorySnapshot {
