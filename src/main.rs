@@ -295,7 +295,8 @@ async fn github_callback(
         Ok(response) => match response.json::<GitHubUser>().await {
             Ok(user) => user,
             Err(_) => {
-                return (StatusCode::UNAUTHORIZED, "Unable to read member identity").into_response();
+                return (StatusCode::UNAUTHORIZED, "Unable to read member identity")
+                    .into_response();
             }
         },
         Err(_) => {
