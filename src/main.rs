@@ -3,12 +3,11 @@ use std::{env, net::SocketAddr};
 use anyhow::{Context, Result};
 use axum::{
     Json, Router,
-    extract::{Query, State},
+    extract::State,
     http::{HeaderValue, StatusCode, header},
     response::{Html, IntoResponse, Redirect, Response},
     routing::{get, post},
 };
-use oauth2_reqwest::ReqwestClient;
 use serde::{Deserialize, Serialize};
 use time::Duration;
 use tower_http::{
@@ -28,9 +27,6 @@ mod resources;
 mod state;
 
 const RELEASE: &str = env!("CARGO_PKG_VERSION");
-const MEMBER_KEY: &str = "member";
-const OAUTH_STATE_KEY: &str = "oauth_state";
-const OAUTH_VERIFIER_KEY: &str = "oauth_pkce_verifier";
 
 async fn public_home() -> Html<&'static str> {
     Html(include_str!("../static/home.html"))
@@ -50,112 +46,6 @@ async fn public_links() -> Html<&'static str> {
 
 async fn login() -> Html<&'static str> {
     Html(include_str!("../static/login.html"))
-}
-
-async fn github_start(State(state): State<AppState>, session: Session) -> Response {
-    let client = github_client(&state.github);
-
-    let (challenge, verifier) = PkceCodeChallenge::new_random_sha256();
-    let (auth_url, csrf_state) = client
-        .authorize_url(oauth2::CsrfToken::new_random)
-        .add_scope(oauth2::Scope::new("read:user".into()))
-        .set_pkce_challenge(challenge)
-        .url();
-
-    if session
-        .insert(OAUTH_STATE_KEY, csrf_state.secret())
-        .await
-        .is_err()
-        || session
-            .insert(OAUTH_VERIFIER_KEY, verifier.secret())
-            .await
-            .is_err()
-    {
-        return (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            "Unable to initialize login",
-        )
-            .into_response();
-    }
-
-    Redirect::to(auth_url.as_str()).into_response()
-}
-
-async fn github_callback(
-    State(state): State<AppState>,
-    Query(query): Query<OAuthCallback>,
-    session: Session,
-) -> Response {
-    let expected_state = session.get::<String>(OAUTH_STATE_KEY).await.ok().flatten();
-    let verifier = session
-        .get::<String>(OAUTH_VERIFIER_KEY)
-        .await
-        .ok()
-        .flatten();
-
-    let _ = session.remove::<String>(OAUTH_STATE_KEY).await;
-    let _ = session.remove::<String>(OAUTH_VERIFIER_KEY).await;
-
-    if expected_state.as_deref() != Some(query.state.as_str()) {
-        return (StatusCode::UNAUTHORIZED, "Login state was invalid").into_response();
-    }
-
-    let verifier = match verifier {
-        Some(value) => value,
-        None => return (StatusCode::UNAUTHORIZED, "Login state was invalid").into_response(),
-    };
-
-    let token = match github_client(&state.github)
-        .exchange_code(oauth2::AuthorizationCode::new(query.code))
-        .set_pkce_verifier(oauth2::PkceCodeVerifier::new(verifier))
-        .request_async(&ReqwestClient::from(state.http.clone()))
-        .await
-    {
-        Ok(token) => token,
-        Err(_) => {
-            return (StatusCode::UNAUTHORIZED, "GitHub authentication failed").into_response();
-        }
-    };
-
-    let user = match state
-        .http
-        .get("https://api.github.com/user")
-        .bearer_auth(token.access_token().secret())
-        .send()
-        .await
-        .and_then(|response| response.error_for_status())
-    {
-        Ok(response) => match response.json::<GitHubUser>().await {
-            Ok(user) => user,
-            Err(_) => {
-                return (StatusCode::UNAUTHORIZED, "Unable to read member identity")
-                    .into_response();
-            }
-        },
-        Err(_) => {
-            return (StatusCode::UNAUTHORIZED, "Unable to verify member identity").into_response();
-        }
-    };
-
-    if !is_allowed_member(&user.login, &state.github.allowed_logins) {
-        info!(github_login = %user.login, "Rejected non-member login");
-        let _ = session.clear().await;
-        return (
-            StatusCode::FORBIDDEN,
-            "This GitHub account is not authorized for GyLiber Command Center",
-        )
-            .into_response();
-    }
-
-    if session.cycle_id().await.is_err() || session.insert(MEMBER_KEY, &user).await.is_err() {
-        return (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            "Unable to establish secure session",
-        )
-            .into_response();
-    }
-
-    Redirect::to("/command").into_response()
 }
 
 async fn logout(session: Session) -> Response {
@@ -284,7 +174,7 @@ async fn command_state(session: Session) -> Response {
 }
 
 async fn command_center(session: Session) -> Response {
-    let user = session.get::<GitHubUser>(MEMBER_KEY).await.ok().flatten();
+    let user = auth::member_from_session(&session).await;
 
     match user {
         Some(user) => Html(render_command_center(&user)).into_response(),
@@ -305,30 +195,6 @@ async fn health() -> Json<Health> {
         version: "0.1.0",
         status: "ok",
     })
-}
-
-type GitHubClient =
-    BasicClient<EndpointSet, EndpointNotSet, EndpointNotSet, EndpointNotSet, EndpointSet>;
-
-fn github_client(config: &config::GitHubConfig) -> config::GitHubClient {
-    BasicClient::new(config.client_id.clone())
-        .set_client_secret(config.client_secret.clone())
-        .set_auth_uri(
-            AuthUrl::new("https://github.com/login/oauth/authorize".into())
-                .expect("static GitHub authorization URL is valid"),
-        )
-        .set_token_uri(
-            TokenUrl::new("https://github.com/login/oauth/access_token".into())
-                .expect("static GitHub token URL is valid"),
-        )
-        .set_redirect_uri(config.redirect_url.clone())
-}
-
-fn is_allowed_member(login: &str, allowed_logins: &[String]) -> bool {
-    let normalized = login.trim();
-    allowed_logins
-        .iter()
-        .any(|allowed| allowed.trim().eq_ignore_ascii_case(normalized))
 }
 
 fn render_command_center(user: &auth::GitHubUser) -> String {
@@ -384,7 +250,8 @@ mod tests {
     use tower::ServiceExt;
     use tower_sessions::cookie::Key;
 
-    use super::{AppState, GitHubConfig, build_app, html_escape, is_allowed_member, parse_bool};
+    use super::{build_app, config, html_escape};
+    use crate::auth::{self, GitHubUser};
     use oauth2::{ClientId, ClientSecret, RedirectUrl};
 
     fn test_app() -> axum::Router {
@@ -672,9 +539,9 @@ mod tests {
     #[test]
     fn member_allowlist_is_case_insensitive_and_trimmed() {
         let allowed = vec!["GyLiber".to_string(), "ExampleMember".to_string()];
-        assert!(is_allowed_member("gyliber", &allowed));
-        assert!(is_allowed_member(" EXAMPLEMEMBER ", &allowed));
-        assert!(!is_allowed_member("intruder", &allowed));
+        assert!(auth::is_allowed_member("gyliber", &allowed));
+        assert!(auth::is_allowed_member(" EXAMPLEMEMBER ", &allowed));
+        assert!(!auth::is_allowed_member("intruder", &allowed));
     }
 
     #[test]
