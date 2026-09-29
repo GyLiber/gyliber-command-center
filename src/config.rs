@@ -10,7 +10,7 @@ use tower_sessions::cookie::Key;
 
 #[derive(Clone)]
 pub(crate) struct AppState {
-    pub(crate) github: Arc<GitHubConfig>,
+    pub(crate) github: Option<Arc<GitHubConfig>>,
     pub(crate) http: Client,
 }
 
@@ -40,33 +40,48 @@ pub(crate) fn github_client(config: &GitHubConfig) -> GitHubClient {
 }
 
 pub(crate) fn load_state() -> Result<AppState> {
-    let client_id =
-        ClientId::new(env::var("GITHUB_CLIENT_ID").context("GITHUB_CLIENT_ID is required")?);
-    let client_secret = ClientSecret::new(
-        env::var("GITHUB_CLIENT_SECRET").context("GITHUB_CLIENT_SECRET is required")?,
-    );
-    let redirect_url = RedirectUrl::new(
-        env::var("GITHUB_REDIRECT_URL").context("GITHUB_REDIRECT_URL is required")?,
-    )?;
-    let allowed_logins = env::var("GYLIBER_ALLOWED_GITHUB_LOGINS")
-        .context("GYLIBER_ALLOWED_GITHUB_LOGINS is required")?
-        .split(',')
-        .map(|value| value.trim().to_ascii_lowercase())
-        .filter(|value| !value.is_empty())
-        .collect::<Vec<_>>();
+    let github_configured = [
+        "GITHUB_CLIENT_ID",
+        "GITHUB_CLIENT_SECRET",
+        "GITHUB_REDIRECT_URL",
+        "GYLIBER_ALLOWED_GITHUB_LOGINS",
+    ]
+    .iter()
+    .any(|name| env::var(name).is_ok());
 
-    anyhow::ensure!(
-        !allowed_logins.is_empty(),
-        "GYLIBER_ALLOWED_GITHUB_LOGINS cannot be empty"
-    );
+    let github = if github_configured {
+        let client_id =
+            ClientId::new(env::var("GITHUB_CLIENT_ID").context("GITHUB_CLIENT_ID is required")?);
+        let client_secret = ClientSecret::new(
+            env::var("GITHUB_CLIENT_SECRET").context("GITHUB_CLIENT_SECRET is required")?,
+        );
+        let redirect_url = RedirectUrl::new(
+            env::var("GITHUB_REDIRECT_URL").context("GITHUB_REDIRECT_URL is required")?,
+        )?;
+        let allowed_logins = env::var("GYLIBER_ALLOWED_GITHUB_LOGINS")
+            .context("GYLIBER_ALLOWED_GITHUB_LOGINS is required")?
+            .split(',')
+            .map(|value| value.trim().to_ascii_lowercase())
+            .filter(|value| !value.is_empty())
+            .collect::<Vec<_>>();
 
-    Ok(AppState {
-        github: Arc::new(GitHubConfig {
+        anyhow::ensure!(
+            !allowed_logins.is_empty(),
+            "GYLIBER_ALLOWED_GITHUB_LOGINS cannot be empty"
+        );
+
+        Some(Arc::new(GitHubConfig {
             client_id,
             client_secret,
             redirect_url,
             allowed_logins,
-        }),
+        }))
+    } else {
+        None
+    };
+
+    Ok(AppState {
+        github,
         http: Client::builder()
             .user_agent("GyLiber-Command-Center/0.1.0")
             .redirect(reqwest::redirect::Policy::none())
@@ -96,14 +111,14 @@ pub(crate) fn validate_runtime_security() -> Result<()> {
             "COOKIE_SECURE must be true in production"
         );
 
-        let callback = env::var("GITHUB_REDIRECT_URL")
-            .context("GITHUB_REDIRECT_URL is required in production")?;
-        let parsed = url::Url::parse(&callback)
-            .context("GITHUB_REDIRECT_URL must be a valid URL in production")?;
-        anyhow::ensure!(
-            parsed.scheme() == "https",
-            "GITHUB_REDIRECT_URL must use HTTPS in production"
-        );
+        if let Ok(callback) = env::var("GITHUB_REDIRECT_URL") {
+            let parsed = url::Url::parse(&callback)
+                .context("GITHUB_REDIRECT_URL must be a valid URL in production")?;
+            anyhow::ensure!(
+                parsed.scheme() == "https",
+                "GITHUB_REDIRECT_URL must use HTTPS in production"
+            );
+        }
     }
 
     Ok(())
