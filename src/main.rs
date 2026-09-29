@@ -2,16 +2,15 @@ use std::{env, net::SocketAddr, sync::Arc};
 
 use anyhow::{Context, Result};
 use axum::{
+    Json, Router,
     extract::{Query, State},
-    http::{header, HeaderValue, StatusCode},
+    http::{HeaderValue, StatusCode, header},
     response::{Html, IntoResponse, Redirect, Response},
     routing::{get, post},
-    Json, Router,
 };
 use oauth2::{
-    basic::BasicClient,
-    AuthorizationCode, AuthUrl, ClientId, ClientSecret, CsrfToken, PkceCodeChallenge,
-    PkceCodeVerifier, RedirectUrl, Scope, TokenResponse, TokenUrl,
+    AuthUrl, AuthorizationCode, ClientId, ClientSecret, CsrfToken, PkceCodeChallenge,
+    PkceCodeVerifier, RedirectUrl, Scope, TokenResponse, TokenUrl, basic::BasicClient,
 };
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
@@ -22,7 +21,7 @@ use tower_http::{
     set_header::SetResponseHeaderLayer,
     trace::TraceLayer,
 };
-use tower_sessions::{cookie::Key, Expiry, MemoryStore, Session, SessionManagerLayer};
+use tower_sessions::{Expiry, MemoryStore, Session, SessionManagerLayer, cookie::Key};
 use tracing::info;
 
 const MEMBER_KEY: &str = "member";
@@ -160,9 +159,8 @@ fn build_app(state: AppState, session_key: Key, secure_cookie: bool) -> Router {
 }
 
 fn load_state() -> Result<AppState> {
-    let client_id = ClientId::new(
-        env::var("GITHUB_CLIENT_ID").context("GITHUB_CLIENT_ID is required")?,
-    );
+    let client_id =
+        ClientId::new(env::var("GITHUB_CLIENT_ID").context("GITHUB_CLIENT_ID is required")?);
     let client_secret = ClientSecret::new(
         env::var("GITHUB_CLIENT_SECRET").context("GITHUB_CLIENT_SECRET is required")?,
     );
@@ -176,7 +174,10 @@ fn load_state() -> Result<AppState> {
         .filter(|value| !value.is_empty())
         .collect::<Vec<_>>();
 
-    anyhow::ensure!(!allowed_logins.is_empty(), "GYLIBER_ALLOWED_GITHUB_LOGINS cannot be empty");
+    anyhow::ensure!(
+        !allowed_logins.is_empty(),
+        "GYLIBER_ALLOWED_GITHUB_LOGINS cannot be empty"
+    );
 
     Ok(AppState {
         github: Arc::new(GitHubConfig {
@@ -237,7 +238,11 @@ async fn github_start(State(state): State<AppState>, session: Session) -> Respon
             .await
             .is_err()
     {
-        return (StatusCode::INTERNAL_SERVER_ERROR, "Unable to initialize login").into_response();
+        return (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Unable to initialize login",
+        )
+            .into_response();
     }
 
     Redirect::to(auth_url.as_str()).into_response()
@@ -274,7 +279,9 @@ async fn github_callback(
         .await
     {
         Ok(token) => token,
-        Err(_) => return (StatusCode::UNAUTHORIZED, "GitHub authentication failed").into_response(),
+        Err(_) => {
+            return (StatusCode::UNAUTHORIZED, "GitHub authentication failed").into_response();
+        }
     };
 
     let user = match state
@@ -287,9 +294,13 @@ async fn github_callback(
     {
         Ok(response) => match response.json::<GitHubUser>().await {
             Ok(user) => user,
-            Err(_) => return (StatusCode::UNAUTHORIZED, "Unable to read member identity").into_response(),
+            Err(_) => {
+                return (StatusCode::UNAUTHORIZED, "Unable to read member identity").into_response();
+            }
         },
-        Err(_) => return (StatusCode::UNAUTHORIZED, "Unable to verify member identity").into_response(),
+        Err(_) => {
+            return (StatusCode::UNAUTHORIZED, "Unable to verify member identity").into_response();
+        }
     };
 
     if !is_allowed_member(&user.login, &state.github.allowed_logins) {
@@ -302,9 +313,7 @@ async fn github_callback(
             .into_response();
     }
 
-    if session.cycle_id().await.is_err()
-        || session.insert(MEMBER_KEY, &user).await.is_err()
-    {
+    if session.cycle_id().await.is_err() || session.insert(MEMBER_KEY, &user).await.is_err() {
         return (
             StatusCode::INTERNAL_SERVER_ERROR,
             "Unable to establish secure session",
@@ -321,7 +330,13 @@ async fn logout(session: Session) -> Response {
 }
 
 async fn protected_state(session: Session) -> Response {
-    if session.get::<GitHubUser>(MEMBER_KEY).await.ok().flatten().is_none() {
+    if session
+        .get::<GitHubUser>(MEMBER_KEY)
+        .await
+        .ok()
+        .flatten()
+        .is_none()
+    {
         return (
             StatusCode::UNAUTHORIZED,
             Json(serde_json::json!({"error": "authentication_required"})),
@@ -334,7 +349,8 @@ async fn protected_state(session: Session) -> Response {
         "authenticated_surface": "protected",
         "sensitive_data": "disabled",
         "data_freshness": "live-process",
-    })).into_response()
+    }))
+    .into_response()
 }
 
 async fn command_center(session: Session) -> Response {
@@ -432,19 +448,15 @@ mod tests {
     use tower::ServiceExt;
     use tower_sessions::cookie::Key;
 
-    use super::{
-        build_app, html_escape, is_allowed_member, AppState, GitHubConfig,
-    };
+    use super::{AppState, GitHubConfig, build_app, html_escape, is_allowed_member};
     use oauth2::{ClientId, ClientSecret, RedirectUrl};
 
     fn test_app() -> axum::Router {
         let github = GitHubConfig {
             client_id: ClientId::new("test-client".into()),
             client_secret: ClientSecret::new("test-secret".into()),
-            redirect_url: RedirectUrl::new(
-                "http://localhost:3000/auth/github/callback".into(),
-            )
-            .expect("test callback URL is valid"),
+            redirect_url: RedirectUrl::new("http://localhost:3000/auth/github/callback".into())
+                .expect("test callback URL is valid"),
             allowed_logins: vec!["gyliber".into()],
         };
 
@@ -506,24 +518,39 @@ mod tests {
             .expect("response is produced");
 
         assert_eq!(
-            response.headers().get("x-content-type-options").and_then(|value| value.to_str().ok()),
+            response
+                .headers()
+                .get("x-content-type-options")
+                .and_then(|value| value.to_str().ok()),
             Some("nosniff")
         );
         assert_eq!(
-            response.headers().get("x-frame-options").and_then(|value| value.to_str().ok()),
+            response
+                .headers()
+                .get("x-frame-options")
+                .and_then(|value| value.to_str().ok()),
             Some("DENY")
         );
         assert_eq!(
-            response.headers().get("cache-control").and_then(|value| value.to_str().ok()),
+            response
+                .headers()
+                .get("cache-control")
+                .and_then(|value| value.to_str().ok()),
             Some("no-store")
         );
         assert!(response.headers().contains_key("content-security-policy"));
         assert_eq!(
-            response.headers().get("permissions-policy").and_then(|value| value.to_str().ok()),
+            response
+                .headers()
+                .get("permissions-policy")
+                .and_then(|value| value.to_str().ok()),
             Some("camera=(), microphone=(), geolocation=()")
         );
         assert_eq!(
-            response.headers().get("cross-origin-opener-policy").and_then(|value| value.to_str().ok()),
+            response
+                .headers()
+                .get("cross-origin-opener-policy")
+                .and_then(|value| value.to_str().ok()),
             Some("same-origin")
         );
     }
@@ -572,7 +599,10 @@ mod tests {
 
         assert_eq!(response.status(), StatusCode::SEE_OTHER);
         assert_eq!(
-            response.headers().get("location").and_then(|value| value.to_str().ok()),
+            response
+                .headers()
+                .get("location")
+                .and_then(|value| value.to_str().ok()),
             Some("/login")
         );
     }
@@ -604,9 +634,6 @@ mod tests {
     #[test]
     fn html_escape_blocks_markup_characters() {
         let escaped = html_escape("<script>alert('x')</script>");
-        assert_eq!(
-            escaped,
-            "&lt;script&gt;alert(&#39;x&#39;)&lt;/script&gt;"
-        );
+        assert_eq!(escaped, "&lt;script&gt;alert(&#39;x&#39;)&lt;/script&gt;");
     }
 }
