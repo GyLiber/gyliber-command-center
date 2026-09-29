@@ -1,4 +1,4 @@
-use std::{env, net::SocketAddr, sync::Arc};
+use std::{env, net::SocketAddr};
 
 use anyhow::{Context, Result};
 use axum::{
@@ -8,13 +8,7 @@ use axum::{
     response::{Html, IntoResponse, Redirect, Response},
     routing::{get, post},
 };
-use oauth2::{
-    AuthUrl, AuthorizationCode, ClientId, ClientSecret, CsrfToken, EndpointNotSet, EndpointSet,
-    PkceCodeChallenge, PkceCodeVerifier, RedirectUrl, Scope, TokenResponse, TokenUrl,
-    basic::BasicClient,
-};
 use oauth2_reqwest::ReqwestClient;
-use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use time::Duration;
 use tower_http::{
@@ -27,6 +21,7 @@ use tower_http::{
 use tower_sessions::{Expiry, MemoryStore, Session, SessionManagerLayer, cookie::Key};
 use tracing::info;
 
+mod config;
 mod modules;
 mod repository;
 mod resources;
@@ -36,237 +31,6 @@ const RELEASE: &str = env!("CARGO_PKG_VERSION");
 const MEMBER_KEY: &str = "member";
 const OAUTH_STATE_KEY: &str = "oauth_state";
 const OAUTH_VERIFIER_KEY: &str = "oauth_pkce_verifier";
-
-#[derive(Clone)]
-struct AppState {
-    github: Arc<GitHubConfig>,
-    http: Client,
-}
-
-#[derive(Clone)]
-struct GitHubConfig {
-    client_id: ClientId,
-    client_secret: ClientSecret,
-    redirect_url: RedirectUrl,
-    allowed_logins: Vec<String>,
-}
-
-#[derive(Deserialize)]
-struct OAuthCallback {
-    code: String,
-    state: String,
-}
-
-#[derive(Deserialize, Serialize, Clone)]
-struct GitHubUser {
-    login: String,
-    name: Option<String>,
-    avatar_url: Option<String>,
-}
-
-#[derive(Serialize)]
-struct Health {
-    service: &'static str,
-    version: &'static str,
-    status: &'static str,
-}
-
-#[tokio::main]
-async fn main() -> Result<()> {
-    tracing_subscriber::fmt()
-        .with_env_filter(env::var("RUST_LOG").unwrap_or_else(|_| "info".into()))
-        .init();
-
-    let state = load_state()?;
-    let session_key = load_session_key()?;
-    validate_runtime_security()?;
-    let secure_cookie = match env::var("COOKIE_SECURE") {
-        Ok(value) => parse_bool("COOKIE_SECURE", &value)?,
-        Err(env::VarError::NotPresent) => false,
-        Err(error) => return Err(error.into()),
-    };
-
-    let app = build_app(state, session_key, secure_cookie);
-
-    let port = env::var("PORT")
-        .unwrap_or_else(|_| "3000".into())
-        .parse::<u16>()
-        .context("PORT must be a valid u16")?;
-    let addr = SocketAddr::from(([0, 0, 0, 0], port));
-
-    info!(%addr, "GyLiber Command Center starting");
-    let listener = tokio::net::TcpListener::bind(addr).await?;
-    axum::serve(listener, app).await?;
-    Ok(())
-}
-
-fn build_app(state: AppState, session_key: Key, secure_cookie: bool) -> Router {
-    let sessions = SessionManagerLayer::new(MemoryStore::default())
-        .with_name("gyliber.sid")
-        .with_http_only(true)
-        .with_secure(secure_cookie)
-        // Lax permits the top-level GET OAuth callback while blocking cross-site subrequests.
-        .with_same_site(tower_sessions::cookie::SameSite::Lax)
-        .with_expiry(Expiry::OnInactivity(Duration::hours(8)))
-        .with_private(session_key);
-
-    let hsts = if secure_cookie {
-        HeaderValue::from_static("max-age=31536000; includeSubDomains")
-    } else {
-        HeaderValue::from_static("max-age=0")
-    };
-
-    Router::new()
-        .route("/", get(public_home))
-        .route("/about", get(public_about))
-        .route("/work", get(public_work))
-        .route("/links", get(public_links))
-        .route("/login", get(login))
-        .route("/auth/github/start", get(github_start))
-        .route("/auth/github/callback", get(github_callback))
-        .route("/logout", post(logout))
-        .route("/command", get(command_center))
-        .route("/command/state", get(command_state))
-        .route("/command/repository", get(command_repository))
-        .route("/command/resources", get(command_resources))
-        .route("/api/health", get(health))
-        .route("/api/state", get(protected_state))
-        .route("/api/modules", get(protected_modules))
-        .route("/api/repository", get(protected_repository))
-        .route("/api/resources", get(protected_resources))
-        .nest_service("/static", ServeDir::new("static"))
-        .fallback(not_found)
-        .layer(RequestBodyLimitLayer::new(64 * 1024))
-        .layer(SetRequestIdLayer::new(
-            header::HeaderName::from_static("x-request-id"),
-            MakeRequestUuid,
-        ))
-        .layer(PropagateRequestIdLayer::new(
-            header::HeaderName::from_static("x-request-id"),
-        ))
-        .layer(TraceLayer::new_for_http())
-        .layer(SetResponseHeaderLayer::if_not_present(
-            header::CONTENT_SECURITY_POLICY,
-            HeaderValue::from_static(
-                "default-src 'self'; img-src 'self' https://avatars.githubusercontent.com; style-src 'self'; script-src 'self'; base-uri 'none'; form-action 'self' https://github.com; frame-ancestors 'none'; object-src 'none'; connect-src 'self'",
-            ),
-        ))
-        .layer(SetResponseHeaderLayer::if_not_present(
-            header::X_CONTENT_TYPE_OPTIONS,
-            HeaderValue::from_static("nosniff"),
-        ))
-        .layer(SetResponseHeaderLayer::if_not_present(
-            header::X_FRAME_OPTIONS,
-            HeaderValue::from_static("DENY"),
-        ))
-        .layer(SetResponseHeaderLayer::if_not_present(
-            header::REFERRER_POLICY,
-            HeaderValue::from_static("no-referrer"),
-        ))
-        .layer(SetResponseHeaderLayer::if_not_present(
-            header::CACHE_CONTROL,
-            HeaderValue::from_static("no-store"),
-        ))
-        .layer(SetResponseHeaderLayer::if_not_present(
-            header::HeaderName::from_static("permissions-policy"),
-            HeaderValue::from_static("camera=(), microphone=(), geolocation=()"),
-        ))
-        .layer(SetResponseHeaderLayer::if_not_present(
-            header::HeaderName::from_static("cross-origin-opener-policy"),
-            HeaderValue::from_static("same-origin"),
-        ))
-        .layer(SetResponseHeaderLayer::if_not_present(
-            header::HeaderName::from_static("x-permitted-cross-domain-policies"),
-            HeaderValue::from_static("none"),
-        ))
-        .layer(SetResponseHeaderLayer::if_not_present(
-            header::HeaderName::from_static("cross-origin-resource-policy"),
-            HeaderValue::from_static("same-origin"),
-        ))
-        .layer(SetResponseHeaderLayer::if_not_present(
-            header::STRICT_TRANSPORT_SECURITY,
-            hsts,
-        ))
-        .layer(sessions)
-        .with_state(state)
-}
-
-fn load_state() -> Result<AppState> {
-    let client_id =
-        ClientId::new(env::var("GITHUB_CLIENT_ID").context("GITHUB_CLIENT_ID is required")?);
-    let client_secret = ClientSecret::new(
-        env::var("GITHUB_CLIENT_SECRET").context("GITHUB_CLIENT_SECRET is required")?,
-    );
-    let redirect_url = RedirectUrl::new(
-        env::var("GITHUB_REDIRECT_URL").context("GITHUB_REDIRECT_URL is required")?,
-    )?;
-    let allowed_logins = env::var("GYLIBER_ALLOWED_GITHUB_LOGINS")
-        .context("GYLIBER_ALLOWED_GITHUB_LOGINS is required")?
-        .split(',')
-        .map(|value| value.trim().to_ascii_lowercase())
-        .filter(|value| !value.is_empty())
-        .collect::<Vec<_>>();
-
-    anyhow::ensure!(
-        !allowed_logins.is_empty(),
-        "GYLIBER_ALLOWED_GITHUB_LOGINS cannot be empty"
-    );
-
-    Ok(AppState {
-        github: Arc::new(GitHubConfig {
-            client_id,
-            client_secret,
-            redirect_url,
-            allowed_logins,
-        }),
-        http: Client::builder()
-            .user_agent("GyLiber-Command-Center/0.1.0")
-            .redirect(reqwest::redirect::Policy::none())
-            .timeout(std::time::Duration::from_secs(5))
-            .build()?,
-    })
-}
-
-fn parse_bool(name: &str, value: &str) -> Result<bool> {
-    match value.trim().to_ascii_lowercase().as_str() {
-        "true" => Ok(true),
-        "false" => Ok(false),
-        _ => anyhow::bail!("{name} must be true or false"),
-    }
-}
-
-fn validate_runtime_security() -> Result<()> {
-    let production = env::var("APP_ENV")
-        .map(|value| value.eq_ignore_ascii_case("production"))
-        .unwrap_or(false);
-
-    if production {
-        let cookie_secure =
-            env::var("COOKIE_SECURE").context("COOKIE_SECURE is required in production")?;
-        anyhow::ensure!(
-            cookie_secure.eq_ignore_ascii_case("true"),
-            "COOKIE_SECURE must be true in production"
-        );
-
-        let callback = env::var("GITHUB_REDIRECT_URL")
-            .context("GITHUB_REDIRECT_URL is required in production")?;
-        let parsed = url::Url::parse(&callback)
-            .context("GITHUB_REDIRECT_URL must be a valid URL in production")?;
-        anyhow::ensure!(
-            parsed.scheme() == "https",
-            "GITHUB_REDIRECT_URL must use HTTPS in production"
-        );
-    }
-
-    Ok(())
-}
-
-fn load_session_key() -> Result<Key> {
-    let master = env::var("SESSION_MASTER_KEY")
-        .context("SESSION_MASTER_KEY is required and must contain at least 64 random bytes")?;
-    Key::try_from(master.as_bytes())
-        .context("SESSION_MASTER_KEY must contain at least 64 bytes for a private session key")
-}
 
 async fn public_home() -> Html<&'static str> {
     Html(include_str!("../static/home.html"))
@@ -293,8 +57,8 @@ async fn github_start(State(state): State<AppState>, session: Session) -> Respon
 
     let (challenge, verifier) = PkceCodeChallenge::new_random_sha256();
     let (auth_url, csrf_state) = client
-        .authorize_url(CsrfToken::new_random)
-        .add_scope(Scope::new("read:user".into()))
+        .authorize_url(oauth2::CsrfToken::new_random)
+        .add_scope(oauth2::Scope::new("read:user".into()))
         .set_pkce_challenge(challenge)
         .url();
 
@@ -342,8 +106,8 @@ async fn github_callback(
     };
 
     let token = match github_client(&state.github)
-        .exchange_code(AuthorizationCode::new(query.code))
-        .set_pkce_verifier(PkceCodeVerifier::new(verifier))
+        .exchange_code(oauth2::AuthorizationCode::new(query.code))
+        .set_pkce_verifier(oauth2::PkceCodeVerifier::new(verifier))
         .request_async(&ReqwestClient::from(state.http.clone()))
         .await
     {
@@ -546,7 +310,7 @@ async fn health() -> Json<Health> {
 type GitHubClient =
     BasicClient<EndpointSet, EndpointNotSet, EndpointNotSet, EndpointNotSet, EndpointSet>;
 
-fn github_client(config: &GitHubConfig) -> GitHubClient {
+fn github_client(config: &config::GitHubConfig) -> config::GitHubClient {
     BasicClient::new(config.client_id.clone())
         .set_client_secret(config.client_secret.clone())
         .set_auth_uri(
@@ -567,7 +331,7 @@ fn is_allowed_member(login: &str, allowed_logins: &[String]) -> bool {
         .any(|allowed| allowed.trim().eq_ignore_ascii_case(normalized))
 }
 
-fn render_command_center(user: &GitHubUser) -> String {
+fn render_command_center(user: &auth::GitHubUser) -> String {
     let name = html_escape(user.name.as_deref().unwrap_or(&user.login));
     let login = html_escape(&user.login);
     let avatar = html_escape(user.avatar_url.as_deref().unwrap_or(""));
@@ -624,7 +388,7 @@ mod tests {
     use oauth2::{ClientId, ClientSecret, RedirectUrl};
 
     fn test_app() -> axum::Router {
-        let github = GitHubConfig {
+        let github = config::GitHubConfig {
             client_id: ClientId::new("test-client".into()),
             client_secret: ClientSecret::new("test-secret".into()),
             redirect_url: RedirectUrl::new("http://localhost:3000/auth/github/callback".into())
@@ -632,7 +396,7 @@ mod tests {
             allowed_logins: vec!["gyliber".into()],
         };
 
-        let state = AppState {
+        let state = config::AppState {
             github: std::sync::Arc::new(github),
             http: Client::new(),
         };
