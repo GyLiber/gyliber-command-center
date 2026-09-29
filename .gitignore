@@ -1,0 +1,37 @@
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# JavaScript / frontend
+node_modules/
+.next/
+out/
+dist/
+
+# Rust
+target/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Local databases / dumps
+*.sql
+*.dump
+*.sqlite
+*.sqlite3
+
+# Test / coverage output
+coverage/
+test-results/
+
+# Temporary files
+*.tmp
+*.temp
