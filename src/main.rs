@@ -20,6 +20,7 @@ use tower_http::{
 use tower_sessions::{Expiry, MemoryStore, Session, SessionManagerLayer, cookie::Key};
 use tracing::info;
 
+mod audit;
 mod auth;
 mod config;
 mod modules;
