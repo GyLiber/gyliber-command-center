@@ -40,12 +40,13 @@ pub async fn snapshot(client: &Client) -> Result<RepositorySnapshot, reqwest::Er
         .send()
         .await?;
 
-    if !response.status().is_success() {
-        audit::record(audit::AuditEvent::ExternalSourceUnavailable, None);
-        let response = response.error_for_status()?;
-        let _ = response;
-        unreachable!();
-    }
+    let response = match response.error_for_status() {
+        Ok(response) => response,
+        Err(error) => {
+            audit::record(audit::AuditEvent::ExternalSourceUnavailable, None);
+            return Err(error);
+        }
+    };
 
     let repository = response.json::<GitHubRepository>().await?;
 
