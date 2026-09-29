@@ -494,6 +494,29 @@ mod tests {
             Some("no-store")
         );
         assert!(response.headers().contains_key("content-security-policy"));
+        assert_eq!(
+            response.headers().get("permissions-policy").and_then(|value| value.to_str().ok()),
+            Some("camera=(), microphone=(), geolocation=()")
+        );
+        assert_eq!(
+            response.headers().get("cross-origin-opener-policy").and_then(|value| value.to_str().ok()),
+            Some("same-origin")
+        );
+    }
+
+    #[tokio::test]
+    async fn unknown_routes_use_controlled_not_found_page() {
+        let response = test_app()
+            .oneshot(
+                Request::builder()
+                    .uri("/does-not-exist")
+                    .body(Body::empty())
+                    .expect("request builds"),
+            )
+            .await
+            .expect("response is produced");
+
+        assert_eq!(response.status(), StatusCode::NOT_FOUND);
     }
 
     #[tokio::test]
