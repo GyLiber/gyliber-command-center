@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 use tower_sessions::Session;
 use tracing::info;
 
-use crate::config::{self, AppState};
+use crate::{audit, config::{self, AppState}};
 
 pub(crate) const MEMBER_KEY: &str = "member";
 const OAUTH_STATE_KEY: &str = "oauth_state";
@@ -32,6 +32,7 @@ pub(crate) struct GitHubUser {
 }
 
 pub(crate) async fn github_start(State(state): State<AppState>, session: Session) -> Response {
+    audit::record(audit::AuditEvent::LoginStarted, None);
     let client = config::github_client(&state.github);
 
     let (challenge, verifier) = PkceCodeChallenge::new_random_sha256();
@@ -50,6 +51,7 @@ pub(crate) async fn github_start(State(state): State<AppState>, session: Session
             .await
             .is_err()
     {
+        audit::record(audit::AuditEvent::LoginFailed, None);
         return (
             StatusCode::INTERNAL_SERVER_ERROR,
             "Unable to initialize login",
@@ -76,12 +78,16 @@ pub(crate) async fn github_callback(
     let _ = session.remove::<String>(OAUTH_VERIFIER_KEY).await;
 
     if expected_state.as_deref() != Some(query.state.as_str()) {
+        audit::record(audit::AuditEvent::LoginFailed, None);
         return (StatusCode::UNAUTHORIZED, "Login state was invalid").into_response();
     }
 
     let verifier = match verifier {
         Some(value) => value,
-        None => return (StatusCode::UNAUTHORIZED, "Login state was invalid").into_response(),
+        None => {
+            audit::record(audit::AuditEvent::LoginFailed, None);
+            return (StatusCode::UNAUTHORIZED, "Login state was invalid").into_response();
+        },
     };
 
     let token = match config::github_client(&state.github)
@@ -92,6 +98,7 @@ pub(crate) async fn github_callback(
     {
         Ok(token) => token,
         Err(_) => {
+            audit::record(audit::AuditEvent::LoginFailed, None);
             return (StatusCode::UNAUTHORIZED, "GitHub authentication failed").into_response();
         }
     };
@@ -107,16 +114,19 @@ pub(crate) async fn github_callback(
         Ok(response) => match response.json::<GitHubUser>().await {
             Ok(user) => user,
             Err(_) => {
+                audit::record(audit::AuditEvent::LoginFailed, None);
                 return (StatusCode::UNAUTHORIZED, "Unable to read member identity")
                     .into_response();
             }
         },
         Err(_) => {
+            audit::record(audit::AuditEvent::LoginFailed, None);
             return (StatusCode::UNAUTHORIZED, "Unable to verify member identity").into_response();
         }
     };
 
     if !is_allowed_member(&user.login, &state.github.allowed_logins) {
+        audit::record(audit::AuditEvent::LoginRejected, Some(&user.login));
         info!(github_login = %user.login, "Rejected non-member login");
         let _ = session.clear().await;
         return (
@@ -134,10 +144,16 @@ pub(crate) async fn github_callback(
             .into_response();
     }
 
+    audit::record(audit::AuditEvent::LoginSucceeded, Some(&user.login));
     Redirect::to("/command").into_response()
 }
 
 pub(crate) async fn logout(session: Session) -> Response {
+    let member = member_from_session(&session).await;
+    audit::record(
+        audit::AuditEvent::Logout,
+        member.as_ref().map(|user| user.login.as_str()),
+    );
     let _ = session.clear().await;
     Redirect::to("/").into_response()
 }
@@ -168,13 +184,13 @@ impl IntoResponse for AuthFailure {
 pub(crate) async fn require_page_member(session: &Session) -> Result<GitHubUser, AuthFailure> {
     member_from_session(session)
         .await
-        .ok_or(AuthFailure::PageLogin)
+        .ok_or_else(|| { audit::record(audit::AuditEvent::ProtectedAccessDenied, None); AuthFailure::PageLogin })
 }
 
 pub(crate) async fn require_api_member(session: &Session) -> Result<GitHubUser, AuthFailure> {
     member_from_session(session)
         .await
-        .ok_or(AuthFailure::ApiUnauthorized)
+        .ok_or_else(|| { audit::record(audit::AuditEvent::ProtectedAccessDenied, None); AuthFailure::ApiUnauthorized })
 }
 
 pub(crate) fn is_allowed_member(login: &str, allowed_logins: &[String]) -> bool {
