@@ -9,7 +9,7 @@ publish = false
 anyhow = "1"
 axum = { version = "0.8.9", features = ["form"] }
 oauth2 = "5.0"
-reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+reqwest = { version = "0.13", default-features = false, features = ["json", "rustls-tls"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 time = { version = "0.3", features = ["serde"] }
