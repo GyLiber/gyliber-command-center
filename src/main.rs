@@ -364,8 +364,11 @@ async fn command_center(session: Session) -> Response {
     }
 }
 
-async fn not_found() -> Html<&'static str> {
-    Html(include_str!("../static/404.html"))
+async fn not_found() -> impl IntoResponse {
+    (
+        StatusCode::NOT_FOUND,
+        Html(include_str!("../static/404.html")),
+    )
 }
 
 async fn health() -> Json<Health> {
@@ -394,8 +397,10 @@ fn github_client(config: &GitHubConfig) -> GitHubClient {
 }
 
 fn is_allowed_member(login: &str, allowed_logins: &[String]) -> bool {
-    let normalized = login.trim().to_ascii_lowercase();
-    allowed_logins.iter().any(|allowed| allowed == &normalized)
+    let normalized = login.trim();
+    allowed_logins
+        .iter()
+        .any(|allowed| allowed.trim().eq_ignore_ascii_case(normalized))
 }
 
 fn render_command_center(user: &GitHubUser) -> String {
