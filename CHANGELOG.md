@@ -21,12 +21,17 @@
 - Hardened production transport configuration, HSTS behavior and request-body limits.
 - Added architecture and deployment documentation for the new modules and hosting constraints.
 
-- Added runtime release and Render deployment commit provenance to the authenticated live-state surface.
+- Added runtime release and managed-host deployment commit provenance to the authenticated live-state surface.
+- Added safe public-only deployment bootstrap while keeping protected routes denied until GitHub OAuth is configured.
+- Added a public live-health indicator, dashboard build identity and the client demonstration baseline.
+- Corrected the Docker runtime image to include system CA certificates required by rustls outbound TLS.
+- Documented the canonical-domain strategy so the public GyLiber identity remains independent of the hosting provider.
 
 ## Unreleased — v0.3.0 development
 
-- Added safe public-only deployment bootstrap while keeping protected routes denied until GitHub OAuth is configured.
-- Added a public live-health indicator, dashboard build identity and the client demonstration baseline.
+The next development line is intentionally planned before implementation. See:
+
+`docs/operations/NEXT_DEVELOPMENT_STEPS.md`
 
 ## [0.1.0] — Foundation
 
@@ -49,7 +54,7 @@
 - GitHub Actions CI with format, check, clippy, test and advisory verification.
 - CI concurrency cancellation and execution timeout.
 - Dependabot configuration for Cargo and GitHub Actions.
-- Docker and Render deployment definitions.
+- Docker and managed-host deployment definitions.
 - Requirements, system design, security baseline, data classification, backup/recovery, manual setup, governance and architecture decision records.
 
 ### Security boundary

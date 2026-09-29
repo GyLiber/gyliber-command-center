@@ -16,7 +16,7 @@ The architecture may later introduce a separate frontend framework, WASM modules
 | HTTP | Axum 0.8.x + Tower ecosystem |
 | Database | PostgreSQL 18.x when persistence is introduced |
 | Frontend | Web platform + TypeScript/JavaScript as needed; browser code is never trusted for authorization |
-| Authentication | OIDC-capable identity provider; WebAuthn/passkeys in mature design |
+| Authentication | GitHub OAuth + PKCE for current member boundary; OIDC/WebAuthn/passkeys in mature design |
 | Real-time | SSE first; WebSockets only for genuine bidirectional needs |
 | Object storage | S3-compatible storage; migration-friendly |
 | CI/CD | GitHub Actions |
@@ -29,12 +29,31 @@ Python is deliberately excluded.
 
 Rust 1.98.1 is the current stable release used by this design baseline. Axum 0.8.9 and PostgreSQL 18.6 are current checked baselines as of 2026-09-29. Next.js 16.3 is current, but the v0.1 implementation intentionally avoids creating an additional server runtime until its value is demonstrated.
 
-## 3. Trust boundaries
+## 3. Public identity and infrastructure boundary
+
+The canonical public origin belongs to GyLiber, not to the hosting provider.
+
+```
+                      GYLIBER-OWNED PUBLIC DOMAIN
+                               |
+                               v
+                        managed hosting edge
+                               |
+                         Rust application
+```
+
+The public domain is the stable product address. The hosting service's generated hostname, deployment IDs and dashboard URLs are operational references only.
+
+Changing hosting providers should not require changing printed business cards, client materials or the public authentication contract except for DNS/certificate and callback reconfiguration.
+
+The preferred public address is `https://gyliber.com/` when available and controlled by GyLiber. A short subdomain such as `https://hq.gyliber.com/` is the fallback when the root domain is used for another corporate surface.
+
+## 4. Trust boundaries
 
 ```text
 Internet
    |
-   +-- Public Web
+   +-- Canonical Public Web
    |
    +-- Authentication / Identity Boundary
              |
@@ -51,7 +70,7 @@ Internet
 
 The backend authorizes every protected operation independently of UI state.
 
-## 4. Domain modules
+## 5. Domain modules
 
 The first runtime domain boundary is the module registry. It defines typed module identity, route, availability, data classification and live-state capability without persisting business data. The protected `/api/modules` endpoint is the contract consumed by the Command Center dashboard. New modules should be added through this registry before acquiring larger UI/backend boundaries.
 
@@ -69,7 +88,7 @@ Planned bounded domains:
 
 A domain may remain in the primary application or be extracted when security, scaling, deployment ownership or fault isolation makes extraction worthwhile.
 
-## 5. Information freshness
+## 6. Information freshness
 
 Every live-state representation should eventually expose:
 - source
@@ -80,23 +99,24 @@ Every live-state representation should eventually expose:
 
 The UI must distinguish live, recently observed, stale and unknown.
 
-## 6. Data classification
+## 7. Data classification
 
 `PUBLIC`, `INTERNAL`, `CONFIDENTIAL`, `RESTRICTED`, `CRITICAL`.
 
 Classification controls storage, display, authorization, audit, retention and recovery.
 
-## 7. Versioning
+## 8. Versioning
 
 Semantic versioning is used:
 - v0.1.0: first working vertical slice
+- v0.2.0: live product foundation
 - v0.x: additive/refining work
 - v1.0.0: first mature public/private platform contract
 - later versions remain extensible without assuming a final architecture
 
 Architecture changes are permitted when new evidence invalidates earlier assumptions. Material changes require an Architecture Decision Record.
 
-## 8. Throughput-oriented UX
+## 9. Throughput-oriented UX
 
 The interface should behave like an operational room:
 - dense but legible state
@@ -110,18 +130,18 @@ The interface should behave like an operational room:
 
 The aim is not maximum information density; it is maximum **useful information/action per attention unit**.
 
-## 9. Transport and input hardening
+## 10. Transport and input hardening
 
-The HTTP boundary disables outbound redirects in the OAuth client, applies secure browser headers, disables caching, applies a 64 KiB request-body limit, and validates production transport configuration before startup. Production requires HTTPS callback URLs and secure cookies.
+The HTTP boundary disables outbound redirects in the OAuth client, applies secure browser headers, applies request-body limits, and validates production transport configuration before startup. Production requires HTTPS callback URLs and secure cookies.
 
-## 10. Disaster recovery
+## 11. Disaster recovery
 
 Primary hosting is not the archive.
 
 Critical production data eventually requires an independently recoverable copy, separate credentials, retention/versioning, restore testing and defined RPO/RTO.
 
-Free hosting is an early engineering environment, not automatic authorization to store critical company records.
+Free/low-cost hosting is an early engineering environment, not automatic authorization to store critical company records.
 
-## 11. Release gates
+## 12. Release gates
 
 No release may be represented as “secure” merely because tests pass. High-impact private data requires evidence across application security, identity, infrastructure, data protection, monitoring, backups, recovery and independent review.
