@@ -10,7 +10,6 @@ use axum::{
 };
 use oauth2::{
     basic::BasicClient,
-    reqwest::async_http_client,
     AuthorizationCode, AuthUrl, ClientId, ClientSecret, CsrfToken, PkceCodeChallenge,
     PkceCodeVerifier, RedirectUrl, Scope, TokenResponse, TokenUrl,
 };
@@ -248,7 +247,7 @@ async fn github_callback(
     let token = match github_client(&state.github)
         .exchange_code(AuthorizationCode::new(query.code))
         .set_pkce_verifier(PkceCodeVerifier::new(verifier))
-        .request_async(async_http_client)
+        .request_async(&state.http)
         .await
     {
         Ok(token) => token,
