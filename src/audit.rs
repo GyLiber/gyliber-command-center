@@ -6,6 +6,7 @@ pub(crate) enum AuditEvent {
     LoginSucceeded,
     LoginFailed,
     LoginRejected,
+    LoginUnavailable,
     Logout,
     ProtectedAccessDenied,
     ExternalSourceUnavailable,
@@ -18,6 +19,7 @@ impl AuditEvent {
             Self::LoginSucceeded => "auth.login_succeeded",
             Self::LoginFailed => "auth.login_failed",
             Self::LoginRejected => "auth.login_rejected",
+            Self::LoginUnavailable => "auth.login_unavailable",
             Self::Logout => "auth.logout",
             Self::ProtectedAccessDenied => "auth.access_denied",
             Self::ExternalSourceUnavailable => "integration.source_unavailable",
@@ -40,6 +42,10 @@ mod tests {
     fn event_codes_are_stable_and_non_sensitive() {
         assert_eq!(AuditEvent::LoginStarted.code(), "auth.login_started");
         assert_eq!(AuditEvent::LoginRejected.code(), "auth.login_rejected");
+        assert_eq!(
+            AuditEvent::LoginUnavailable.code(),
+            "auth.login_unavailable"
+        );
         assert_eq!(
             AuditEvent::ExternalSourceUnavailable.code(),
             "integration.source_unavailable"

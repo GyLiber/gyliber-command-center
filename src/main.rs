@@ -173,8 +173,8 @@ async fn public_links() -> Html<&'static str> {
     Html(include_str!("../static/links.html"))
 }
 
-async fn login() -> Html<&'static str> {
-    Html(include_str!("../static/login.html"))
+async fn login(State(state): State<config::AppState>) -> Html<String> {
+    Html(render_login(state.github.is_some()))
 }
 
 async fn protected_state(session: Session) -> Response {
@@ -270,6 +270,23 @@ async fn health() -> Json<Health> {
     })
 }
 
+fn render_login(authentication_configured: bool) -> String {
+    let action = if authentication_configured {
+        r#"<a class="primary-btn" href="/auth/github/start">Continue with GitHub</a>"#
+    } else {
+        r#"<span class="muted">Member authentication is not configured for this deployment yet.</span>"#
+    };
+    let status = if authentication_configured {
+        "GitHub OAuth with PKCE is enabled for authorized member access."
+    } else {
+        "Public deployment mode is active. Protected routes remain unavailable until GitHub OAuth is configured."
+    };
+
+    include_str!("../static/login.html")
+        .replace("<!-- MEMBER_ACTION -->", action)
+        .replace("<!-- AUTH_STATUS -->", status)
+}
+
 fn render_command_center(user: &auth::GitHubUser) -> String {
     let name = html_escape(user.name.as_deref().unwrap_or(&user.login));
     let login = html_escape(&user.login);
@@ -337,7 +354,7 @@ mod tests {
         };
 
         let state = config::AppState {
-            github: std::sync::Arc::new(github),
+            github: Some(std::sync::Arc::new(github)),
             http: Client::new(),
         };
 
@@ -364,6 +381,53 @@ mod tests {
             .expect("OAuth location header exists");
         assert!(location.starts_with("https://github.com/login/oauth/authorize"));
         assert!(response.headers().contains_key("set-cookie"));
+    }
+
+    fn public_only_test_app() -> axum::Router {
+        let state = config::AppState {
+            github: None,
+            http: Client::new(),
+        };
+
+        build_app(state, Key::generate(), false)
+    }
+
+    #[tokio::test]
+    async fn member_login_reports_unavailable_when_oauth_is_unconfigured() {
+        let response = public_only_test_app()
+            .oneshot(
+                Request::builder()
+                    .uri("/auth/github/start")
+                    .body(Body::empty())
+                    .expect("request builds"),
+            )
+            .await
+            .expect("response is produced");
+
+        assert_eq!(response.status(), StatusCode::SERVICE_UNAVAILABLE);
+    }
+
+    #[tokio::test]
+    async fn public_only_login_page_is_honest_about_authentication_state() {
+        let response = public_only_test_app()
+            .oneshot(
+                Request::builder()
+                    .uri("/login")
+                    .body(Body::empty())
+                    .expect("request builds"),
+            )
+            .await
+            .expect("response is produced");
+
+        assert_eq!(response.status(), StatusCode::OK);
+
+        let body = axum::body::to_bytes(response.into_body(), 16 * 1024)
+            .await
+            .expect("body reads");
+        let body = String::from_utf8(body.to_vec()).expect("body is UTF-8");
+
+        assert!(body.contains("Member authentication is not configured for this deployment yet."));
+        assert!(!body.contains("Continue with GitHub"));
     }
 
     #[tokio::test]

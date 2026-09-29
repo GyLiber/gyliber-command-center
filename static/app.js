@@ -54,6 +54,7 @@ async function refreshState() {
   const api = document.getElementById("api-status");
   const release = document.getElementById("release");
   const data = document.getElementById("data-status");
+  const build = document.getElementById("build-commit");
 
   try {
     const response = await fetch("/api/state", {
@@ -71,9 +72,12 @@ async function refreshState() {
     api.textContent = "ONLINE";
     release.textContent = state.release ?? "UNKNOWN";
     data.textContent = state.sensitive_data === "disabled" ? "GATED" : "ACTIVE";
+    const commit = state.deployment_commit;
+    build.textContent = commit ? commit.slice(0, 12) : "LOCAL";
     seen.textContent = `observed ${new Date().toLocaleTimeString()}`;
   } catch (error) {
     api.textContent = "DEGRADED";
+    build.textContent = "UNAVAILABLE";
     seen.textContent = "unavailable";
     console.error("Command Center state refresh failed", error);
   }

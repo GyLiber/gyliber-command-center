@@ -173,7 +173,7 @@ The repository contains `render.yaml` for the initial free hosting route.
 
 Before production deployment, Gyile must create/sign into a Render account and connect the GitHub account/repository.
 
-The deployment runbook must then be followed to populate the required environment variables in Render.
+The deployment runbook must then be followed to populate the required environment variables in Render. Member authentication is disabled until the GitHub OAuth credentials are configured; the public product may run safely without them.
 
 Never put the production Client Secret or session key into a committed file.
 

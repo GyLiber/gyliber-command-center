@@ -2,7 +2,7 @@
 
 > **GyLiber's digital headquarters:** a high-signal operational hub for systems, resources, knowledge and future company operations.
 
-![Status](https://img.shields.io/badge/release-v0.1.0--foundation-slate)
+![Status](https://img.shields.io/badge/release-v0.2.0--live-product-foundation-slate)
 ![Backend](https://img.shields.io/badge/backend-Rust-orange)
 
 ## 1. Product
@@ -17,9 +17,9 @@ The interface is deliberately calm, dark and information-forward. Its design tar
 
 ## 2. Current release
 
-### v0.1.0 Foundation
+### v0.2.0 Live product foundation
 
-The first end-to-end vertical slice currently includes:
+The current live-product foundation includes:
 
 - public GyLiber landing page
 - About / Work / Links public pages
@@ -41,9 +41,11 @@ The first end-to-end vertical slice currently includes:
 - dependency-update automation
 - Docker deployment
 - Render deployment blueprint
+- runtime release/build provenance in the protected Live State Monitor
+- safe public-only deployment mode while member authentication is unconfigured
 - requirements, architecture, security, governance and operational runbooks
 
-### Deliberately absent from v0.1.0
+### Deliberately absent from v0.2.0
 
 The first release does **not** authorize storage of:
 

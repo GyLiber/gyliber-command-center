@@ -25,6 +25,9 @@
 
 ## Unreleased — v0.3.0 development
 
+- Added safe public-only deployment bootstrap while keeping protected routes denied until GitHub OAuth is configured.
+- Added a public live-health indicator, dashboard build identity and the client demonstration baseline.
+
 ## [0.1.0] — Foundation
 
 ### Added
