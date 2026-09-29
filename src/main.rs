@@ -534,6 +534,7 @@ fn render_command_center(user: &GitHubUser) -> String {
     let name = html_escape(user.name.as_deref().unwrap_or(&user.login));
     let login = html_escape(&user.login);
     let avatar = html_escape(user.avatar_url.as_deref().unwrap_or(""));
+    let release = RELEASE;
 
     format!(
         r#"<!doctype html>
@@ -549,7 +550,7 @@ fn render_command_center(user: &GitHubUser) -> String {
 <section class="hero-grid">
 <article class="panel primary"><div class="status-line"><span class="pulse"></span>SYSTEM OPERATIONAL</div>
 <h2>Welcome, {name}</h2><p>Authenticated member surface. Sensitive company data is intentionally disabled in v0.1.0.</p>
-<div class="metrics"><div><span>Release</span><strong id="release">RELEASE</strong></div><div><span>API</span><strong id="api-status">ONLINE</strong></div><div><span>Data</span><strong id="data-status">GATED</strong></div></div>
+<div class="metrics"><div><span>Release</span><strong id="release">{release}</strong></div><div><span>API</span><strong id="api-status">ONLINE</strong></div><div><span>Data</span><strong id="data-status">GATED</strong></div></div>
 <p class="muted live-readout">Last state observation: <span id="state-seen">checking…</span></p>
 </article>
 <article class="panel"><span class="eyebrow">MEMBER</span><div class="member"><img src="{avatar}" alt=""><div><strong>@{login}</strong><span>GitHub identity verified</span></div></div>
