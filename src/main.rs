@@ -9,8 +9,9 @@ use axum::{
     routing::{get, post},
 };
 use oauth2::{
-    AuthUrl, AuthorizationCode, ClientId, ClientSecret, CsrfToken, PkceCodeChallenge,
-    PkceCodeVerifier, RedirectUrl, Scope, TokenResponse, TokenUrl, basic::BasicClient,
+    AuthUrl, AuthorizationCode, ClientId, ClientSecret, CsrfToken, EndpointNotSet, EndpointSet,
+    PkceCodeChallenge, PkceCodeVerifier, RedirectUrl, Scope, TokenResponse, TokenUrl,
+    basic::BasicClient,
 };
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
@@ -199,23 +200,23 @@ fn load_session_key() -> Result<Key> {
         .context("SESSION_MASTER_KEY must contain at least 64 bytes for a private session key")
 }
 
-fn public_home() -> Html<&'static str> {
+async fn public_home() -> Html<&'static str> {
     Html(include_str!("../static/home.html"))
 }
 
-fn public_about() -> Html<&'static str> {
+async fn public_about() -> Html<&'static str> {
     Html(include_str!("../static/about.html"))
 }
 
-fn public_work() -> Html<&'static str> {
+async fn public_work() -> Html<&'static str> {
     Html(include_str!("../static/work.html"))
 }
 
-fn public_links() -> Html<&'static str> {
+async fn public_links() -> Html<&'static str> {
     Html(include_str!("../static/links.html"))
 }
 
-fn login() -> Html<&'static str> {
+async fn login() -> Html<&'static str> {
     Html(include_str!("../static/login.html"))
 }
 
@@ -363,11 +364,11 @@ async fn command_center(session: Session) -> Response {
     }
 }
 
-fn not_found() -> Html<&'static str> {
+async fn not_found() -> Html<&'static str> {
     Html(include_str!("../static/404.html"))
 }
 
-fn health() -> Json<Health> {
+async fn health() -> Json<Health> {
     Json(Health {
         service: "gyliber-command-center",
         version: "0.1.0",
@@ -375,7 +376,10 @@ fn health() -> Json<Health> {
     })
 }
 
-fn github_client(config: &GitHubConfig) -> BasicClient {
+type GitHubClient =
+    BasicClient<EndpointSet, EndpointNotSet, EndpointNotSet, EndpointNotSet, EndpointSet>;
+
+fn github_client(config: &GitHubConfig) -> GitHubClient {
     BasicClient::new(config.client_id.clone())
         .set_client_secret(config.client_secret.clone())
         .set_auth_uri(
