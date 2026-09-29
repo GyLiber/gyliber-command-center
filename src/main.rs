@@ -187,7 +187,7 @@ async fn protected_state(session: Session) -> Response {
 async fn protected_resources(session: Session) -> Response {
     let _member = match auth::require_api_member(&session).await {
         Ok(member) => member,
-        Err(response) => return response,
+        Err(failure) => return failure.into_response(),
     };
 
     Json(resources::catalog()).into_response()
@@ -196,7 +196,7 @@ async fn protected_resources(session: Session) -> Response {
 async fn protected_repository(State(state): State<config::AppState>, session: Session) -> Response {
     let _member = match auth::require_api_member(&session).await {
         Ok(member) => member,
-        Err(response) => return response,
+        Err(failure) => return failure.into_response(),
     };
 
     match repository::snapshot(&state.http).await {
@@ -212,7 +212,7 @@ async fn protected_repository(State(state): State<config::AppState>, session: Se
 async fn protected_modules(session: Session) -> Response {
     let _member = match auth::require_api_member(&session).await {
         Ok(member) => member,
-        Err(response) => return response,
+        Err(failure) => return failure.into_response(),
     };
 
     Json(modules::catalog()).into_response()
@@ -221,7 +221,7 @@ async fn protected_modules(session: Session) -> Response {
 async fn command_resources(session: Session) -> Response {
     let _member = match auth::require_page_member(&session).await {
         Ok(member) => member,
-        Err(response) => return response,
+        Err(failure) => return failure.into_response(),
     };
 
     Html(include_str!("../static/resources.html")).into_response()
@@ -230,7 +230,7 @@ async fn command_resources(session: Session) -> Response {
 async fn command_repository(session: Session) -> Response {
     let _member = match auth::require_page_member(&session).await {
         Ok(member) => member,
-        Err(response) => return response,
+        Err(failure) => return failure.into_response(),
     };
 
     Html(include_str!("../static/repository.html")).into_response()
@@ -239,7 +239,7 @@ async fn command_repository(session: Session) -> Response {
 async fn command_state(session: Session) -> Response {
     let _member = match auth::require_page_member(&session).await {
         Ok(member) => member,
-        Err(response) => return response,
+        Err(failure) => return failure.into_response(),
     };
 
     Html(include_str!("../static/state.html")).into_response()
@@ -248,7 +248,7 @@ async fn command_state(session: Session) -> Response {
 async fn command_center(session: Session) -> Response {
     let user = match auth::require_page_member(&session).await {
         Ok(user) => user,
-        Err(response) => return response,
+        Err(failure) => return failure.into_response(),
     };
 
     Html(render_command_center(&user)).into_response()
