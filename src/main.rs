@@ -17,9 +17,9 @@ use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use time::Duration;
 use tower_http::{
+    limit::RequestBodyLimitLayer,
     request_id::{MakeRequestUuid, PropagateRequestIdLayer, SetRequestIdLayer},
     services::ServeDir,
-    limit::RequestBodyLimitLayer,
     set_header::SetResponseHeaderLayer,
     trace::TraceLayer,
 };
@@ -236,8 +236,8 @@ fn validate_runtime_security() -> Result<()> {
         .unwrap_or(false);
 
     if production {
-        let cookie_secure = env::var("COOKIE_SECURE")
-            .context("COOKIE_SECURE is required in production")?;
+        let cookie_secure =
+            env::var("COOKIE_SECURE").context("COOKIE_SECURE is required in production")?;
         anyhow::ensure!(
             cookie_secure.eq_ignore_ascii_case("true"),
             "COOKIE_SECURE must be true in production"
