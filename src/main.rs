@@ -136,6 +136,10 @@ fn build_app(state: AppState, session_key: Key, secure_cookie: bool) -> Router {
             header::REFERRER_POLICY,
             HeaderValue::from_static("no-referrer"),
         ))
+        .layer(SetResponseHeaderLayer::if_not_present(
+            header::CACHE_CONTROL,
+            HeaderValue::from_static("no-store"),
+        ))
         .layer(sessions)
         .with_state(state)
 }
