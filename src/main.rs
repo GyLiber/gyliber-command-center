@@ -800,6 +800,43 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn resource_registry_redirects_anonymous_visitors() {
+        let response = test_app()
+            .oneshot(
+                Request::builder()
+                    .uri("/command/resources")
+                    .body(Body::empty())
+                    .expect("request builds"),
+            )
+            .await
+            .expect("response is produced");
+
+        assert_eq!(response.status(), StatusCode::SEE_OTHER);
+        assert_eq!(
+            response
+                .headers()
+                .get("location")
+                .and_then(|value| value.to_str().ok()),
+            Some("/login")
+        );
+    }
+
+    #[tokio::test]
+    async fn resource_api_rejects_anonymous_requests() {
+        let response = test_app()
+            .oneshot(
+                Request::builder()
+                    .uri("/api/resources")
+                    .body(Body::empty())
+                    .expect("request builds"),
+            )
+            .await
+            .expect("response is produced");
+
+        assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+    }
+
+    #[tokio::test]
     async fn repository_monitor_redirects_anonymous_visitors() {
         let response = test_app()
             .oneshot(
