@@ -75,6 +75,21 @@ async fn main() -> Result<()> {
         .map(|value| value != "false")
         .unwrap_or(true);
 
+    let app = build_app(state, session_key, secure_cookie);
+
+    let port = env::var("PORT")
+        .unwrap_or_else(|_| "3000".into())
+        .parse::<u16>()
+        .context("PORT must be a valid u16")?;
+    let addr = SocketAddr::from(([0, 0, 0, 0], port));
+
+    info!(%addr, "GyLiber Command Center starting");
+    let listener = tokio::net::TcpListener::bind(addr).await?;
+    axum::serve(listener, app).await?;
+    Ok(())
+}
+
+fn build_app(state: AppState, session_key: Key, secure_cookie: bool) -> Router {
     let sessions = SessionManagerLayer::new(MemoryStore::default())
         .with_name("gyliber.sid")
         .with_secure(secure_cookie)
@@ -82,7 +97,7 @@ async fn main() -> Result<()> {
         .with_expiry(Expiry::OnInactivity(Duration::hours(8)))
         .with_private(session_key);
 
-    let app = Router::new()
+    Router::new()
         .route("/", get(public_home))
         .route("/about", get(public_about))
         .route("/work", get(public_work))
@@ -122,18 +137,7 @@ async fn main() -> Result<()> {
             HeaderValue::from_static("no-referrer"),
         ))
         .layer(sessions)
-        .with_state(state);
-
-    let port = env::var("PORT")
-        .unwrap_or_else(|_| "3000".into())
-        .parse::<u16>()
-        .context("PORT must be a valid u16")?;
-    let addr = SocketAddr::from(([0, 0, 0, 0], port));
-
-    info!(%addr, "GyLiber Command Center starting");
-    let listener = tokio::net::TcpListener::bind(addr).await?;
-    axum::serve(listener, app).await?;
-    Ok(())
+        .with_state(state)
 }
 
 fn load_state() -> Result<AppState> {
