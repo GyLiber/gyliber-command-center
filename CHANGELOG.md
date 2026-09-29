@@ -10,9 +10,11 @@
 - Private authenticated sessions with HttpOnly, Secure and SameSite controls.
 - Protected Command Center route.
 - Protected live-state API.
+- Protected typed module registry API and dynamic dashboard rendering.
 - Browser live-state polling with freshness display.
 - Public health endpoint for deployment probes.
-- CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Cache-Control, Permissions-Policy and Cross-Origin-Opener-Policy headers.
+- CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Cache-Control, Permissions-Policy, Cross-Origin-Opener-Policy and Cross-Origin-Resource-Policy headers.
+- Production transport validation, HSTS policy and request-body limits.
 - Request IDs and HTTP tracing.
 - Controlled 404 page.
 - Rust unit and HTTP-boundary tests.
