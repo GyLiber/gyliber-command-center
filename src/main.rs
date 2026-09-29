@@ -448,6 +448,33 @@ mod tests {
     }
 
     #[tokio::test]
+    #[tokio::test]
+    async fn security_headers_are_present() {
+        let response = test_app()
+            .oneshot(
+                Request::builder()
+                    .uri("/")
+                    .body(Body::empty())
+                    .expect("request builds"),
+            )
+            .await
+            .expect("response is produced");
+
+        assert_eq!(
+            response.headers().get("x-content-type-options").and_then(|value| value.to_str().ok()),
+            Some("nosniff")
+        );
+        assert_eq!(
+            response.headers().get("x-frame-options").and_then(|value| value.to_str().ok()),
+            Some("DENY")
+        );
+        assert_eq!(
+            response.headers().get("cache-control").and_then(|value| value.to_str().ok()),
+            Some("no-store")
+        );
+        assert!(response.headers().contains_key("content-security-policy"));
+    }
+
     async fn health_is_public() {
         let response = test_app()
             .oneshot(
