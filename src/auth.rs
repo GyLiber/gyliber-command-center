@@ -35,8 +35,20 @@ pub(crate) struct GitHubUser {
 }
 
 pub(crate) async fn github_start(State(state): State<AppState>, session: Session) -> Response {
+    let github = match state.github.as_deref() {
+        Some(github) => github,
+        None => {
+            audit::record(audit::AuditEvent::LoginUnavailable, None);
+            return (
+                StatusCode::SERVICE_UNAVAILABLE,
+                Json(serde_json::json!({"error": "member_authentication_unavailable"})),
+            )
+                .into_response();
+        }
+    };
+
     audit::record(audit::AuditEvent::LoginStarted, None);
-    let client = config::github_client(&state.github);
+    let client = config::github_client(github);
 
     let (challenge, verifier) = PkceCodeChallenge::new_random_sha256();
     let (auth_url, csrf_state) = client
@@ -70,6 +82,18 @@ pub(crate) async fn github_callback(
     Query(query): Query<OAuthCallback>,
     session: Session,
 ) -> Response {
+    let github = match state.github.as_deref() {
+        Some(github) => github,
+        None => {
+            audit::record(audit::AuditEvent::LoginUnavailable, None);
+            return (
+                StatusCode::SERVICE_UNAVAILABLE,
+                Json(serde_json::json!({"error": "member_authentication_unavailable"})),
+            )
+                .into_response();
+        }
+    };
+
     let expected_state = session.get::<String>(OAUTH_STATE_KEY).await.ok().flatten();
     let verifier = session
         .get::<String>(OAUTH_VERIFIER_KEY)
@@ -93,7 +117,7 @@ pub(crate) async fn github_callback(
         }
     };
 
-    let token = match config::github_client(&state.github)
+    let token = match config::github_client(github)
         .exchange_code(AuthorizationCode::new(query.code))
         .set_pkce_verifier(PkceCodeVerifier::new(verifier))
         .request_async(&ReqwestClient::from(state.http.clone()))
@@ -128,7 +152,7 @@ pub(crate) async fn github_callback(
         }
     };
 
-    if !is_allowed_member(&user.login, &state.github.allowed_logins) {
+    if !is_allowed_member(&user.login, &github.allowed_logins) {
         audit::record(audit::AuditEvent::LoginRejected, Some(&user.login));
         info!(github_login = %user.login, "Rejected non-member login");
         let _ = session.clear().await;
