@@ -20,6 +20,7 @@ use tower_http::{
 use tower_sessions::{Expiry, MemoryStore, Session, SessionManagerLayer, cookie::Key};
 use tracing::info;
 
+mod auth;
 mod config;
 mod modules;
 mod repository;
@@ -48,19 +49,8 @@ async fn login() -> Html<&'static str> {
     Html(include_str!("../static/login.html"))
 }
 
-async fn logout(session: Session) -> Response {
-    let _ = session.clear().await;
-    Redirect::to("/").into_response()
-}
-
 async fn protected_state(session: Session) -> Response {
-    if session
-        .get::<GitHubUser>(MEMBER_KEY)
-        .await
-        .ok()
-        .flatten()
-        .is_none()
-    {
+    if auth::member_from_session(&session).await.is_none() {
         return (
             StatusCode::UNAUTHORIZED,
             Json(serde_json::json!({"error": "authentication_required"})),
@@ -71,13 +61,7 @@ async fn protected_state(session: Session) -> Response {
 }
 
 async fn protected_resources(session: Session) -> Response {
-    if session
-        .get::<GitHubUser>(MEMBER_KEY)
-        .await
-        .ok()
-        .flatten()
-        .is_none()
-    {
+    if auth::member_from_session(&session).await.is_none() {
         return (
             StatusCode::UNAUTHORIZED,
             Json(serde_json::json!({"error": "authentication_required"})),
@@ -89,13 +73,7 @@ async fn protected_resources(session: Session) -> Response {
 }
 
 async fn protected_repository(State(state): State<AppState>, session: Session) -> Response {
-    if session
-        .get::<GitHubUser>(MEMBER_KEY)
-        .await
-        .ok()
-        .flatten()
-        .is_none()
-    {
+    if auth::member_from_session(&session).await.is_none() {
         return (
             StatusCode::UNAUTHORIZED,
             Json(serde_json::json!({"error": "authentication_required"})),
@@ -114,13 +92,7 @@ async fn protected_repository(State(state): State<AppState>, session: Session) -
 }
 
 async fn protected_modules(session: Session) -> Response {
-    if session
-        .get::<GitHubUser>(MEMBER_KEY)
-        .await
-        .ok()
-        .flatten()
-        .is_none()
-    {
+    if auth::member_from_session(&session).await.is_none() {
         return (
             StatusCode::UNAUTHORIZED,
             Json(serde_json::json!({"error": "authentication_required"})),
@@ -132,13 +104,7 @@ async fn protected_modules(session: Session) -> Response {
 }
 
 async fn command_resources(session: Session) -> Response {
-    if session
-        .get::<GitHubUser>(MEMBER_KEY)
-        .await
-        .ok()
-        .flatten()
-        .is_none()
-    {
+    if auth::member_from_session(&session).await.is_none() {
         return Redirect::to("/login").into_response();
     }
 
@@ -146,13 +112,7 @@ async fn command_resources(session: Session) -> Response {
 }
 
 async fn command_repository(session: Session) -> Response {
-    if session
-        .get::<GitHubUser>(MEMBER_KEY)
-        .await
-        .ok()
-        .flatten()
-        .is_none()
-    {
+    if auth::member_from_session(&session).await.is_none() {
         return Redirect::to("/login").into_response();
     }
 
@@ -160,13 +120,7 @@ async fn command_repository(session: Session) -> Response {
 }
 
 async fn command_state(session: Session) -> Response {
-    if session
-        .get::<GitHubUser>(MEMBER_KEY)
-        .await
-        .ok()
-        .flatten()
-        .is_none()
-    {
+    if auth::member_from_session(&session).await.is_none() {
         return Redirect::to("/login").into_response();
     }
 
