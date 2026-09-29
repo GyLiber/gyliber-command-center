@@ -31,6 +31,13 @@ Protect against:
 9. Backup copies must be independently recoverable.
 10. AI-generated code receives the same verification as human code.
 
+## Transport and configuration
+
+- production startup fails closed unless secure cookies and an HTTPS OAuth callback are configured
+- outbound OAuth HTTP redirects are disabled
+- request bodies are bounded at the HTTP boundary
+- browser responses receive restrictive security headers and are marked `no-store`
+
 ## Authentication progression
 
 ### v0.1
