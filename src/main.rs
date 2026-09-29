@@ -205,7 +205,7 @@ mod tests {
     use tower_sessions::cookie::Key;
 
     use super::{build_app, config, html_escape};
-    use crate::auth::{self, GitHubUser};
+    use crate::auth;
     use oauth2::{ClientId, ClientSecret, RedirectUrl};
 
     fn test_app() -> axum::Router {
@@ -485,9 +485,9 @@ mod tests {
 
     #[test]
     fn boolean_configuration_accepts_only_true_or_false() {
-        assert!(parse_bool("COOKIE_SECURE", "true").expect("true parses"));
-        assert!(!parse_bool("COOKIE_SECURE", "false").expect("false parses"));
-        assert!(parse_bool("COOKIE_SECURE", "enabled").is_err());
+        assert!(config::parse_bool("COOKIE_SECURE", "true").expect("true parses"));
+        assert!(!config::parse_bool("COOKIE_SECURE", "false").expect("false parses"));
+        assert!(config::parse_bool("COOKIE_SECURE", "enabled").is_err());
     }
 
     #[test]
