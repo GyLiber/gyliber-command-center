@@ -137,6 +137,7 @@ pub(crate) async fn github_callback(
     }
 
     if session.cycle_id().await.is_err() || session.insert(MEMBER_KEY, &user).await.is_err() {
+        audit::record(audit::AuditEvent::LoginFailed, Some(&user.login));
         return (
             StatusCode::INTERNAL_SERVER_ERROR,
             "Unable to establish secure session",
