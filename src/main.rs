@@ -35,11 +35,11 @@ async fn main() -> Result<()> {
         .with_env_filter(env::var("RUST_LOG").unwrap_or_else(|_| "info".into()))
         .init();
 
-    let state = load_state()?;
-    let session_key = load_session_key()?;
-    validate_runtime_security()?;
+    let state = config::load_state()?;
+    let session_key = config::load_session_key()?;
+    config::validate_runtime_security()?;
     let secure_cookie = match env::var("COOKIE_SECURE") {
-        Ok(value) => parse_bool("COOKIE_SECURE", &value)?,
+        Ok(value) => config::parse_bool("COOKIE_SECURE", &value)?,
         Err(env::VarError::NotPresent) => false,
         Err(error) => return Err(error.into()),
     };
@@ -58,7 +58,7 @@ async fn main() -> Result<()> {
     Ok(())
 }
 
-fn build_app(state: AppState, session_key: Key, secure_cookie: bool) -> Router {
+fn build_app(state: config::AppState, session_key: Key, secure_cookie: bool) -> Router {
     let sessions = SessionManagerLayer::new(MemoryStore::default())
         .with_name("gyliber.sid")
         .with_http_only(true)
