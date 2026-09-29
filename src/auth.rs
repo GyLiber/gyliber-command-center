@@ -145,6 +145,30 @@ pub(crate) async fn member_from_session(session: &Session) -> Option<GitHubUser>
     session.get::<GitHubUser>(MEMBER_KEY).await.ok().flatten()
 }
 
+pub(crate) async fn require_page_member(session: &Session) -> Result<GitHubUser, Response> {
+    member_from_session(session)
+        .await
+        .ok_or_else(login_redirect)
+}
+
+pub(crate) async fn require_api_member(session: &Session) -> Result<GitHubUser, Response> {
+    member_from_session(session)
+        .await
+        .ok_or_else(authentication_required)
+}
+
+pub(crate) fn login_redirect() -> Response {
+    Redirect::to("/login").into_response()
+}
+
+pub(crate) fn authentication_required() -> Response {
+    (
+        StatusCode::UNAUTHORIZED,
+        Json(serde_json::json!({"error": "authentication_required"})),
+    )
+        .into_response()
+}
+
 pub(crate) fn is_allowed_member(login: &str, allowed_logins: &[String]) -> bool {
     let normalized = login.trim();
     allowed_logins
