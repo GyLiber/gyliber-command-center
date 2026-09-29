@@ -40,7 +40,7 @@ The current live-product foundation includes:
 - GitHub Actions CI
 - dependency-update automation
 - Docker deployment
-- Render deployment blueprint
+- initial managed-host deployment
 - runtime release/build provenance in the protected Live State Monitor
 - safe public-only deployment mode while member authentication is unconfigured
 - requirements, architecture, security, governance and operational runbooks
@@ -59,9 +59,27 @@ The first release does **not** authorize storage of:
 
 That boundary is intentional.
 
-## 3. Architecture
+## 3. Canonical public address
 
-```text
+The application is designed to expose a **GyLiber-owned canonical domain** as its public identity.
+
+The infrastructure provider's generated hostname is an implementation detail and is not the intended business-card, client-facing or brand address.
+
+### Target presentation
+
+The preferred final presentation is:
+
+`https://gyliber.com/`
+
+subject to GyLiber ownership and availability of that domain.
+
+A subdomain such as `https://hq.gyliber.com/` is the documented fallback when the root domain is reserved for a separate public corporate site.
+
+The canonical domain must remain independent of the underlying hosting provider so infrastructure can be changed without changing GyLiber's public identity.
+
+## 4. Architecture
+
+```
                          INTERNET
                              |
               +--------------+--------------+
@@ -96,7 +114,7 @@ That boundary is intentional.
 
 The backend is the trust authority. Browser state is never treated as authorization.
 
-## 4. Technology baseline
+## 5. Technology baseline
 
 The current implementation intentionally excludes Python from the application stack.
 
@@ -111,13 +129,13 @@ The current implementation intentionally excludes Python from the application st
 | Persistence baseline | PostgreSQL |
 | Object storage baseline | S3-compatible |
 | CI/CD | GitHub Actions |
-| Deployment | Docker / Render for initial environment |
+| Deployment | Docker on an abstracted managed hosting environment |
 | Observability direction | tracing + OpenTelemetry-compatible architecture |
-| Browser surface | standards-based HTML/CSS/JS in v0.1 |
+| Browser surface | standards-based HTML/CSS/JS |
 
 Dependency versions are maintained in `Cargo.toml` and the committed `Cargo.lock`; CI uses locked resolution for reproducible verification.
 
-## 5. Security model
+## 6. Security model
 
 Security starts from the first commit.
 
@@ -139,7 +157,7 @@ Core controls include:
 
 **Important:** no software language or framework guarantees an unbreachable system. Rust addresses important classes of implementation risk; complete security depends on the whole system and its operation.
 
-## 6. Data classification
+## 7. Data classification
 
 Future information is classified as:
 
@@ -153,7 +171,7 @@ See:
 - `docs/security/SECURITY.md`
 - `docs/operations/BACKUP_AND_RECOVERY.md`
 
-## 7. Engineering workflow
+## 8. Engineering workflow
 
 Every commit should be a coherent unit of work.
 
@@ -170,7 +188,7 @@ docs: record architecture decision
 
 Correct earlier work may be superseded when implementation evidence proves an earlier assumption incorrect. The correction should remain visible in history.
 
-## 8. CI/CD
+## 9. CI/CD
 
 CI is part of the product.
 
@@ -196,7 +214,7 @@ The project is intended to evolve toward stronger release verification such as:
 - deployment health verification
 - restore/recovery tests
 
-## 9. Manual setup
+## 10. Manual setup
 
 Gyile/GyLiber should not need to infer infrastructure setup from source code.
 
@@ -204,19 +222,21 @@ Start with:
 
 `docs/operations/MANUAL_SETUP.md`
 
-That runbook explains Rust/Cargo, GitHub OAuth App creation, callback URLs, environment configuration, secrets, and which steps can safely be deferred.
+That runbook explains Rust/Cargo, GitHub OAuth App creation, callback URLs, environment configuration, secrets, canonical-domain binding and which steps can safely be deferred.
 
-## 10. Hosting and recovery
+## 11. Hosting and recovery
 
-The first live environment is intentionally low-cost.
+The initial hosted service is intentionally low-cost and replaceable.
 
-Hosting is not the archive.
+**The hosting provider is not the product identity and is not the archive.**
+
+The canonical public domain belongs to GyLiber. DNS points that domain to the current hosting service, allowing the underlying provider to change without requiring a new business-card address.
 
 The mature platform will use independent recovery mechanisms so loss of the laptop, application host, database or one storage provider does not eliminate GyLiber's irreplaceable information.
 
 See `docs/operations/BACKUP_AND_RECOVERY.md`.
 
-## 11. Extensibility
+## 12. Extensibility
 
 A future feature may become:
 
@@ -229,7 +249,7 @@ The Command Center remains the navigation/control plane when that split occurs.
 
 This permits future modules such as creative knowledge/trivia experiences, project operations, asset observability, intellectual-property records, staff operations and financial representations without forcing every function into one page or one process.
 
-## 12. AI-assisted engineering
+## 13. AI-assisted engineering
 
 AI is intentionally used as an engineering accelerator for research, implementation, testing, documentation and refactoring.
 
@@ -246,7 +266,7 @@ Human responsibility remains with GyLiber and the project maintainers for:
 - releases
 - production operations
 
-## 13. Intellectual property
+## 14. Intellectual property
 
 This repository is currently public during the early development phase.
 
@@ -254,17 +274,20 @@ Public visibility does not grant a general license to reuse GyLiber intellectual
 
 See `LICENSE` for the current repository-level rights notice. Third-party dependencies remain governed by their own licenses.
 
-## 14. Living documentation
+## 15. Living documentation
 
 The following documents are intentionally living documents:
 
 - `docs/requirements/REQUIREMENTS.md`
 - `docs/architecture/DESIGN.md`
+- `docs/architecture/ADR-0009-canonical-public-domain.md`
 - `docs/security/SECURITY.md`
 - `docs/security/DATA_CLASSIFICATION.md`
 - `docs/operations/MANUAL_SETUP.md`
 - `docs/operations/DEPLOYMENT.md`
 - `docs/operations/BACKUP_AND_RECOVERY.md`
+- `docs/operations/CLIENT_DEMONSTRATION_BASELINE.md`
+- `docs/operations/NEXT_DEVELOPMENT_STEPS.md`
 - `docs/governance/DEVELOPMENT.md`
 - `docs/governance/KNOWLEDGE_GAPS.md`
 
