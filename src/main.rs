@@ -13,8 +13,8 @@ use oauth2::{
     PkceCodeChallenge, PkceCodeVerifier, RedirectUrl, Scope, TokenResponse, TokenUrl,
     basic::BasicClient,
 };
-use reqwest::Client;
 use oauth2_reqwest::ReqwestClient;
+use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use time::Duration;
 use tower_http::{
