@@ -94,7 +94,7 @@ async fn main() -> Result<()> {
         .route("/logout", post(logout))
         .route("/command", get(command_center))
         .route("/api/health", get(health))
-        .route("/api/state", get(safe_state))
+        .route("/api/state", get(protected_state))
         .nest_service("/static", ServeDir::new("static"))
         .layer(SetRequestIdLayer::new(
             header::HeaderName::from_static("x-request-id"),
@@ -298,6 +298,19 @@ async fn logout(session: Session) -> Response {
     Redirect::to("/").into_response()
 }
 
+async fn protected_state(session: Session) -> Response {
+    if session.get::<GitHubUser>(MEMBER_KEY).await.ok().flatten().is_none() {
+        return Redirect::to("/login").into_response();
+    }
+    Json(serde_json::json!({
+        "release": "0.1.0",
+        "public_surface": "operational",
+        "authenticated_surface": "protected",
+        "sensitive_data": "disabled",
+        "data_freshness": "live-process",
+    })).into_response()
+}
+
 async fn command_center(session: Session) -> Response {
     let user = session.get::<GitHubUser>(MEMBER_KEY).await.ok().flatten();
 
@@ -315,15 +328,6 @@ fn health() -> Json<Health> {
     })
 }
 
-fn safe_state() -> Json<serde_json::Value> {
-    Json(serde_json::json!({
-        "release": "0.1.0",
-        "public_surface": "operational",
-        "authenticated_surface": "protected",
-        "sensitive_data": "disabled",
-        "data_freshness": "live-process",
-    }))
-}
 
 fn github_client(config: &GitHubConfig) -> BasicClient {
     BasicClient::new(config.client_id.clone())
