@@ -2,6 +2,12 @@
 
 ## Unreleased — v0.2.0 development
 
+- Added a typed Digital Assets resource registry.
+- Added a protected resource registry API and browser surface.
+- Registered the resource registry as a first-class Command Center module.
+
+## Unreleased — v0.2.0 development
+
 - Added the first typed Command Center module registry.
 - Added the protected Live State Monitor with server observation timestamps.
 - Added live Repository Monitor integration for the public GyLiber Command Center GitHub repository.
