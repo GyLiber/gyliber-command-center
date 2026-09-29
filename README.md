@@ -1,65 +1,266 @@
 # GyLiber Command Center
 
-> The operational command center for GyLiber's digital assets, systems, knowledge, and future operations.
+> **GyLiber's digital headquarters:** a high-signal operational hub for systems, resources, knowledge and future company operations.
 
-## Status
+![Status](https://img.shields.io/badge/release-v0.1.0--foundation-slate)
+![Backend](https://img.shields.io/badge/backend-Rust-orange)
 
-**Release track:** v0.x → v1.0.0  
-**Current milestone:** v0.1.0 foundation
+## 1. Product
 
-This repository contains the security-first foundation of GyLiber's long-lived Command Center Hub. The platform is intended to become a central operational interface for public GyLiber information, authenticated internal resources, live system representations, knowledge modules, and future business capabilities.
+GyLiber Command Center is being built as a long-lived **command-center hub**, not as a conventional brochure website.
 
-## Engineering principles
+The public surface represents GyLiber as a company/brand. The authenticated surface is intended to become the operational control plane for GyLiber's digital resources, live system information, knowledge, documents, integrations and—only after explicit security gates—high-value company information.
 
-- Security is designed from the first commit.
-- Every commit represents a coherent, reviewable unit of work.
-- Automated verification is part of development.
-- Secrets never belong in source control.
-- Sensitive production information is gated behind explicit readiness criteria.
-- Public presentation and authenticated operations are separate trust zones.
-- Architecture may evolve when implementation evidence invalidates an earlier assumption.
-- AI-assisted work is reviewed and verified as engineering work; it is not treated as an authority.
+The interface is deliberately calm, dark and information-forward. Its design target is:
 
-## Technology direction
+> **more useful state and action per unit of human attention.**
 
-The application stack intentionally excludes Python. The current baseline is a Rust backend with a modern web frontend and PostgreSQL persistence. Dependency versions are pinned in implementation files and lockfiles.
+## 2. Current release
 
-## Repository structure
+### v0.1.0 Foundation
+
+The first end-to-end vertical slice currently includes:
+
+- public GyLiber landing page
+- About / Work / Links public pages
+- discreet member-access route
+- GitHub OAuth Authorization Code flow with PKCE
+- explicit GitHub member allowlist
+- private authenticated session
+- protected Command Center
+- protected live-state API
+- browser polling of live state every 15 seconds
+- health endpoint for deployment probes
+- security response headers
+- request IDs and structured request tracing
+- custom 404 page
+- Rust tests for route/authentication boundaries
+- GitHub Actions CI
+- dependency-update automation
+- Docker deployment
+- Render deployment blueprint
+- requirements, architecture, security, governance and operational runbooks
+
+### Deliberately absent from v0.1.0
+
+The first release does **not** authorize storage of:
+
+- banking credentials
+- unrestricted banking/financial records
+- production cloud secrets
+- high-value trade secrets
+- personnel records
+- customer records
+- irreplaceable corporate archives
+
+That boundary is intentional.
+
+## 3. Architecture
 
 ```text
-docs/           Project requirements, architecture, security and governance
-backend/        Rust API/backend
-frontend/       Web client
-.github/        CI/CD and repository automation
+                         INTERNET
+                             |
+              +--------------+--------------+
+              |                             |
+         PUBLIC WEB                 MEMBER AUTHENTICATION
+              |                             |
+     +--------+--------+                    v
+     | About / Work    |             +-------------+
+     | Links / Brand   |             | Command Hub |
+     +-----------------+             +------+------+
+                                             |
+                                  +----------+----------+
+                                  |                     |
+                             live state             future modules
+                                  |                     |
+                              API layer       +---------+---------+
+                                              | knowledge / IP    |
+                                              | resources         |
+                                              | operations        |
+                                              | finance*          |
+                                              | people*           |
+                                              +---------+---------+
+                                                        |
+                                                   data services
+                                                        |
+                                       +----------------+----------------+
+                                       |                                 |
+                                  PostgreSQL*                      Object storage*
 ```
 
-## Security boundary
+`*` denotes a future security-gated capability.
 
-v0.1.0 is a working end-to-end foundation, not a declaration that the platform is ready for unrestricted production secrets.
+The backend is the trust authority. Browser state is never treated as authorization.
 
-Until the relevant security, identity, backup, recovery, monitoring and operational gates are satisfied, do not place banking credentials, unrestricted financial data, high-value trade secrets, personnel records, or irreplaceable corporate archives in the system.
+## 4. Technology baseline
 
-## Development
+The current implementation intentionally excludes Python from the application stack.
 
-Use conventional commits, for example:
+| Concern | Baseline |
+|---|---|
+| Application language | Rust |
+| HTTP framework | Axum |
+| Async runtime | Tokio |
+| HTTP client | reqwest + rustls |
+| Authentication protocol | GitHub OAuth + PKCE |
+| Session layer | tower-sessions |
+| Persistence baseline | PostgreSQL |
+| Object storage baseline | S3-compatible |
+| CI/CD | GitHub Actions |
+| Deployment | Docker / Render for initial environment |
+| Observability direction | tracing + OpenTelemetry-compatible architecture |
+| Browser surface | standards-based HTML/CSS/JS in v0.1 |
+
+Dependency versions are maintained in `Cargo.toml` and `Cargo.lock` when dependency resolution is generated.
+
+## 5. Security model
+
+Security starts from the first commit.
+
+Core controls include:
+
+- deny-by-default protected routes
+- explicit member allowlisting
+- OAuth state + PKCE
+- private session protection
+- HttpOnly / Secure / SameSite cookie controls
+- no secret values in source control
+- CSP and browser security headers
+- disabled outbound HTTP redirects for the OAuth client
+- dependency/advisory checks
+- automated security-oriented tests
+- data-classification gates
+- independent backup/recovery requirements for critical data
+
+**Important:** no software language or framework guarantees an unbreachable system. Rust addresses important classes of implementation risk; complete security depends on the whole system and its operation.
+
+## 6. Data classification
+
+Future information is classified as:
+
+`PUBLIC` → `INTERNAL` → `CONFIDENTIAL` → `RESTRICTED` → `CRITICAL`
+
+Critical information requires stronger identity, authorization, audit, storage, backup, recovery and operational controls.
+
+See:
+
+- `docs/security/DATA_CLASSIFICATION.md`
+- `docs/security/SECURITY.md`
+- `docs/operations/BACKUP_AND_RECOVERY.md`
+
+## 7. Engineering workflow
+
+Every commit should be a coherent unit of work.
+
+Examples:
 
 ```text
 chore: initialize repository structure
 feat: add public command center shell
-test: add authentication integration coverage
-fix: reject expired sessions
+test: cover protected state boundary
+fix: reject unauthorized resource access
+refactor: isolate resource status module
+docs: record architecture decision
 ```
 
-The authoritative checks are run by CI from a clean environment.
+Correct earlier work may be superseded when implementation evidence proves an earlier assumption incorrect. The correction should remain visible in history.
 
-## AI-assisted development
+## 8. CI/CD
 
-AI is used intentionally as an engineering accelerator for research, implementation, testing, documentation and refactoring. Human ownership remains responsible for requirements, architecture, security decisions, intellectual-property decisions, verification, releases and production operation.
+CI is part of the product.
 
-## Intellectual property
+Current verification includes:
 
-Repository visibility during v0.x does not grant permission to reuse proprietary GyLiber materials. The project's formal licensing and IP policy will be established before protected company assets are published or distributed.
+```text
+cargo fmt
+cargo check
+cargo clippy --all-targets --all-features -- -D warnings
+cargo test
+cargo audit
+```
 
-## License
+The workflow is manually dispatchable and runs automatically for repository changes.
 
-License terms are pending formal GyLiber policy.
+The project is intended to evolve toward stronger release verification such as:
+
+- SBOM generation
+- artifact provenance
+- container vulnerability scanning
+- CodeQL
+- policy enforcement
+- deployment health verification
+- restore/recovery tests
+
+## 9. Manual setup
+
+Gyile/GyLiber should not need to infer infrastructure setup from source code.
+
+Start with:
+
+`docs/operations/MANUAL_SETUP.md`
+
+That runbook explains Rust/Cargo, GitHub OAuth App creation, callback URLs, environment configuration, secrets, and which steps can safely be deferred.
+
+## 10. Hosting and recovery
+
+The first live environment is intentionally low-cost.
+
+Hosting is not the archive.
+
+The mature platform will use independent recovery mechanisms so loss of the laptop, application host, database or one storage provider does not eliminate GyLiber's irreplaceable information.
+
+See `docs/operations/BACKUP_AND_RECOVERY.md`.
+
+## 11. Extensibility
+
+A future feature may become:
+
+1. an internal module,
+2. a bounded backend/domain service,
+3. an independently deployed application, or
+4. a linked companion site.
+
+The Command Center remains the navigation/control plane when that split occurs.
+
+This permits future modules such as creative knowledge/trivia experiences, project operations, asset observability, intellectual-property records, staff operations and financial representations without forcing every function into one page or one process.
+
+## 12. AI-assisted engineering
+
+AI is intentionally used as an engineering accelerator for research, implementation, testing, documentation and refactoring.
+
+AI output is never treated as authoritative.
+
+Human responsibility remains with GyLiber and the project maintainers for:
+
+- requirements
+- architecture
+- security
+- dependency selection
+- intellectual property
+- verification
+- releases
+- production operations
+
+## 13. Intellectual property
+
+This repository is currently public during the early development phase.
+
+Public visibility does not grant a general license to reuse GyLiber intellectual property.
+
+See `LICENSE` for the current repository-level rights notice. Third-party dependencies remain governed by their own licenses.
+
+## 14. Living documentation
+
+The following documents are intentionally living documents:
+
+- `docs/requirements/REQUIREMENTS.md`
+- `docs/architecture/DESIGN.md`
+- `docs/security/SECURITY.md`
+- `docs/security/DATA_CLASSIFICATION.md`
+- `docs/operations/MANUAL_SETUP.md`
+- `docs/operations/DEPLOYMENT.md`
+- `docs/operations/BACKUP_AND_RECOVERY.md`
+- `docs/governance/DEVELOPMENT.md`
+- `docs/governance/KNOWLEDGE_GAPS.md`
+
+The architecture is expected to evolve as implementation evidence accumulates.
