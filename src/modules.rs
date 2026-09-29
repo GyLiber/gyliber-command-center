@@ -2,6 +2,7 @@ use serde::Serialize;
 
 #[derive(Debug, Clone, Copy, Serialize, PartialEq, Eq)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[expect(dead_code)]
 pub enum DataClassification {
     Public,
     Internal,
