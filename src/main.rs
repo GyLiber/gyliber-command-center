@@ -493,11 +493,9 @@ fn render_command_center(user: &GitHubUser) -> String {
 <article class="panel"><span class="eyebrow">MEMBER</span><div class="member"><img src="{avatar}" alt=""><div><strong>@{login}</strong><span>GitHub identity verified</span></div></div>
 <p class="muted">Authorization is enforced server-side through the configured GyLiber member allowlist.</p></article>
 </section>
-<section class="module-grid">
-<a class="module" href="/api/state"><span>01</span><h3>Live System State</h3><p>Inspect the current safe operational signal.</p></a>
-<article class="module locked"><span>02</span><h3>Finance</h3><p>Reserved for a later security-gated release.</p></article>
-<article class="module locked"><span>03</span><h3>Intellectual Property</h3><p>Reserved for classified document and rights controls.</p></article>
-<article class="module locked"><span>04</span><h3>People</h3><p>Reserved for private staff information controls.</p></article>
+<section>
+<div class="section-heading"><span class="eyebrow">MODULE REGISTRY</span><span class="muted small" id="module-summary">loading…</span></div>
+<div class="module-grid" id="module-grid"></div>
 </section>
 </main></body></html>"#
     )
