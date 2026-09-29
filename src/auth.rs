@@ -7,7 +7,6 @@ use axum::{
 };
 use oauth2::{AuthorizationCode, CsrfToken, PkceCodeChallenge, PkceCodeVerifier, Scope};
 use oauth2_reqwest::ReqwestClient;
-use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use tower_sessions::Session;
 use tracing::info;
@@ -151,11 +150,6 @@ pub(crate) fn is_allowed_member(login: &str, allowed_logins: &[String]) -> bool 
     allowed_logins
         .iter()
         .any(|allowed| allowed.trim().eq_ignore_ascii_case(normalized))
-}
-
-#[allow(dead_code)]
-fn _keep_reqwest_type(_: &Client) -> Result<()> {
-    Ok(())
 }
 
 #[cfg(test)]
