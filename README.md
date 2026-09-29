@@ -29,6 +29,8 @@ The first end-to-end vertical slice currently includes:
 - private authenticated session
 - protected Command Center
 - protected live-state API
+- protected typed module registry API
+- dynamic module rendering from the internal registry
 - browser polling of live state every 15 seconds
 - health endpoint for deployment probes
 - security response headers
