@@ -179,7 +179,7 @@ async fn login() -> Html<&'static str> {
 async fn protected_state(session: Session) -> Response {
     let _member = match auth::require_api_member(&session).await {
         Ok(member) => member,
-        Err(response) => return response,
+        Err(failure) => return failure.into_response(),
     };
     Json(state::snapshot()).into_response()
 }
