@@ -14,6 +14,7 @@ use oauth2::{
     basic::BasicClient,
 };
 use reqwest::Client;
+use oauth2_reqwest::ReqwestClient;
 use serde::{Deserialize, Serialize};
 use time::Duration;
 use tower_http::{
@@ -342,7 +343,7 @@ async fn github_callback(
     let token = match github_client(&state.github)
         .exchange_code(AuthorizationCode::new(query.code))
         .set_pkce_verifier(PkceCodeVerifier::new(verifier))
-        .request_async(&state.http)
+        .request_async(&ReqwestClient::from(state.http.clone()))
         .await
     {
         Ok(token) => token,
