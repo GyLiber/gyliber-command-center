@@ -64,7 +64,7 @@ mod tests {
     use serde_json::json;
 
     #[test]
-    fn repository_payload_shape_is_stable() {
+    fn repository_payload_deserializes_into_expected_shape() {
         let payload = json!({
             "full_name": "GyLiber/gyliber-command-center",
             "html_url": "https://github.com/GyLiber/gyliber-command-center",
@@ -76,7 +76,10 @@ mod tests {
             "pushed_at": "2026-09-29T00:00:00Z"
         });
 
-        assert_eq!(payload["full_name"], "GyLiber/gyliber-command-center");
-        assert_eq!(payload["default_branch"], "main");
+        let repository: super::GitHubRepository =
+            serde_json::from_value(payload).expect("GitHub fixture deserializes");
+        assert_eq!(repository.full_name, "GyLiber/gyliber-command-center");
+        assert_eq!(repository.default_branch, "main");
+        assert_eq!(repository.visibility, "public");
     }
 }
