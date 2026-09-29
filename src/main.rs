@@ -76,8 +76,9 @@ async fn main() -> Result<()> {
     let session_key = load_session_key()?;
     validate_runtime_security()?;
     let secure_cookie = env::var("COOKIE_SECURE")
-        .map(|value| value != "false")
-        .unwrap_or(true);
+        .map(|value| parse_bool("COOKIE_SECURE", &value))
+        .transpose()?
+        .unwrap_or(false);
 
     let app = build_app(state, session_key, secure_cookie);
 
@@ -212,6 +213,14 @@ fn load_state() -> Result<AppState> {
             .redirect(reqwest::redirect::Policy::none())
             .build()?,
     })
+}
+
+fn parse_bool(name: &str, value: &str) -> Result<bool> {
+    match value.trim().to_ascii_lowercase().as_str() {
+        "true" => Ok(true),
+        "false" => Ok(false),
+        _ => anyhow::bail!("{name} must be true or false"),
+    }
 }
 
 fn validate_runtime_security() -> Result<()> {
@@ -625,6 +634,13 @@ mod tests {
                 .and_then(|value| value.to_str().ok()),
             Some("same-origin")
         );
+        assert_eq!(
+            response
+                .headers()
+                .get("strict-transport-security")
+                .and_then(|value| value.to_str().ok()),
+            Some("max-age=0")
+        );
     }
 
     #[tokio::test]
@@ -680,6 +696,21 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn module_catalog_rejects_anonymous_requests() {
+        let response = test_app()
+            .oneshot(
+                Request::builder()
+                    .uri("/api/modules")
+                    .body(Body::empty())
+                    .expect("request builds"),
+            )
+            .await
+            .expect("response is produced");
+
+        assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+    }
+
+    #[tokio::test]
     async fn live_state_rejects_anonymous_api_requests() {
         let response = test_app()
             .oneshot(
@@ -693,6 +724,13 @@ mod tests {
 
         assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
         assert!(response.headers().get("location").is_none());
+    }
+
+    #[test]
+    fn boolean_configuration_accepts_only_true_or_false() {
+        assert!(parse_bool("COOKIE_SECURE", "true").expect("true parses"));
+        assert!(!parse_bool("COOKIE_SECURE", "false").expect("false parses"));
+        assert!(parse_bool("COOKIE_SECURE", "enabled").is_err());
     }
 
     #[test]
