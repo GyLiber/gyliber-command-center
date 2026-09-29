@@ -28,6 +28,7 @@ use tracing::info;
 
 mod modules;
 mod repository;
+mod resources;
 mod state;
 
 const RELEASE: &str = env!("CARGO_PKG_VERSION");
@@ -125,10 +126,12 @@ fn build_app(state: AppState, session_key: Key, secure_cookie: bool) -> Router {
         .route("/command", get(command_center))
         .route("/command/state", get(command_state))
         .route("/command/repository", get(command_repository))
+        .route("/command/resources", get(command_resources))
         .route("/api/health", get(health))
         .route("/api/state", get(protected_state))
         .route("/api/modules", get(protected_modules))
         .route("/api/repository", get(protected_repository))
+        .route("/api/resources", get(protected_resources))
         .nest_service("/static", ServeDir::new("static"))
         .fallback(not_found)
         .layer(RequestBodyLimitLayer::new(64 * 1024))
@@ -411,6 +414,24 @@ async fn protected_state(session: Session) -> Response {
     Json(state::snapshot()).into_response()
 }
 
+async fn protected_resources(session: Session) -> Response {
+    if session
+        .get::<GitHubUser>(MEMBER_KEY)
+        .await
+        .ok()
+        .flatten()
+        .is_none()
+    {
+        return (
+            StatusCode::UNAUTHORIZED,
+            Json(serde_json::json!({"error": "authentication_required"})),
+        )
+            .into_response();
+    }
+
+    Json(resources::catalog()).into_response()
+}
+
 async fn protected_repository(State(state): State<AppState>, session: Session) -> Response {
     if session
         .get::<GitHubUser>(MEMBER_KEY)
@@ -452,6 +473,20 @@ async fn protected_modules(session: Session) -> Response {
     }
 
     Json(modules::catalog()).into_response()
+}
+
+async fn command_resources(session: Session) -> Response {
+    if session
+        .get::<GitHubUser>(MEMBER_KEY)
+        .await
+        .ok()
+        .flatten()
+        .is_none()
+    {
+        return Redirect::to("/login").into_response();
+    }
+
+    Html(include_str!("../static/resources.html")).into_response()
 }
 
 async fn command_repository(session: Session) -> Response {
