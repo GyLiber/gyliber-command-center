@@ -413,7 +413,7 @@ mod tests {
     use oauth2::{ClientId, ClientSecret, RedirectUrl};
 
     fn test_app() -> axum::Router {
-            let github = config::GitHubConfig {
+        let github = config::GitHubConfig {
             client_id: ClientId::new("test-client".into()),
             client_secret: ClientSecret::new("test-secret".into()),
             redirect_url: RedirectUrl::new("http://localhost:3000/auth/github/callback".into())
