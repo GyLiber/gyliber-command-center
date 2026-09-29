@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: gyliber-command-center
+    runtime: docker
+    plan: free
+    branch: main
+    healthCheckPath: /api/health
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: RUST_LOG
+        value: info
+      - key: SESSION_MASTER_KEY
+        sync: false
+      - key: GITHUB_CLIENT_ID
+        sync: false
+      - key: GITHUB_CLIENT_SECRET
+        sync: false
+      - key: GITHUB_REDIRECT_URL
+        sync: false
+      - key: GYLIBER_ALLOWED_GITHUB_LOGINS
+        sync: false
