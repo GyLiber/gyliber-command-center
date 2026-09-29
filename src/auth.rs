@@ -187,7 +187,7 @@ pub(crate) fn is_allowed_member(login: &str, allowed_logins: &[String]) -> bool 
 #[cfg(test)]
 mod tests {
     use super::{AuthFailure, is_allowed_member};
-    use axum::http::StatusCode;
+    use axum::{http::StatusCode, response::IntoResponse};
 
     #[test]
     fn page_auth_failure_redirects_to_login() {
