@@ -620,7 +620,7 @@ mod tests {
     use tower::ServiceExt;
     use tower_sessions::cookie::Key;
 
-    use super::{AppState, GitHubConfig, build_app, html_escape, is_allowed_member};
+    use super::{AppState, GitHubConfig, build_app, html_escape, is_allowed_member, parse_bool};
     use oauth2::{ClientId, ClientSecret, RedirectUrl};
 
     fn test_app() -> axum::Router {
