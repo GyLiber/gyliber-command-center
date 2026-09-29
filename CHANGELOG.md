@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased — v0.2.0 development
+## [0.2.0] — Live product foundation
 
 - Centralized authenticated-member access policy for protected browser and API surfaces.
 - Added explicit tests for page redirect and API authentication failure semantics.
@@ -14,7 +14,7 @@
 - Added a protected resource registry API and browser surface.
 - Registered the resource registry as a first-class Command Center module.
 
-## Unreleased — v0.2.0 development
+## Unreleased — v0.3.0 development
 
 - Added the first typed Command Center module registry.
 - Added the protected Live State Monitor with server observation timestamps.
@@ -22,6 +22,7 @@
 - Added bounded upstream timeouts and explicit unavailable-state handling.
 - Hardened production transport configuration, HSTS behavior and request-body limits.
 - Added architecture and deployment documentation for the new modules and hosting constraints.
+- Added runtime release and Render deployment commit provenance to the authenticated live-state surface.
 
 ## [0.1.0] — Foundation
 
