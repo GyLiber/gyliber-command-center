@@ -40,13 +40,9 @@ pub(crate) fn github_client(config: &GitHubConfig) -> GitHubClient {
 }
 
 pub(crate) fn load_state() -> Result<AppState> {
-    let github_configured = [
-        "GITHUB_CLIENT_ID",
-        "GITHUB_CLIENT_SECRET",
-        "GYLIBER_ALLOWED_GITHUB_LOGINS",
-    ]
-    .iter()
-    .any(|name| env::var(name).is_ok());
+    let github_configured = ["GITHUB_CLIENT_ID", "GITHUB_CLIENT_SECRET"]
+        .iter()
+        .any(|name| env::var(name).is_ok());
 
     let github = if github_configured {
         let client_id =
