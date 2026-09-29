@@ -720,6 +720,28 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn live_state_page_redirects_anonymous_visitors() {
+        let response = test_app()
+            .oneshot(
+                Request::builder()
+                    .uri("/command/state")
+                    .body(Body::empty())
+                    .expect("request builds"),
+            )
+            .await
+            .expect("response is produced");
+
+        assert_eq!(response.status(), StatusCode::SEE_OTHER);
+        assert_eq!(
+            response
+                .headers()
+                .get("location")
+                .and_then(|value| value.to_str().ok()),
+            Some("/login")
+        );
+    }
+
+    #[tokio::test]
     async fn live_state_rejects_anonymous_api_requests() {
         let response = test_app()
             .oneshot(
