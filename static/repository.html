@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Repository Monitor — GyLiber</title>
+<link rel="stylesheet" href="/static/app.css">
+<script src="/static/repository.js" defer></script>
+</head>
+<body>
+<main class="shell">
+<header class="topbar">
+<div>
+<span class="eyebrow">GYLIBER / ASSET OBSERVABILITY</span>
+<h1>Repository Monitor</h1>
+</div>
+<nav class="internal-nav">
+<a href="/command">Command Center</a>
+<form action="/logout" method="post"><button class="ghost" type="submit">Sign out</button></form>
+</nav>
+</header>
+<section class="panel state-hero">
+<div class="status-line"><span class="pulse"></span><span id="repo-status">CONNECTING</span></div>
+<h2>GyLiber Command Center repository</h2>
+<p class="muted">Live public metadata fetched server-side from GitHub. No GitHub credential is persisted by this monitor.</p>
+</section>
+<section class="state-grid">
+<article class="state-card"><span>VISIBILITY</span><strong id="visibility">—</strong></article>
+<article class="state-card"><span>DEFAULT BRANCH</span><strong id="branch">—</strong></article>
+<article class="state-card"><span>OPEN ISSUES</span><strong id="issues">—</strong></article>
+<article class="state-card"><span>STARS / FORKS</span><strong id="community">—</strong></article>
+</section>
+<section class="panel observation">
+<div>
+<span class="eyebrow">UPSTREAM OBSERVATION</span>
+<h3 id="last-push">Awaiting GitHub response…</h3>
+</div>
+<p id="observed" class="muted">—</p>
+</section>
+<footer><span>GYLIBER / REPOSITORY MONITOR</span><span>Read-only integration · v0.1.0</span></footer>
+</main>
+</body>
+</html>
