@@ -99,7 +99,11 @@ A deployed v0.1.0 slice must demonstrate:
 9. security baseline and secret hygiene
 10. version metadata
 
-## 7. v1.0.0 expansion
+## 7. v0.1.x evolution
+
+The v0.1.x line may harden the transport boundary, extract domain modules, establish module-registry contracts, and improve operational observability without introducing critical business data.
+
+## 8. v1.0.0 expansion
 
 The architecture must permit:
 - resource registry and integrations
@@ -113,6 +117,6 @@ The architecture must permit:
 - richer observability
 - separate services/sites when necessary
 
-## 8. Traceability
+## 9. Traceability
 
 Every material feature after v0.1.0 should link to a documented requirement, implementation boundary and automated acceptance evidence.
