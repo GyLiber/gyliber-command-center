@@ -80,11 +80,14 @@ Planned bounded domains:
 - operations/live state
 - knowledge/trivia
 - documents/IP
+- contracts/engagements (confidential)
 - finance (restricted)
 - people/staff (restricted)
 - integrations/secrets (restricted)
 - audit/events
 - system administration
+
+The Contracts & Engagements domain is the planned record of active and prospective GyLiber client engagements. It should separate contract metadata from controlled document content and enforce classification-aware, role-limited access with durable audit events.
 
 A domain may remain in the primary application or be extracted when security, scaling, deployment ownership or fault isolation makes extraction worthwhile.
 
@@ -103,7 +106,7 @@ The UI must distinguish live, recently observed, stale and unknown.
 
 `PUBLIC`, `INTERNAL`, `CONFIDENTIAL`, `RESTRICTED`, `CRITICAL`.
 
-Classification controls storage, display, authorization, audit, retention and recovery.
+Classification controls storage, display, authorization, audit, retention and recovery. Contract and engagement records are Confidential by default; client-identifying, financial, credential or other higher-risk fields may require Restricted or Critical handling.
 
 ## 8. Versioning
 
