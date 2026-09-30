@@ -174,7 +174,6 @@ impl SessionStoreBackend {
             Err(error) => Err(error.into()),
         }
     }
-
 }
 
 #[async_trait]
