@@ -23,6 +23,14 @@ jobs:
           toolchain: 1.98.1
           components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
+      - name: Generate lockfile for verification
+        run: cargo generate-lockfile
+      - name: Export generated lockfile
+        run: |
+          echo "LOCKFILE_BEGIN"
+          base64 -w0 Cargo.lock
+          echo
+          echo "LOCKFILE_END"
       - name: Format check
         run: cargo fmt --all -- --check
       - name: Check
