@@ -1,4 +1,4 @@
-# Manual Setup Runbook — v0.2.0
+# Manual Setup Runbook — v0.3.0 development
 
 This document covers actions that require Gyile/GyLiber because they involve an external account, secret, domain or approval boundary.
 
@@ -81,39 +81,57 @@ Treat the Client Secret exactly like a password for an infrastructure service:
 
 Store it only in the local environment or hosting-provider secret store.
 
-## 3. Canonical public domain
+## 3. Canonical public domain — deferred
 
-The public site should not expose a provider-generated hosting hostname in business-card or client-facing material.
+The canonical GyLiber-owned domain remains the preferred long-term public identity:
 
-### Target
+- preferred: `gyliber.com`
+- fallback Command Center address: `hq.gyliber.com`
 
-Preferred:
+**Domain purchase is currently deferred for budget reasons.** The Command Center therefore continues to use the current managed-host URL as its temporary public address. No DNS or OAuth callback migration should be attempted until a GyLiber-owned domain is actually secured.
 
-`gyliber.com`
+The long-term cutover procedure remains documented in `docs/operations/DEPLOYMENT.md`.
 
-Preferred Command Center subdomain when the root domain is used elsewhere:
+## 4. PostgreSQL session persistence
 
-`hq.gyliber.com`
+The v0.3 development line replaces production in-memory sessions with PostgreSQL-backed sessions.
 
-The final choice depends on which domain GyLiber owns and intends to make the public corporate address.
+### Required production value
 
-### What Gyile must do
+Production requires:
 
-1. Own or control the chosen domain through a registrar/DNS provider.
-2. Add the chosen domain to the managed-host service's **Custom Domains** section.
-3. Copy the exact DNS target shown by the hosting provider.
-4. Add that DNS record at the domain's DNS provider.
-5. Remove conflicting IPv6 `AAAA` records if instructed by the hosting provider.
-6. Return to the hosting provider and click **Verify**.
-7. Confirm that HTTPS/TLS becomes active.
-8. Update the GitHub OAuth callback to the canonical domain.
-9. Update `GITHUB_REDIRECT_URL` in the hosting environment to match exactly.
-10. Test login and the public site using the canonical domain.
-11. Use only the canonical domain on printed material.
+`DATABASE_URL`
 
-The underlying hosting provider can then be changed later without changing the public address.
+The value must be the private/internal PostgreSQL connection string for the managed deployment. Store it only in the hosting provider's environment/secret configuration.
 
-## 4. Current infrastructure secrets
+Do not:
+
+- commit the value to Git;
+- put real credentials in `.env.example`;
+- paste it into ChatGPT;
+- place it in an issue, README or screenshot.
+
+### Current development database
+
+A free Render PostgreSQL 18 instance named `gyliber-command-center-db` is currently provisioned in Frankfurt for development verification. Render currently reports an expiry date of **2026-10-30**.
+
+It is **temporary** and must not become the authoritative company archive or backup system. Real client contracts, credentials, critical company records or irreplaceable archives must not be loaded into this temporary database.
+
+### What Gyile must do before production activation
+
+1. Open the Render PostgreSQL resource's **Connect** view.
+2. Copy its private/internal database connection string.
+3. Open the `gyliber-command-center` Web Service.
+4. Open **Environment**.
+5. Add an environment variable with key `DATABASE_URL`.
+6. Paste the private/internal connection string as its value.
+7. Save the environment changes.
+
+The connection string itself must never be pasted into this chat.
+
+CI uses an ephemeral PostgreSQL service for automated session tests, so the source verification does not depend on exposing the production database credential.
+
+## 5. Current infrastructure secrets
 
 The managed-host environment already contains the required session key and operational configuration.
 
@@ -121,12 +139,12 @@ Do not replace existing production values merely to “clean up” the environme
 
 Do not paste any secret value into chat.
 
-## 5. Release rule
+## 6. Release rule
 
 If a screen asks for a value not described by the current runbook, stop rather than guessing. Update the engineering documentation first.
 
-## 6. What Gyile should do now
+## 7. What Gyile should do now
 
 No manual action is required for ordinary source-code development, documentation updates, CI verification or routine deployment triggering when the engineering tooling can perform them.
 
-The next manual dependency is the **GyLiber-owned canonical domain**. Once a domain is owned and selected, the remaining DNS/custom-domain/OAuth callback steps can be executed from this runbook.
+The current manual deployment dependency is the **DATABASE_URL** configuration described above. The canonical domain remains a separate deferred task and does not block v0.3 development.
