@@ -33,6 +33,11 @@
 - Added the GyLiber slogan, **Ever Toward Liberation**, to the public Command Center identity.
 - Documented contract/engagement record requirements, classification and security prerequisites without onboarding real contract data.
 
+- Added a PostgreSQL-backed production session-store implementation with migration support and fail-closed production configuration.
+- Added an ephemeral PostgreSQL 18 CI service and an automated session create/save/load/delete round-trip test.
+- Documented the current temporary free PostgreSQL environment and its 2026-10-30 expiry.
+- Deferred the canonical domain purchase without changing the long-term GyLiber-owned domain strategy.
+
 The next development line is intentionally planned before implementation. See:
 
 `docs/operations/NEXT_DEVELOPMENT_STEPS.md`
