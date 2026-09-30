@@ -153,22 +153,20 @@ impl SessionStoreBackend {
             .map(|value| value.eq_ignore_ascii_case("production"))
             .unwrap_or(false);
 
-        production && !database_url.map(|value| !value.trim().is_empty()).unwrap_or(false)
+        production
+            && !database_url
+                .map(|value| !value.trim().is_empty())
+                .unwrap_or(false)
     }
 
     pub(crate) async fn from_environment() -> Result<Self> {
         match std::env::var("DATABASE_URL") {
-            Ok(database_url) if !database_url.trim().is_empty() => {
-                Ok(Self::Postgres(
-                    PostgresSessionStore::connect(&database_url).await?,
-                ))
-            }
+            Ok(database_url) if !database_url.trim().is_empty() => Ok(Self::Postgres(
+                PostgresSessionStore::connect(&database_url).await?,
+            )),
             Ok(_) => anyhow::bail!("DATABASE_URL cannot be empty when provided"),
             Err(std::env::VarError::NotPresent) => {
-                if Self::requires_database(
-                    std::env::var("APP_ENV").ok().as_deref(),
-                    None,
-                ) {
+                if Self::requires_database(std::env::var("APP_ENV").ok().as_deref(), None) {
                     anyhow::bail!(
                         "DATABASE_URL is required in production; refusing to start with in-memory sessions"
                     );
@@ -229,9 +227,21 @@ mod tests {
 
     #[test]
     fn production_requires_database_persistence() {
-        assert!(SessionStoreBackend::requires_database(Some("production"), None));
-        assert!(SessionStoreBackend::requires_database(Some("PRODUCTION"), Some("   ")));
-        assert!(!SessionStoreBackend::requires_database(Some("production"), Some("postgres://example")));
-        assert!(!SessionStoreBackend::requires_database(Some("development"), None));
+        assert!(SessionStoreBackend::requires_database(
+            Some("production"),
+            None
+        ));
+        assert!(SessionStoreBackend::requires_database(
+            Some("PRODUCTION"),
+            Some("   ")
+        ));
+        assert!(!SessionStoreBackend::requires_database(
+            Some("production"),
+            Some("postgres://example")
+        ));
+        assert!(!SessionStoreBackend::requires_database(
+            Some("development"),
+            None
+        ));
     }
 }
