@@ -401,7 +401,12 @@ mod tests {
             http: Client::new(),
         };
 
-        build_app(state, Key::generate(), false)
+        build_app(
+            state,
+            Key::generate(),
+            false,
+            session_store::SessionStoreBackend::Memory(tower_sessions::MemoryStore::default()),
+        )
     }
 
     #[tokio::test]
