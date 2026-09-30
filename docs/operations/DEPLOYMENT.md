@@ -85,6 +85,26 @@ ca-certificates
 
 before the application starts.
 
+### Durable-session deployment checkpoint
+
+The durable PostgreSQL session implementation was merged into `main` as commit `d6d52c12ac221e2f233b5e9f30e4c20d5856a20d`.
+
+The first controlled Render deployment of that commit failed during the Docker build because the image build context did not include the repository's `migrations/` directory. The compiler reported:
+
+```text
+couldn't read src/../migrations/0001_sessions.sql: No such file or directory
+```
+
+The failure is a container-build packaging defect, not evidence that the PostgreSQL connection failed at runtime.
+
+PR #22 records the corrective change:
+
+- `COPY migrations ./migrations` is added before the release build;
+- the existing versioned session migration remains the source of schema truth;
+- no manual SQL table creation is required.
+
+Until PR #22 is verified, merged and successfully deployed, the previous v0.2 live deployment remains the active production-like release.
+
 ## 7. Render/managed-host free-tier constraints
 
 The initial managed-host environment is suitable for development, demonstration and low-risk operation, not for critical company data.
@@ -99,13 +119,15 @@ Therefore:
 - keep source and infrastructure definitions in version control;
 - establish independent backups before persistent high-value information is introduced.
 
-## 9. Manual changes
+The current free Render PostgreSQL instance `gyliber-command-center-db` expires on **2026-10-30** and is temporary development infrastructure.
+
+## 8. Manual changes
 
 Infrastructure credentials and external DNS changes are the only deployment actions that should require Gyile/GyLiber intervention.
 
-Never put the production Client Secret or session key into a committed file.
+Never put the production Client Secret, session key or private database connection string into a committed file.
 
-## 10. Release evidence
+## 9. Release evidence
 
 For each material release, retain:
 
