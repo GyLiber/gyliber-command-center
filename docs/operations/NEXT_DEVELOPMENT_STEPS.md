@@ -67,7 +67,9 @@ Acceptance evidence:
 
 ### 3.2 Database foundation
 
-Introduce PostgreSQL as a controlled platform capability, not as a reason to load sensitive company data immediately.
+**Implementation status: schema and migration foundation complete; production activation pending the managed service connection configuration.**
+
+PostgreSQL is introduced as a controlled platform capability, not as a reason to load sensitive company data immediately.
 
 A temporary free Render PostgreSQL 18 instance is currently available for development verification and expires on **2026-10-30**. It is not permanent storage or backup infrastructure.
 
