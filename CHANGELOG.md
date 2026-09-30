@@ -36,41 +36,13 @@
 - Added a PostgreSQL-backed production session-store implementation with migration support and fail-closed production configuration.
 - Added an ephemeral PostgreSQL 18 CI service and an automated session create/save/load/delete round-trip test.
 - Documented the current temporary free PostgreSQL environment and its 2026-10-30 expiry.
+- Configured the private/internal `DATABASE_URL` in the Render web service environment without recording the secret value in source control.
+- Recorded the first controlled deployment failure caused by the Docker build context omitting `migrations/0001_sessions.sql`.
+- PR #22 adds the required Docker build-context correction; v0.3 deployment activation remains pending successful verification and redeployment.
 - Deferred the canonical domain purchase without changing the long-term GyLiber-owned domain strategy.
 
 The v0.3 development line is being implemented incrementally. See:
 
 `docs/operations/NEXT_DEVELOPMENT_STEPS.md`
 
-## [0.1.0] — Foundation
-
-### Added
-- Public GyLiber landing surface with About, Work and Links pages.
-- Discreet member-access entry.
-- GitHub OAuth Authorization Code authentication with PKCE.
-- Explicit GitHub username allowlist for internal access.
-- Private authenticated sessions with HttpOnly, Secure and SameSite controls.
-- Protected Command Center route.
-- Protected live-state API.
-- Protected typed module registry API and dynamic dashboard rendering.
-- Browser live-state polling with freshness display.
-- Public health endpoint for deployment probes.
-- CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Cache-Control, Permissions-Policy, Cross-Origin-Opener-Policy and Cross-Origin-Resource-Policy headers.
-- Production transport validation, HSTS policy and request-body limits.
-- Request IDs and HTTP tracing.
-- Controlled 404 page.
-- Rust unit and HTTP-boundary tests.
-- GitHub Actions CI with format, check, clippy, test and advisory verification.
-- CI concurrency cancellation and execution timeout.
-- Dependabot configuration for Cargo and GitHub Actions.
-- Docker and managed-host deployment definitions.
-- Requirements, system design, security baseline, data classification, backup/recovery, manual setup, governance and architecture decision records.
-
-### Security boundary
-v0.1.0 intentionally stores no banking records, production credentials, high-value trade secrets, personnel records, customer records or irreplaceable corporate archives.
-
-### Known operational limitation
-The v0.1 session store is in memory. Active sessions are lost on process restart. This is accepted only for the initial non-critical release and must be replaced by durable identity/session infrastructure before multi-instance production operation.
-
-## Future
-Subsequent releases will add modular resource registries, richer live operations, knowledge modules, persistent private data behind security gates, independent backups, stronger identity/passkeys, observability and production-grade deployment controls.
+Development is temporarily paused at the PR #22 verification/deployment-correction checkpoint.
