@@ -131,7 +131,7 @@ The connection string itself must never be pasted into this chat.
 
 CI uses an ephemeral PostgreSQL service for automated session tests, so the source verification does not depend on exposing the production database credential.
 
-## 6. Current infrastructure secrets
+## 5. Current infrastructure secrets
 
 The managed-host environment already contains the required session key and operational configuration.
 
@@ -139,12 +139,12 @@ Do not replace existing production values merely to “clean up” the environme
 
 Do not paste any secret value into chat.
 
-## 5. Release rule
+## 6. Release rule
 
 If a screen asks for a value not described by the current runbook, stop rather than guessing. Update the engineering documentation first.
 
-## 6. What Gyile should do now
+## 7. What Gyile should do now
 
 No manual action is required for ordinary source-code development, documentation updates, CI verification or routine deployment triggering when the engineering tooling can perform them.
 
-The next manual dependency is the **GyLiber-owned canonical domain**. Once a domain is owned and selected, the remaining DNS/custom-domain/OAuth callback steps can be executed from this runbook.
+The current manual deployment dependency is the **DATABASE_URL** configuration described above. The canonical domain remains a separate deferred task and does not block v0.3 development.
