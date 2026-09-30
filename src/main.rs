@@ -17,7 +17,7 @@ use tower_http::{
     set_header::SetResponseHeaderLayer,
     trace::TraceLayer,
 };
-use tower_sessions::{Expiry, MemoryStore, Session, SessionManagerLayer, cookie::Key};
+use tower_sessions::{Expiry, Session, SessionManagerLayer, cookie::Key};
 use tracing::info;
 
 mod audit;
@@ -26,6 +26,7 @@ mod config;
 mod modules;
 mod repository;
 mod resources;
+mod session_store;
 mod state;
 
 const RELEASE: &str = env!("CARGO_PKG_VERSION");
@@ -52,7 +53,8 @@ async fn main() -> Result<()> {
         Err(error) => return Err(error.into()),
     };
 
-    let app = build_app(state, session_key, secure_cookie);
+    let session_store = session_store::SessionStoreBackend::from_environment().await?;
+    let app = build_app(state, session_key, secure_cookie, session_store);
 
     let port = env::var("PORT")
         .unwrap_or_else(|_| "3000".into())
@@ -66,8 +68,13 @@ async fn main() -> Result<()> {
     Ok(())
 }
 
-fn build_app(state: config::AppState, session_key: Key, secure_cookie: bool) -> Router {
-    let sessions = SessionManagerLayer::new(MemoryStore::default())
+fn build_app(
+    state: config::AppState,
+    session_key: Key,
+    secure_cookie: bool,
+    session_store: session_store::SessionStoreBackend,
+) -> Router {
+    let sessions = SessionManagerLayer::new(session_store)
         .with_name("gyliber.sid")
         .with_http_only(true)
         .with_secure(secure_cookie)
@@ -358,7 +365,12 @@ mod tests {
             http: Client::new(),
         };
 
-        build_app(state, Key::generate(), false)
+        build_app(
+            state,
+            Key::generate(),
+            false,
+            session_store::SessionStoreBackend::Memory(tower_sessions::MemoryStore::default()),
+        )
     }
 
     #[tokio::test]
