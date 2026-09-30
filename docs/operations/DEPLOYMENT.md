@@ -25,7 +25,7 @@ The OAuth callback URL must exactly match the GitHub application configuration.
 
 ## 3. Security boundary
 
-v0.2.0 is not authorized to store banking records, unrestricted financial data, high-value trade secrets, personnel records, production credentials or irreplaceable company archives.
+The current v0.3 development line is not authorized to store banking records, unrestricted financial data, high-value trade secrets, personnel records, production credentials, real client contracts or irreplaceable company archives in the temporary development database.
 
 ## 4. Current release acceptance
 
@@ -86,10 +86,6 @@ ca-certificates
 before the application starts.
 
 ## 7. Render/managed-host free-tier constraints
-
-The current free PostgreSQL development instance expires on **2026-10-30** and is not approved as permanent storage or backup infrastructure.
-
-## 8. Render/managed-host free-tier constraints
 
 The initial managed-host environment is suitable for development, demonstration and low-risk operation, not for critical company data.
 
