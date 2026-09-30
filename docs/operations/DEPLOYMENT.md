@@ -1,4 +1,4 @@
-# v0.2.0 Deployment Runbook
+# v0.3.0 Development Deployment Runbook
 
 ## 1. Deployment model
 
@@ -18,6 +18,7 @@ Runtime configuration:
 - `GITHUB_CLIENT_SECRET`
 - `GITHUB_REDIRECT_URL`
 - `SESSION_MASTER_KEY` — at least 64 cryptographically random bytes
+- `DATABASE_URL` — private/internal PostgreSQL connection string in production
 - `GYLIBER_ALLOWED_GITHUB_LOGINS`
 
 The OAuth callback URL must exactly match the GitHub application configuration.
@@ -37,14 +38,15 @@ A successful hosted deployment must demonstrate:
 5. `COOKIE_SECURE=true`.
 6. GitHub OAuth callback URL is exact when member authentication is enabled.
 7. Only intended GitHub usernames are allowlisted.
-8. `/api/health` reports `status=ok` and the expected release version.
-9. The public landing page is reachable.
-10. The authenticated Command Center is reachable for an allowlisted account when authentication is configured.
-11. A non-allowlisted GitHub account receives HTTP 403.
-12. Logout clears the authenticated session.
-13. No sensitive company data has been loaded.
-14. The authenticated Live State Monitor reports the release and running deployment provenance.
-15. The canonical public domain resolves to the live service once domain binding is complete.
+8. Production sessions use the PostgreSQL-backed session store.
+9. `/api/health` reports `status=ok` and the expected release version.
+10. The public landing page is reachable.
+11. The authenticated Command Center is reachable for an allowlisted account when authentication is configured.
+12. A non-allowlisted GitHub account receives HTTP 403.
+13. Logout clears the authenticated session.
+14. No sensitive company data has been loaded.
+15. The authenticated Live State Monitor reports the release and running deployment provenance.
+16. The canonical public domain resolves to the live service once domain binding is complete.
 
 ## 5. Canonical-domain binding
 
@@ -85,6 +87,10 @@ before the application starts.
 
 ## 7. Render/managed-host free-tier constraints
 
+The current free PostgreSQL development instance expires on **2026-10-30** and is not approved as permanent storage or backup infrastructure.
+
+## 8. Render/managed-host free-tier constraints
+
 The initial managed-host environment is suitable for development, demonstration and low-risk operation, not for critical company data.
 
 Treat the hosted filesystem as disposable unless a separate durable storage contract exists.
@@ -97,13 +103,13 @@ Therefore:
 - keep source and infrastructure definitions in version control;
 - establish independent backups before persistent high-value information is introduced.
 
-## 8. Manual changes
+## 9. Manual changes
 
 Infrastructure credentials and external DNS changes are the only deployment actions that should require Gyile/GyLiber intervention.
 
 Never put the production Client Secret or session key into a committed file.
 
-## 9. Release evidence
+## 10. Release evidence
 
 For each material release, retain:
 
