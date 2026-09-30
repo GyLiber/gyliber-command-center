@@ -6,11 +6,11 @@ use sqlx::{
     PgPool, Row,
     postgres::PgPoolOptions,
 };
-use std::{env, sync::Arc, time::Duration as StdDuration};
+use std::time::Duration as StdDuration;
 
-use time::{Duration, OffsetDateTime};
+use time::OffsetDateTime;
 use tower_sessions::{
-    MemoryStore, Session, SessionStore,
+    MemoryStore, SessionStore,
     session::{Id, Record},
     session_store,
 };
@@ -223,6 +223,9 @@ impl SessionStore for SessionStoreBackend {
 mod tests {
     use super::{PostgresSessionStore, SessionStoreBackend};
     use std::{env, sync::Arc};
+
+    use time::Duration;
+    use tower_sessions::Session;
 
     #[test]
     fn production_requires_database_persistence() {
