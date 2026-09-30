@@ -1,0 +1,252 @@
+use std::time::Duration as StdDuration;
+
+use anyhow::{Context, Result};
+use async_trait::async_trait;
+use sqlx::{
+    PgPool,
+    postgres::{PgPoolOptions, PgRow},
+};
+use time::OffsetDateTime;
+use tower_sessions::{
+    ExpiredDeletion, MemoryStore, SessionStore,
+    session::{Id, Record},
+    session_store,
+};
+
+const MIGRATION: &str = include_str!("../migrations/0001_sessions.sql");
+const SESSION_TABLE: &str = "gyliber_sessions";
+const MAX_CONNECTIONS: u32 = 5;
+
+#[derive(Clone, Debug)]
+pub(crate) struct PostgresSessionStore {
+    pool: PgPool,
+}
+
+impl PostgresSessionStore {
+    pub(crate) async fn connect(database_url: &str) -> Result<Self> {
+        let pool = PgPoolOptions::new()
+            .max_connections(MAX_CONNECTIONS)
+            .acquire_timeout(StdDuration::from_secs(5))
+            .connect(database_url)
+            .await
+            .context("unable to connect to PostgreSQL session store")?;
+
+        let store = Self { pool };
+        store.migrate().await?;
+        Ok(store)
+    }
+
+    async fn migrate(&self) -> Result<()> {
+        sqlx::raw_sql(MIGRATION)
+            .execute(&self.pool)
+            .await
+            .context("unable to migrate PostgreSQL session store")?;
+        Ok(())
+    }
+
+    fn encode(record: &Record) -> session_store::Result<Vec<u8>> {
+        rmp_serde::to_vec(record).map_err(|error| session_store::Error::Encode(error.to_string()))
+    }
+
+    fn decode(data: Vec<u8>) -> session_store::Result<Record> {
+        rmp_serde::from_slice(&data)
+            .map_err(|error| session_store::Error::Decode(error.to_string()))
+    }
+
+    fn is_unique_violation(error: &sqlx::Error) -> bool {
+        matches!(
+            error,
+            sqlx::Error::Database(database_error)
+                if database_error.code().as_deref() == Some("23505")
+        )
+    }
+}
+
+#[async_trait]
+impl SessionStore for PostgresSessionStore {
+    async fn create(&self, record: &mut Record) -> session_store::Result<()> {
+        let data = Self::encode(record)?;
+
+        loop {
+            let result = sqlx::query(
+                "INSERT INTO gyliber_sessions (id, data, expiry_date) VALUES ($1, $2, $3)",
+            )
+            .bind(record.id.to_string())
+            .bind(&data)
+            .bind(record.expiry_date)
+            .execute(&self.pool)
+            .await;
+
+            match result {
+                Ok(_) => return Ok(()),
+                Err(error) if Self::is_unique_violation(&error) => {
+                    record.id = Id::default();
+                }
+                Err(error) => return Err(session_store::Error::Backend(error.to_string())),
+            }
+        }
+    }
+
+    async fn save(&self, record: &Record) -> session_store::Result<()> {
+        let data = Self::encode(record)?;
+
+        sqlx::query(
+            "INSERT INTO gyliber_sessions (id, data, expiry_date)
+             VALUES ($1, $2, $3)
+             ON CONFLICT (id) DO UPDATE SET
+                 data = EXCLUDED.data,
+                 expiry_date = EXCLUDED.expiry_date",
+        )
+        .bind(record.id.to_string())
+        .bind(data)
+        .bind(record.expiry_date)
+        .execute(&self.pool)
+        .await
+        .map_err(|error| session_store::Error::Backend(error.to_string()))?;
+
+        Ok(())
+    }
+
+    async fn load(&self, session_id: &Id) -> session_store::Result<Option<Record>> {
+        let row: Option<PgRow> = sqlx::query(
+            "SELECT data FROM gyliber_sessions
+             WHERE id = $1 AND expiry_date > $2",
+        )
+        .bind(session_id.to_string())
+        .bind(OffsetDateTime::now_utc())
+        .fetch_optional(&self.pool)
+        .await
+        .map_err(|error| session_store::Error::Backend(error.to_string()))?;
+
+        match row {
+            Some(row) => {
+                let data: Vec<u8> = sqlx::Row::try_get(&row, "data")
+                    .map_err(|error| session_store::Error::Backend(error.to_string()))?;
+                Ok(Some(Self::decode(data)?))
+            }
+            None => Ok(None),
+        }
+    }
+
+    async fn delete(&self, session_id: &Id) -> session_store::Result<()> {
+        sqlx::query("DELETE FROM gyliber_sessions WHERE id = $1")
+            .bind(session_id.to_string())
+            .execute(&self.pool)
+            .await
+            .map_err(|error| session_store::Error::Backend(error.to_string()))?;
+
+        Ok(())
+    }
+}
+
+#[async_trait]
+impl ExpiredDeletion for PostgresSessionStore {
+    async fn delete_expired(&self) -> session_store::Result<()> {
+        sqlx::query("DELETE FROM gyliber_sessions WHERE expiry_date <= $1")
+            .bind(OffsetDateTime::now_utc())
+            .execute(&self.pool)
+            .await
+            .map_err(|error| session_store::Error::Backend(error.to_string()))?;
+
+        Ok(())
+    }
+}
+
+#[derive(Clone, Debug)]
+pub(crate) enum SessionStoreBackend {
+    Memory(MemoryStore),
+    Postgres(PostgresSessionStore),
+}
+
+impl SessionStoreBackend {
+    pub(crate) async fn from_environment() -> Result<Self> {
+        match std::env::var("DATABASE_URL") {
+            Ok(database_url) if !database_url.trim().is_empty() => {
+                Ok(Self::Postgres(
+                    PostgresSessionStore::connect(&database_url).await?,
+                ))
+            }
+            Ok(_) => anyhow::bail!("DATABASE_URL cannot be empty when provided"),
+            Err(std::env::VarError::NotPresent) => {
+                let production = std::env::var("APP_ENV")
+                    .map(|value| value.eq_ignore_ascii_case("production"))
+                    .unwrap_or(false);
+
+                if production {
+                    anyhow::bail!(
+                        "DATABASE_URL is required in production; refusing to start with in-memory sessions"
+                    );
+                }
+
+                tracing::warn!(
+                    "DATABASE_URL is not configured; using in-memory sessions for local development"
+                );
+                Ok(Self::Memory(MemoryStore::default()))
+            }
+            Err(error) => Err(error.into()),
+        }
+    }
+
+    pub(crate) fn is_postgres(&self) -> bool {
+        matches!(self, Self::Postgres(_))
+    }
+}
+
+#[async_trait]
+impl SessionStore for SessionStoreBackend {
+    async fn create(&self, record: &mut Record) -> session_store::Result<()> {
+        match self {
+            Self::Memory(store) => store.create(record).await,
+            Self::Postgres(store) => store.create(record).await,
+        }
+    }
+
+    async fn save(&self, record: &Record) -> session_store::Result<()> {
+        match self {
+            Self::Memory(store) => store.save(record).await,
+            Self::Postgres(store) => store.save(record).await,
+        }
+    }
+
+    async fn load(&self, session_id: &Id) -> session_store::Result<Option<Record>> {
+        match self {
+            Self::Memory(store) => store.load(session_id).await,
+            Self::Postgres(store) => store.load(session_id).await,
+        }
+    }
+
+    async fn delete(&self, session_id: &Id) -> session_store::Result<()> {
+        match self {
+            Self::Memory(store) => store.delete(session_id).await,
+            Self::Postgres(store) => store.delete(session_id).await,
+        }
+    }
+}
+
+#[async_trait]
+impl ExpiredDeletion for SessionStoreBackend {
+    async fn delete_expired(&self) -> session_store::Result<()> {
+        match self {
+            Self::Memory(store) => store.delete_expired().await,
+            Self::Postgres(store) => store.delete_expired().await,
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::SessionStoreBackend;
+    use std::env;
+
+    #[test]
+    fn production_never_allows_implicit_memory_sessions() {
+        unsafe { env::set_var("APP_ENV", "production") };
+        unsafe { env::remove_var("DATABASE_URL") };
+
+        let result = futures_test::block_on(SessionStoreBackend::from_environment());
+
+        assert!(result.is_err());
+
+        unsafe { env::remove_var("APP_ENV") };
+    }
+}
