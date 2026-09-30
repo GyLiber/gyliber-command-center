@@ -31,25 +31,18 @@ The Command Center now has a verified live vertical slice:
 
 The current environment remains an engineering/demo environment. It is **not** an authorization to load critical company information.
 
-## 2. Immediate external dependency
+## 2. Deferred external dependency
 
 ### Canonical public address
 
-The next non-code infrastructure task is to establish the GyLiber-owned canonical public address.
+The canonical GyLiber-owned public domain remains the long-term target:
 
-Preferred:
+- preferred: `https://gyliber.com/`
+- fallback: `https://hq.gyliber.com/`
 
-`https://gyliber.com/`
+**Domain purchase is deferred for now because of budget.** Development does not block on the purchase. The current managed-host URL remains the temporary public address until a GyLiber-owned domain is secured.
 
-Fallback:
-
-`https://hq.gyliber.com/`
-
-The final choice depends on domain ownership and intended corporate information architecture.
-
-Once established, the domain is attached to the current service, DNS is configured, TLS is verified, and the GitHub OAuth callback plus `GITHUB_REDIRECT_URL` are migrated to the canonical origin.
-
-The provider-generated hostname then becomes an internal operational reference only.
+When the domain is eventually secured, perform the documented DNS, TLS and GitHub OAuth callback migration, then remove the provider-generated hostname from client-facing material.
 
 ## 3. v0.3 — Operational hardening
 
@@ -57,7 +50,11 @@ The next development line should strengthen the platform before expanding the am
 
 ### 3.1 Durable application/session boundary
 
-Replace the current in-memory session limitation with a durable session architecture backed by managed persistence.
+**Implementation status: complete in the development branch; deployment activation pending `DATABASE_URL`.**
+
+The application now uses a PostgreSQL-backed session store in production and retains an in-memory store only for local/development operation. Production refuses to start without `DATABASE_URL`.
+
+Automated CI now exercises the PostgreSQL store against an ephemeral PostgreSQL 18 service and verifies session create/save/load/delete behavior.
 
 Acceptance evidence:
 
@@ -65,11 +62,14 @@ Acceptance evidence:
 - session expiry/revocation is explicit;
 - secrets remain outside source control;
 - failure of the persistence layer fails safely;
-- tests cover session lifecycle and failure behavior.
+- tests cover session lifecycle and failure behavior;
+- CI passes formatting, compiler checks, Clippy, tests and advisory audit with PostgreSQL available.
 
 ### 3.2 Database foundation
 
-Introduce PostgreSQL only as a controlled platform capability, not as a reason to load sensitive company data immediately.
+Introduce PostgreSQL as a controlled platform capability, not as a reason to load sensitive company data immediately.
+
+A temporary free Render PostgreSQL 18 instance is currently available for development verification and expires on **2026-10-30**. It is not permanent storage or backup infrastructure.
 
 Scope:
 
@@ -245,8 +245,6 @@ The following remain in force throughout development:
 ## 9. Development order
 
 ```text
-CANONICAL DOMAIN
-      ↓
 DURABLE SESSIONS
       ↓
 POSTGRES FOUNDATION
@@ -270,7 +268,7 @@ BACKUP / RECOVERY EVIDENCE
 v1.0 PLATFORM CONTRACT
 ```
 
-The order is intentional: **reliability and control precede sensitive information and feature scale.**
+The order is intentional: **reliability and control precede sensitive information and feature scale.** The canonical-domain cutover is deliberately deferred and is not a blocker for the v0.3 engineering line.
 
 ## 10. Definition of progress
 
