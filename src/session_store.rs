@@ -2,12 +2,7 @@ use std::time::Duration as StdDuration;
 
 use anyhow::{Context, Result};
 use async_trait::async_trait;
-use sqlx::{
-    PgPool, Row,
-    postgres::PgPoolOptions,
-};
-use std::time::Duration as StdDuration;
-
+use sqlx::{PgPool, Row, postgres::PgPoolOptions};
 use time::OffsetDateTime;
 use tower_sessions::{
     MemoryStore, SessionStore,
