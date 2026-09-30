@@ -348,7 +348,7 @@ mod tests {
     use tower_sessions::cookie::Key;
 
     use super::{build_app, config, html_escape};
-    use crate::auth;
+    use crate::{auth, session_store};
     use oauth2::{ClientId, ClientSecret, RedirectUrl};
 
     fn test_app() -> axum::Router {
