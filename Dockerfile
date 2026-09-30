@@ -2,6 +2,7 @@ FROM rust:1.98-bookworm AS build
 WORKDIR /app
 COPY Cargo.toml ./
 COPY src ./src
+COPY migrations ./migrations
 COPY static ./static
 RUN cargo build --release
 
