@@ -38,7 +38,7 @@
 - Documented the current temporary free PostgreSQL environment and its 2026-10-30 expiry.
 - Deferred the canonical domain purchase without changing the long-term GyLiber-owned domain strategy.
 
-The next development line is intentionally planned before implementation. See:
+The v0.3 development line is being implemented incrementally. See:
 
 `docs/operations/NEXT_DEVELOPMENT_STEPS.md`
 
