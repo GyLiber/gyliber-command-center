@@ -3,18 +3,17 @@ use std::time::Duration as StdDuration;
 use anyhow::{Context, Result};
 use async_trait::async_trait;
 use sqlx::{
-    PgPool,
-    postgres::{PgPoolOptions, PgRow},
+    PgPool, Row,
+    postgres::PgPoolOptions,
 };
 use time::OffsetDateTime;
 use tower_sessions::{
-    ExpiredDeletion, MemoryStore, SessionStore,
+    MemoryStore, SessionStore,
     session::{Id, Record},
     session_store,
 };
 
 const MIGRATION: &str = include_str!("../migrations/0001_sessions.sql");
-const SESSION_TABLE: &str = "gyliber_sessions";
 const MAX_CONNECTIONS: u32 = 5;
 
 #[derive(Clone, Debug)]
@@ -139,18 +138,6 @@ impl SessionStore for PostgresSessionStore {
     }
 }
 
-#[async_trait]
-impl ExpiredDeletion for PostgresSessionStore {
-    async fn delete_expired(&self) -> session_store::Result<()> {
-        sqlx::query("DELETE FROM gyliber_sessions WHERE expiry_date <= $1")
-            .bind(OffsetDateTime::now_utc())
-            .execute(&self.pool)
-            .await
-            .map_err(|error| session_store::Error::Backend(error.to_string()))?;
-
-        Ok(())
-    }
-}
 
 #[derive(Clone, Debug)]
 pub(crate) enum SessionStoreBackend {
@@ -159,6 +146,14 @@ pub(crate) enum SessionStoreBackend {
 }
 
 impl SessionStoreBackend {
+    pub(crate) fn requires_database(app_env: Option<&str>, database_url: Option<&str>) -> bool {
+        let production = app_env
+            .map(|value| value.eq_ignore_ascii_case("production"))
+            .unwrap_or(false);
+
+        production && !database_url.map(|value| !value.trim().is_empty()).unwrap_or(false)
+    }
+
     pub(crate) async fn from_environment() -> Result<Self> {
         match std::env::var("DATABASE_URL") {
             Ok(database_url) if !database_url.trim().is_empty() => {
@@ -168,11 +163,10 @@ impl SessionStoreBackend {
             }
             Ok(_) => anyhow::bail!("DATABASE_URL cannot be empty when provided"),
             Err(std::env::VarError::NotPresent) => {
-                let production = std::env::var("APP_ENV")
-                    .map(|value| value.eq_ignore_ascii_case("production"))
-                    .unwrap_or(false);
-
-                if production {
+                if Self::requires_database(
+                    std::env::var("APP_ENV").ok().as_deref(),
+                    None,
+                ) {
                     anyhow::bail!(
                         "DATABASE_URL is required in production; refusing to start with in-memory sessions"
                     );
@@ -236,17 +230,11 @@ impl ExpiredDeletion for SessionStoreBackend {
 #[cfg(test)]
 mod tests {
     use super::SessionStoreBackend;
-    use std::env;
-
     #[test]
-    fn production_never_allows_implicit_memory_sessions() {
-        unsafe { env::set_var("APP_ENV", "production") };
-        unsafe { env::remove_var("DATABASE_URL") };
-
-        let result = futures_test::block_on(SessionStoreBackend::from_environment());
-
-        assert!(result.is_err());
-
-        unsafe { env::remove_var("APP_ENV") };
+    fn production_requires_database_persistence() {
+        assert!(SessionStoreBackend::requires_database(Some("production"), None));
+        assert!(SessionStoreBackend::requires_database(Some("PRODUCTION"), Some("   ")));
+        assert!(!SessionStoreBackend::requires_database(Some("production"), Some("postgres://example")));
+        assert!(!SessionStoreBackend::requires_database(Some("development"), None));
     }
 }
