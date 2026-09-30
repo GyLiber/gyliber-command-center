@@ -57,7 +57,6 @@ impl PostgresSessionStore {
         )
     }
 }
-
 #[async_trait]
 impl SessionStore for PostgresSessionStore {
     async fn create(&self, record: &mut Record) -> session_store::Result<()> {
