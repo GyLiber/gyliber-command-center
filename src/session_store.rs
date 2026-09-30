@@ -217,7 +217,6 @@ mod tests {
     use time::Duration;
     use tower_sessions::Session;
 
-    #[test]
     #[tokio::test]
     async fn postgres_store_round_trips_sessions_when_database_is_available() {
         let Ok(database_url) = env::var("DATABASE_URL") else {
@@ -253,6 +252,7 @@ mod tests {
         loaded.delete().await.expect("session deletes");
     }
 
+    #[test]
     fn production_requires_database_persistence() {
         assert!(SessionStoreBackend::requires_database(
             Some("production"),
