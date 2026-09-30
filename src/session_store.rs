@@ -107,7 +107,7 @@ impl SessionStore for PostgresSessionStore {
     }
 
     async fn load(&self, session_id: &Id) -> session_store::Result<Option<Record>> {
-        let row: Option<PgRow> = sqlx::query(
+        let row = sqlx::query(
             "SELECT data FROM gyliber_sessions
              WHERE id = $1 AND expiry_date > $2",
         )
@@ -119,7 +119,8 @@ impl SessionStore for PostgresSessionStore {
 
         match row {
             Some(row) => {
-                let data: Vec<u8> = sqlx::Row::try_get(&row, "data")
+                let data: Vec<u8> = row
+                    .try_get("data")
                     .map_err(|error| session_store::Error::Backend(error.to_string()))?;
                 Ok(Some(Self::decode(data)?))
             }
@@ -137,7 +138,6 @@ impl SessionStore for PostgresSessionStore {
         Ok(())
     }
 }
-
 
 #[derive(Clone, Debug)]
 pub(crate) enum SessionStoreBackend {
@@ -213,16 +213,6 @@ impl SessionStore for SessionStoreBackend {
         match self {
             Self::Memory(store) => store.delete(session_id).await,
             Self::Postgres(store) => store.delete(session_id).await,
-        }
-    }
-}
-
-#[async_trait]
-impl ExpiredDeletion for SessionStoreBackend {
-    async fn delete_expired(&self) -> session_store::Result<()> {
-        match self {
-            Self::Memory(store) => store.delete_expired().await,
-            Self::Postgres(store) => store.delete_expired().await,
         }
     }
 }
