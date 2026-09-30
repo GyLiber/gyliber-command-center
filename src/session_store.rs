@@ -176,9 +176,6 @@ impl SessionStoreBackend {
         }
     }
 
-    pub(crate) fn is_postgres(&self) -> bool {
-        matches!(self, Self::Postgres(_))
-    }
 }
 
 #[async_trait]
@@ -221,6 +218,41 @@ mod tests {
     use tower_sessions::Session;
 
     #[test]
+    #[tokio::test]
+    async fn postgres_store_round_trips_sessions_when_database_is_available() {
+        let Ok(database_url) = env::var("DATABASE_URL") else {
+            return;
+        };
+
+        let store = PostgresSessionStore::connect(&database_url)
+            .await
+            .expect("PostgreSQL store connects and migrates");
+
+        let session = Session::new(
+            None,
+            Arc::new(store.clone()),
+            Some(tower_sessions::Expiry::OnInactivity(Duration::minutes(5))),
+        );
+        session
+            .insert("test-key", "test-value")
+            .await
+            .expect("session value inserts");
+        session.save().await.expect("new session persists");
+
+        let id = session.id().expect("persisted session has an id");
+        let loaded = Session::new(Some(id), Arc::new(store), None);
+        assert_eq!(
+            loaded
+                .get::<String>("test-key")
+                .await
+                .expect("session loads")
+                .as_deref(),
+            Some("test-value")
+        );
+
+        loaded.delete().await.expect("session deletes");
+    }
+
     fn production_requires_database_persistence() {
         assert!(SessionStoreBackend::requires_database(
             Some("production"),
