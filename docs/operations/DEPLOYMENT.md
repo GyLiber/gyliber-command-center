@@ -101,7 +101,9 @@ PR #22 records the corrective change:
 
 - `COPY migrations ./migrations` is added before the release build;
 - the existing versioned session migration remains the source of schema truth;
-- no manual SQL table creation is required.
+- no manual SQL table creation is required;
+- the image uses Rust 1.98.1 and the committed lockfile with `cargo build --release --locked`;
+- CI builds the production image and verifies startup against disposable PostgreSQL 18 through `scripts/verify-container.sh`.
 
 Until PR #22 is verified, merged and successfully deployed, the previous v0.2 live deployment remains the active production-like release.
 

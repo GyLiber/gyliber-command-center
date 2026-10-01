@@ -292,6 +292,7 @@ The following documents are intentionally living documents:
 - `docs/operations/CLIENT_DEMONSTRATION_BASELINE.md`
 - `docs/operations/NEXT_DEVELOPMENT_STEPS.md`
 - `docs/governance/DEVELOPMENT.md`
+- `docs/governance/DEVELOPMENT_HANDOFF.md`
 - `docs/governance/KNOWLEDGE_GAPS.md`
 
 The architecture is expected to evolve as implementation evidence accumulates.

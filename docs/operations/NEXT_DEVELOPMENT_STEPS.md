@@ -2,6 +2,7 @@
 
 **Document status:** Active roadmap  
 **Planning date:** 2026-09-30  
+**Last development update:** 2026-10-01
 **Current release:** v0.2.0 Live Product Foundation  
 **Next development line:** v0.3.x operational hardening  
 **Product principle:** maximize useful state and action per unit of human attention.
@@ -289,8 +290,12 @@ A milestone is considered complete when it produces all of the following:
 
 A feature that exists only in source code but cannot be demonstrated or verified is not treated as finished.
 
-### Current stopping point
+### Current development checkpoint
 
-Development is intentionally paused after documenting the durable-session deployment correction.
+Sol resumed development from Luna's PR #22 checkpoint on 2026-10-01 at Gyile's request. See `docs/governance/DEVELOPMENT_HANDOFF.md` for scope, attribution and remaining work.
 
-The next development action is to complete PR #22 verification and, once green, merge and redeploy the corrected container. The canonical domain remains deferred.
+PR #22 now also makes the production dependency graph reproducible and adds an automated production-container build/startup gate. The test uses a disposable PostgreSQL 18 database, verifies migration from an empty database, production refusal without `DATABASE_URL`, health/static assets, anonymous access controls and restart with persisted OAuth session metadata.
+
+The next action is to verify the expanded PR #22 at its exact head, merge when green, and obtain hosted deployment evidence. CI container evidence does not establish that Render is running the new revision. The canonical domain remains deferred.
+
+Once hosted activation is verified, resume section 3.3 (durable audit/event persistence) before activating any contract/engagement records.
