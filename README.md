@@ -283,6 +283,7 @@ The following documents are intentionally living documents:
 
 - `docs/requirements/REQUIREMENTS.md`
 - `docs/architecture/DESIGN.md`
+- `docs/architecture/MATH_PLAYGROUND_DESIGN.md` — proposed source-driven creative mathematics exhibits; not implemented
 - `docs/architecture/ADR-0009-canonical-public-domain.md`
 - `docs/security/SECURITY.md`
 - `docs/security/DATA_CLASSIFICATION.md`
