@@ -2,7 +2,7 @@
 
 Status: Proposed design; no upload, AI generation or exhibit runtime is implemented by this document.
 
-Design version: 0.1.0
+Design version: 0.1.1
 
 Date: 2026-10-01
 
@@ -14,7 +14,7 @@ Home: GyLiber Command Center, with independently versioned exhibit packages.
 
 Transform selected mathematics from Gyile's existing LaTeX into a playful interactive drawing whose behavior is grounded in an inspectable mathematical model. Preserve the generated model, renderer and verification in Git so the exhibit can be revisited, reproduced and improved.
 
-The default experience is a colourful, goofy scene with a small number of meaningful interactions. Equations and formal proofs belong in an optional source/explanation drawer rather than becoming the main screen again. A childlike visual style describes the artwork, not the audience or mathematical depth.
+The default experience is a colourful, goofy scene with a small number of meaningful interactions. Formal mathematics is progressively revealed on request: exhibit v0.2.0 adds exact general definitions/statements, and v0.3.0 adds checked proofs for supported theorem exhibits. The scene remains the main screen. A childlike visual style describes the artwork, not the audience or mathematical depth.
 
 LaTeX remains the mathematical source. Git already provides programming continuity; Obsidian already holds module notes. This feature adds a derived visual experience and does not introduce a duplicate task manager, note editor, readiness dashboard or resume-work journal.
 
@@ -48,7 +48,7 @@ Proposed private entry: `/command/math-playground`. A public `/math` gallery can
 
 The scene starts with a short invitation such as “Make the blanket smaller.” Provide reset, pause, step, keyboard controls and reduced-motion behavior. Avoid autoplay sound, flashing, confetti loops or compulsory tutorial tours. Touch/keyboard alternatives must avoid requiring precise dragging.
 
-Use a compact “Example” or “Metaphor” label. A drawer explains the mapping, scope and exact source when needed. Repository identifiers, compiler logs and deployment machinery stay in a maintenance view, not in the main play experience.
+Use a compact “Example” or “Metaphor” label. A drawer explains the mapping, scope and exact source when needed. From exhibit v0.2.0, an obvious “Reveal the mathematics” action opens the formal concept behind the scene, not merely its chosen example. Repository identifiers, compiler logs and deployment machinery stay in a maintenance view, not in the main play experience.
 
 ## 4. Visual fidelity contract
 
@@ -66,7 +66,7 @@ For abstract concepts with no useful natural picture, a metaphor is legitimate i
 
 Finite drawings cannot establish infinite claims. A Euclidean scene must not imply Euclidean properties of a general metric space. Numerical approximations must not masquerade as exact symbolic values. Mathematical equivalence, examples and artistic associations are reviewed separately.
 
-The optional source drawer preserves formal statements and hypotheses. The default scene can remain almost entirely pictorial, as Gyile requested. It must still provide readable interaction instructions and an accessible description.
+The authoring specification preserves formal statements and hypotheses from v0.1.0 so the engine can be reviewed correctly. The visitor-facing formal reveal becomes a required capability in v0.2.0; full theorem proofs are deferred to v0.3.0. The default scene can remain almost entirely pictorial, as Gyile requested. It must still provide readable interaction instructions and an accessible description.
 
 ## 5. Creative direction and illustrative seeds
 
@@ -78,7 +78,7 @@ Pi is a giant, friendly character who rolls a circular wheel and unfurls its rim
 
 The correct decimal begins **3.14159265...**, not 3.41596. The engine uses the circle relations `C = 2*pi*r` and `d = 2*r` over a documented positive-radius range. Tests use an independently specified tolerance for floating-point results and verify scale behavior, zero/invalid-input rejection and the ratio. The expressive Pi silhouette is a mascot, not a claim that a decimal approximation is exact.
 
-No changing stream of digits is needed. The distinctive action is rolling/unfurling and resizing. Exact relations are available in the drawer. This is an illustrative seed, not a statement that circle geometry is currently an examinable module topic.
+No changing stream of digits is needed. The distinctive action is rolling/unfurling and resizing. Exact relations are preserved in the concept specification and revealed in the v0.2.0 drawer. Their mathematical type must be labelled accurately; do not invent a theorem where a definition or identity is the appropriate object. This is an illustrative seed, not a statement that circle geometry is currently an examinable module topic.
 
 ### The shrinking blanket
 
@@ -141,12 +141,46 @@ Initially keep generated engines, renderers and public-safe specifications in on
 
 Every accepted exhibit has its own package version, beginning at `0.1.0`. This is distinct from the Command Center application release and this document's design version.
 
+### Exhibit capability roadmap
+
+These versions describe the mathematics exhibit feature line. The Command Center's existing v0.2.0 application release does not already provide the formal reveal described here.
+
+| Exhibit version | Required experience | Formal content boundary |
+| --- | --- | --- |
+| 0.1.0 | Playful, meaningful interaction powered by a reviewed mathematical engine. | Exact source/specification exists for authoring review; a general formal reveal is not yet required. |
+| 0.2.0 | The scene plus an accessible “Reveal the mathematics” action. | Show the actual general definition, theorem, proposition, lemma or identity with full setting, hypotheses and logical statement. Full theorem proofs are explicitly deferred. |
+| 0.3.0 | The scene, formal reveal and an optional checked proof view for supported theorem exhibits. | Provide an independently readable formal proof with dependencies, justified steps and conclusion. Do not claim machine-checked proof unless that evidence exists. |
+
+### v0.2.0 formal reveal contract
+
+The reveal must identify the formal object, not promote the generated example into a general result. Required content:
+
+1. **Object type and name:** definition, theorem, proposition, lemma, identity or example, following the authoritative source.
+2. **Ambient setting:** sets/spaces, functions, domains/codomains and any structures needed to interpret the claim.
+3. **Exact statement:** all quantifiers, assumptions, hypotheses and conclusion, with notation defined. Use ordinary precise mathematical prose and displayed LaTeX as needed; logical symbols alone are not a completeness requirement.
+4. **Scene correspondence:** which objects/operations the characters represent, whether the scene is a special case or metaphor, and which aspects are not represented.
+5. **Source and scope:** an authorized source reference, exact source revision/digest and the supported mathematical interpretation. Where different generalizations exist, use the one established by the supplied module material rather than silently choosing a stronger result.
+6. **Proof status:** a theorem with no proof view says “Proof deferred to v0.3.0.” An example, animation, passing code test or intuitive explanation is never labelled as that theorem's proof.
+
+For a definition-only scene, reveal the definition; no theorem or proof needs to be manufactured. A scene linked to several formal objects identifies its primary concept and exposes the relevant supporting definitions/results separately. If the source cannot establish the claimed general statement, the formal reveal remains incomplete and must not be released as a verified v0.2.0 capability.
+
+Illustration: a scene using `x_n = 1/n` may reveal the general metric-space definition of convergence: for a metric space `(X,d)`, a sequence `(x_n)` in `X` and `x` in `X`, convergence to `x` means that for every real `epsilon > 0` there exists `N` in the positive integers such that for every `n >= N`, `d(x_n,x) < epsilon`. The sequence drawn is an instance; the definition is the general object. A separate theorem exhibit should reveal its general theorem, not substitute this definition or a worked instance for it.
+
+The reveal is pre-authored, reviewed and versioned with the exhibit; clicking it does not ask AI to improvise a fresh statement. Render formal LaTeX as mathematics using a bounded, reviewed renderer with untrusted HTML/command features disabled. Test display of quantifiers, subscripts and hypotheses; safe rendering and statement correctness are distinct acceptance checks. Source publication/classification rules still apply to hidden and revealed text alike.
+
+### v0.3.0 proof contract
+
+Add a proof panel tied to the exact v0.2.0 formal statement and source revision. Begin from its hypotheses, identify needed definitions/lemmas, justify the inferential steps and conclude the stated claim. Preserve case splits, domain conditions and quantifier dependencies. An unsupported step remains unresolved rather than being dressed up as a proof by animation.
+
+Keep the full formal proof readable independently of the drawing. Optional step highlighting can relate it to the scene but cannot replace an argument. A mathematical reviewer checks the proof against the source and dependencies; code tests cannot certify it. If the theorem statement changes, reassess the engine, scene mapping and proof together and retain the earlier release. Only theorem exhibits with completed proof acceptance advertise v0.3.0 proof support; other exhibits retain their explicit prior proof status.
+
 Suggested package contents:
 
 | File | Responsibility |
 | --- | --- |
 | `manifest.json` | Identity, version, source digest/anchors, mapping mode, scope, build/toolchain metadata and review evidence references. |
-| `concept.md` | Exact mathematical interpretation, assumptions, correspondence and limitations. |
+| `concept.md` | Exact mathematical interpretation, assumptions, correspondence and limitations; source for the reviewed v0.2.0 formal reveal. |
+| `proof.tex` or `proof.md` | v0.3.0 checked proof for a supported theorem, linked to the exact statement and dependencies; absent rather than fabricated when deferred. |
 | `engine.js` | Pure mathematical state/transition functions. |
 | `scene.js` | Renderer and bounded interactions consuming engine output. |
 | `assets/` | Original or approved art with rights/provenance notes. |
@@ -218,11 +252,15 @@ Register the module only when its implemented route exists, following ADR-0003. 
 
 ## 13. Staged implementation and acceptance
 
+The delivery stages below concern infrastructure and collection growth; they are separate from the exhibit 0.1.0/0.2.0/0.3.0 capability roadmap. A public gallery or automatic upload job does not by itself establish formal reveal or proof support.
+
 ### Stage A: one authentic exhibit, assisted authoring
 
 Use one supplied LaTeX unit to produce one reviewed `0.1.0` package and a protected playable scene. Choose a concept with a defensible model or explicitly labelled metaphor. Reuse suitable existing tools after inspecting them.
 
 Acceptance: source anchors and missing-dependency handling are inspectable; independent mathematical cases pass; the scene responds meaningfully to input; exact version/code/artifact provenance is available; reset, pause, keyboard and reduced-motion paths work; browser/network isolation and private access are verified; the artifact remains reproducible without the author's conversation.
+
+For exhibit v0.2.0 acceptance, additionally verify that the reveal states the authoritative general object with complete setting/hypotheses/quantifiers, the scene-to-concept relationship is explicit, mathematical notation renders correctly and accessibly, and theorem proof deferral is visible. For v0.3.0, add an independently reviewed proof of that exact statement and its dependency checks. Neither capability is inferred from the success of the visual/code tests.
 
 ### Stage B: upload and bounded site-operated AI jobs
 
@@ -245,6 +283,8 @@ Learning acceptance is a small personal trial: after viewing and interacting, Gy
 | MP-05 | Uploads and generated code do not gain host secrets or publication authority. | Negative authorization, sandbox, egress and job-limit tests. |
 | MP-06 | Existing LaTeX, Git, Obsidian and mathematics tools remain authoritative/reusable. | Source links and explicit reuse assessment. |
 | MP-07 | Generation cost and Gyile's attention remain bounded. | Budgets, cancellation, caching and a small actual-use trial. |
+| MP-08 | Exhibit v0.2.0 reveals the general formal concept, beyond the drawn example. | Reviewed definition/theorem statement, setting, hypotheses, notation, source and scene correspondence; rendering/accessibility checks. |
+| MP-09 | Full theorem proofs are deferred to exhibit v0.3.0 and honestly labelled until supported. | Explicit deferred status at v0.2.0; independent proof/dependency review tied to the exact theorem for v0.3.0. |
 
 Open decisions before implementation: actual source unit; interfaces of the two existing mathematics tools; model provider and spending ceiling; controlled input storage; preview/build environment; first mathematical mapping; private/public classification of specific content; deployable browser isolation policy; normal maintainer review responsibility. No further general product explanation is needed from Gyile before preparing the first source-grounded prototype.
 
