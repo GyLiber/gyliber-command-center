@@ -121,6 +121,8 @@ query_database 'SELECT id FROM gyliber_sessions' > "$work_dir/session-before"
 
 # A second startup must accept the existing schema and leave the record intact.
 docker restart "$application" >/dev/null
+# Docker can allocate a new host port for an ephemeral binding on restart.
+address="http://$(docker port "$application" 3000/tcp)"
 wait_for_health
 query_database 'SELECT id FROM gyliber_sessions' > "$work_dir/session-after"
 cmp "$work_dir/session-before" "$work_dir/session-after"
