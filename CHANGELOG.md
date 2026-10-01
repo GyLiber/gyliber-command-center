@@ -36,6 +36,12 @@
 - Added a PostgreSQL-backed production session-store implementation with migration support and fail-closed production configuration.
 - Added an ephemeral PostgreSQL 18 CI service and an automated session create/save/load/delete round-trip test.
 - Documented the current temporary free PostgreSQL environment and its 2026-10-30 expiry.
+- Configured the private/internal `DATABASE_URL` in the Render web service environment without recording the secret value in source control.
+- Recorded the first controlled deployment failure caused by the Docker build context omitting `migrations/0001_sessions.sql`.
+- PR #22 adds the required Docker build-context correction; v0.3 deployment activation remains pending successful verification and redeployment.
+- Sol resumed development from Luna's PR #22 checkpoint on 2026-10-01; see `docs/governance/DEVELOPMENT_HANDOFF.md`.
+- Production builds now use the committed `Cargo.lock`, locked resolution and the same Rust 1.98.1 toolchain as CI.
+- Added a production-container CI gate covering fail-closed configuration, PostgreSQL migration, HTTP health, static assets, anonymous access boundaries and restart with persisted session metadata.
 - Deferred the canonical domain purchase without changing the long-term GyLiber-owned domain strategy.
 
 The v0.3 development line is being implemented incrementally. See:

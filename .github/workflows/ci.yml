@@ -13,6 +13,19 @@ permissions:
   contents: read
 
 jobs:
+  container:
+    name: Production container
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Build locked production image
+        run: docker build --tag gyliber-command-center:ci .
+      - name: Verify production startup and PostgreSQL migration
+        run: bash scripts/verify-container.sh gyliber-command-center:ci
+
   rust:
     runs-on: ubuntu-latest
     timeout-minutes: 20

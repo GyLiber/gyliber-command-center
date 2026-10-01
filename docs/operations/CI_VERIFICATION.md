@@ -1,4 +1,4 @@
-# v0.1.0 Deployment Runbook
+# CI and release verification
 
 ## Required external dependency
 
@@ -10,13 +10,14 @@ Runtime configuration:
 - `GITHUB_CLIENT_SECRET`
 - `GITHUB_REDIRECT_URL`
 - `SESSION_MASTER_KEY` — at least 64 cryptographically random bytes
+- `DATABASE_URL` — required for production session persistence
 - `GYLIBER_ALLOWED_GITHUB_LOGINS`
 
 The OAuth callback URL must exactly match the GitHub application configuration.
 
 ## Security boundary
 
-v0.1.0 is not authorized to store banking records, unrestricted financial data, high-value trade secrets, personnel records, production credentials or irreplaceable company archives.
+The current development environment is not authorized to store banking records, unrestricted financial data, high-value trade secrets, personnel records, production credentials or irreplaceable company archives.
 
 ## First deployment checks
 
@@ -33,9 +34,11 @@ v0.1.0 is not authorized to store banking records, unrestricted financial data, 
 
 ## Hosting evolution
 
-The early environment is for engineering/demo use. Introduce durable managed database/object storage and independent backup infrastructure before critical company information is onboarded.
+The early environment is for engineering/demo use. Introduce durable managed database/object storage and independent backup infrastructure before critical company information is onboarded. PostgreSQL session persistence alone does not satisfy these controls.
 
 
 ## CI verification policy
 
 A release candidate is not considered verified until a clean GitHub Actions run completes successfully for the exact commit being released. Historical failed or cancelled runs remain part of the audit trail and do not invalidate a later successful run.
+
+The CI workflow also builds the locked production Docker image and runs the `Production container` job against disposable PostgreSQL 18. See `CONTAINER_VERIFICATION.md` for acceptance scope and local reproduction. Source checks alone are insufficient to establish container packaging or startup correctness.

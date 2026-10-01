@@ -1,14 +1,15 @@
 # GyLiber Command Center — Next Development Plan
 
-**Document status:** Planned  
-**Planning date:** 2026-09-29  
+**Document status:** Active roadmap  
+**Planning date:** 2026-09-30  
+**Last development update:** 2026-10-01
 **Current release:** v0.2.0 Live Product Foundation  
 **Next development line:** v0.3.x operational hardening  
 **Product principle:** maximize useful state and action per unit of human attention.
 
 ## 1. Current position
 
-The Command Center now has a verified live vertical slice:
+The Command Center has a verified live vertical slice:
 
 - public GyLiber landing surface
 - About / Work / Links
@@ -29,7 +30,7 @@ The Command Center now has a verified live vertical slice:
 - deployment and demonstration runbooks
 - documented provider-independent public-domain strategy
 
-The current environment remains an engineering/demo environment. It is **not** an authorization to load critical company information.
+The current live service remains on the v0.2 product foundation while the durable-session deployment correction is completed. The current environment remains an engineering/demo environment. It is **not** an authorization to load critical company information.
 
 ## 2. Deferred external dependency
 
@@ -50,11 +51,13 @@ The next development line should strengthen the platform before expanding the am
 
 ### 3.1 Durable application/session boundary
 
-**Implementation status: complete in the development branch; deployment activation pending `DATABASE_URL`.**
+**Implementation status: merged into main; deployment correction in progress in PR #22.**
 
 The application now uses a PostgreSQL-backed session store in production and retains an in-memory store only for local/development operation. Production refuses to start without `DATABASE_URL`.
 
-Automated CI now exercises the PostgreSQL store against an ephemeral PostgreSQL 18 service and verifies session create/save/load/delete behavior.
+Automated CI exercises the PostgreSQL store against an ephemeral PostgreSQL 18 service and verifies session create/save/load/delete behavior.
+
+The first controlled Render deployment of the merged implementation failed at Docker build time because the `migrations/` directory was omitted from the image build context. PR #22 adds the missing `COPY migrations ./migrations` step.
 
 Acceptance evidence:
 
@@ -63,11 +66,12 @@ Acceptance evidence:
 - secrets remain outside source control;
 - failure of the persistence layer fails safely;
 - tests cover session lifecycle and failure behavior;
-- CI passes formatting, compiler checks, Clippy, tests and advisory audit with PostgreSQL available.
+- CI passes formatting, compiler checks, Clippy, tests and advisory audit with PostgreSQL available;
+- a successful hosted deployment starts with the migration available inside the container.
 
 ### 3.2 Database foundation
 
-**Implementation status: schema and migration foundation complete; production activation pending the managed service connection configuration.**
+**Implementation status: schema and migration foundation complete; Render connection configured; hosted activation pending successful PR #22 deployment.**
 
 PostgreSQL is introduced as a controlled platform capability, not as a reason to load sensitive company data immediately.
 
@@ -285,3 +289,13 @@ A milestone is considered complete when it produces all of the following:
 - explicit known limitations.
 
 A feature that exists only in source code but cannot be demonstrated or verified is not treated as finished.
+
+### Current development checkpoint
+
+Sol resumed development from Luna's PR #22 checkpoint on 2026-10-01 at Gyile's request. See `docs/governance/DEVELOPMENT_HANDOFF.md` for scope, attribution and remaining work.
+
+PR #22 now also makes the production dependency graph reproducible and adds an automated production-container build/startup gate. The test uses a disposable PostgreSQL 18 database, verifies migration from an empty database, production refusal without `DATABASE_URL`, health/static assets, anonymous access controls and restart with persisted OAuth session metadata.
+
+The next action is to verify the expanded PR #22 at its exact head, merge when green, and obtain hosted deployment evidence. CI container evidence does not establish that Render is running the new revision. The canonical domain remains deferred.
+
+Once hosted activation is verified, resume section 3.3 (durable audit/event persistence) before activating any contract/engagement records.

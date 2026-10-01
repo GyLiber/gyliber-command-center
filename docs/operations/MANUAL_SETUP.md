@@ -117,19 +117,23 @@ A free Render PostgreSQL 18 instance named `gyliber-command-center-db` is curren
 
 It is **temporary** and must not become the authoritative company archive or backup system. Real client contracts, credentials, critical company records or irreplaceable archives must not be loaded into this temporary database.
 
-### What Gyile must do before production activation
+### Current configuration status
 
-1. Open the Render PostgreSQL resource's **Connect** view.
-2. Copy its private/internal database connection string.
-3. Open the `gyliber-command-center` Web Service.
-4. Open **Environment**.
-5. Add an environment variable with key `DATABASE_URL`.
-6. Paste the private/internal connection string as its value.
-7. Save the environment changes.
+The private/internal `DATABASE_URL` has now been configured in the Render `gyliber-command-center` web service environment.
 
-The connection string itself must never be pasted into this chat.
+The value is intentionally not recorded in source control, documentation or this chat.
 
-CI uses an ephemeral PostgreSQL service for automated session tests, so the source verification does not depend on exposing the production database credential.
+### What the application does
+
+The application applies the versioned PostgreSQL session migration at startup when `DATABASE_URL` is configured. No manual SQL table creation is required.
+
+### Deployment status
+
+The durable-session code is merged into `main`, but the first controlled Render deployment exposed a Docker build-context defect: the image did not include the repository's `migrations/` directory.
+
+PR #22 corrects the Dockerfile. Production activation therefore remains pending successful CI/security verification, merge and deployment of PR #22.
+
+CI uses an ephemeral PostgreSQL service for automated session tests, so source verification does not depend on exposing the production database credential.
 
 ## 5. Current infrastructure secrets
 
@@ -147,4 +151,6 @@ If a screen asks for a value not described by the current runbook, stop rather t
 
 No manual action is required for ordinary source-code development, documentation updates, CI verification or routine deployment triggering when the engineering tooling can perform them.
 
-The current manual deployment dependency is the **DATABASE_URL** configuration described above. The canonical domain remains a separate deferred task and does not block v0.3 development.
+The `DATABASE_URL` manual configuration has been completed. The canonical domain remains a separate deferred task.
+
+No further manual database action is required for the current durable-session implementation.
