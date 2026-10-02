@@ -305,3 +305,7 @@ External sources consulted on 2026-10-01; the specific architecture above is Sol
 - [OWASP: LLM Prompt Injection Prevention](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html): indirect document instructions and least-privilege action boundaries.
 - [Karpicke and Blunt, 2011](https://pubmed.ncbi.nlm.nih.gov/21252317/): experimental retrieval-practice evidence for science texts; not a validation of this mathematics playground.
 - [Kienitz, Krebs and Eitel, 2023](https://link.springer.com/article/10.1007/s11251-023-09632-w): experimental evidence concerning distracting instructional details; not a prohibition on meaningful creative visuals.
+
+## Implementation amendment — 2026-10-01
+
+Gyile authorized implementation by Sol. [ADR-0010](ADR-0010-bounded-mathematical-playground.md) records the first bounded service and its departures from this broader proposal: member access; constrained AI-to-specification-to-reviewed-code generation; smaller source/context limits; synchronous requests; trusted code playback rather than arbitrary generated-code execution; private derivatives with public source-free artifact packages; formal reveal with theorem proof deferred. The proposal remains the wider design, not a claim that every proposed capability is implemented. See the [activation runbook](../operations/MATH_PLAYGROUND.md) for manual dependencies and hosted acceptance.

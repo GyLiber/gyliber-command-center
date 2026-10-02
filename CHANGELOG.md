@@ -29,6 +29,12 @@
 
 ## Unreleased — v0.3.0 development
 
+- Sol added the member Mathematical Playground: playful Canvas scenes, bounded `.tex` intake, AI concept drafting, a general formal reveal, private PostgreSQL derivatives and exact-byte, source-free Git artifact publishing.
+- Added reviewed Pi, reciprocal-sequence, permutation and mnemonic demonstrations that do not require AI credentials.
+- Added request-token checks, owner isolation, attempted-request budgets, draft expiry, source anchors, artifact digests and explicit unavailable/review states.
+- Exhibit engine capability 0.1.0 and reveal capability 0.2.0 remain separate from application releases; theorem proofs are deferred to exhibit capability 0.3.0.
+- Added mathematical invariant, browser-fixture and PostgreSQL/HTTP-boundary checks. Hosted authoring/publishing requires the activation gates in `docs/operations/MATH_PLAYGROUND.md`.
+
 - Added the reserved Contracts & Engagements module to the authenticated registry as a Confidential, security-gated capability for future active/planned client engagement tracking.
 - Added the GyLiber slogan, **Ever Toward Liberation**, to the public Command Center identity.
 - Documented contract/engagement record requirements, classification and security prerequisites without onboarding real contract data.

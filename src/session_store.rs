@@ -142,6 +142,13 @@ pub(crate) enum SessionStoreBackend {
 }
 
 impl SessionStoreBackend {
+    pub(crate) fn pool(&self) -> Option<PgPool> {
+        match self {
+            Self::Memory(_) => None,
+            Self::Postgres(store) => Some(store.pool.clone()),
+        }
+    }
+
     pub(crate) fn requires_database(app_env: Option<&str>, database_url: Option<&str>) -> bool {
         let production = app_env
             .map(|value| value.eq_ignore_ascii_case("production"))

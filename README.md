@@ -48,6 +48,12 @@ The current live-product foundation includes:
 - safe public-only deployment mode while member authentication is unconfigured
 - requirements, architecture, security, governance and operational runbooks
 
+### Mathematical playground development
+
+The member Command Center now registers `/command/math-playground`: four playable, repository-backed demonstrations, source upload, configured AI concept drafting, formal reveal, private exhibit persistence and source-free Git publishing. AI authoring and publishing require explicit hosting activation; unavailable settings are reflected in the page. General-purpose arbitrary AI code execution is not enabled.
+
+See [playground activation and acceptance](docs/operations/MATH_PLAYGROUND.md) and [ADR-0010](docs/architecture/ADR-0010-bounded-mathematical-playground.md). Exhibit engine 0.1.0, formal reveal 0.2.0 and deferred proof 0.3.0 are independent capability versions.
+
 ### Deliberately absent from v0.2.0
 
 The first release does **not** authorize storage of:
@@ -283,8 +289,10 @@ The following documents are intentionally living documents:
 
 - `docs/requirements/REQUIREMENTS.md`
 - `docs/architecture/DESIGN.md`
-- `docs/architecture/MATH_PLAYGROUND_DESIGN.md` — proposed source-driven creative mathematics exhibits; not implemented
+- `docs/architecture/MATH_PLAYGROUND_DESIGN.md` — source-driven creative mathematics design, with bounded implementation in ADR-0010
 - `docs/architecture/ADR-0009-canonical-public-domain.md`
+- `docs/architecture/ADR-0010-bounded-mathematical-playground.md`
+- `docs/operations/MATH_PLAYGROUND.md`
 - `docs/security/SECURITY.md`
 - `docs/security/DATA_CLASSIFICATION.md`
 - `docs/operations/MANUAL_SETUP.md`

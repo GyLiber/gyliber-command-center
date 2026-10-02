@@ -79,6 +79,14 @@ pub fn catalog() -> &'static [ModuleDescriptor] {
             live: false,
         },
         ModuleDescriptor {
+            id: "mathematical-playground",
+            name: "Mathematical Playground",
+            ui_path: Some("/command/math-playground"),
+            status: ModuleStatus::Active,
+            classification: DataClassification::Internal,
+            live: false,
+        },
+        ModuleDescriptor {
             id: "people",
             name: "People",
             ui_path: None,
@@ -96,7 +104,7 @@ mod tests {
     #[test]
     fn catalog_contains_only_declared_modules() {
         let modules = catalog();
-        assert_eq!(modules.len(), 7);
+        assert_eq!(modules.len(), 8);
         assert_eq!(modules[0].status, ModuleStatus::Active);
         assert_eq!(modules[1].classification, DataClassification::Internal);
         assert_eq!(modules[3].id, "contracts-engagements");
