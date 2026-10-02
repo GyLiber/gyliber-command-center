@@ -29,7 +29,7 @@
 
 ## Unreleased — v0.3.0 development
 
-- Corrected Gemini structured-output request fields to the published generateContent protocol, removing Gemini-only unsupported retention/format fields. OpenAI request behavior is unchanged.
+- Use Gemini's established responseMimeType/responseJsonSchema output configuration while retaining store: false. The live API recognizes the earlier format too, so this compatibility change is not a proven production root-cause fix. OpenAI request behavior is unchanged.
 - Distinguish Gemini's HTTP-400 invalid-key reason, request rejection, unavailable model and timeout from transient provider failure. Error inspection is bounded and exposes/logs only fixed codes and status metadata.
 - Updated deployed-playground evidence and provider recovery instructions. Successful live generation/publication still require observation with the deployed credentials.
 - Documented Gyile's next-minor preference for calmer dark visuals matching the site, covering Canvas and formal/source panels. This visual change is planned, not included in the provider fix.

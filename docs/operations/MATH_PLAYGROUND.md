@@ -31,7 +31,7 @@ OpenAI key creation does not establish funded model access. OpenAI lists the fre
 
 For the current zero-spend pilot, select Gemini and use a Google AI Studio project that remains on the **Free tier**, without enabling paid billing. Google currently lists free input/output for `gemini-2.5-flash` and supports South Africa. Availability and account quotas must be checked in the account; free limits can change. The application cannot determine a project's billing tier from its API key. The site's eight-attempt budget is not a monetary cap. If the project is later upgraded, its requests can incur charges.
 
-Google's unpaid services may use inputs/outputs to improve products, including human review. Use only non-sensitive material that the member has permission to share. Gemini is therefore an explicit alternative with provider-specific consent, not an invisible substitution for OpenAI. This member pilot is for Gyile's adult study use in an available region; public/expanded access requires reassessing provider eligibility and terms. OpenAI's request-level `store: false` does not override account retention policy. It is not sent to Gemini; Gemini unpaid-service data use cannot be disabled by adding that field.
+Google's unpaid services may use inputs/outputs to improve products, including human review. Use only non-sensitive material that the member has permission to share. Gemini is therefore an explicit alternative with provider-specific consent, not an invisible substitution for OpenAI. This member pilot is for Gyile's adult study use in an available region; public/expanded access requires reassessing provider eligibility and terms. Both providers receive `store: false`, which is not a zero-retention guarantee. Gemini's request logging setting does not override unpaid-service product-improvement/human-review terms.
 
 ### Browser-only Gemini setup
 
@@ -100,7 +100,7 @@ The existing development database expires on 2026-10-30 unless replaced. Preserv
 
 ## Provider failure recovery
 
-The Gemini request uses `responseMimeType: "application/json"` and `responseJsonSchema` under `generationConfig`. It does not send `store` or `responseFormat`. OpenAI keeps its existing Responses request. Both remain bounded and use the same independent concept/source validation.
+The Gemini request uses `responseMimeType: "application/json"` and `responseJsonSchema` under `generationConfig`. It retains `store: false` and does not send `responseFormat`. Both output formats are recognized by Google's live REST discovery; this compatibility change alone cannot establish the original failure cause. OpenAI keeps its existing Responses request. Both remain bounded and use the same independent concept/source validation.
 
 | Visible failure | Action |
 | --- | --- |
@@ -113,7 +113,7 @@ The Gemini request uses `responseMimeType: "application/json"` and `responseJson
 
 After deploying the correction, refresh the member page, confirm **Google Gemini**, and submit one small non-sensitive synthetic `.tex` excerpt, such as `For every Euclidean circle of radius r > 0, its circumference is C = 2\pi r.` Confirm a draft appears and its formal statement/source anchor match. If it fails, record the exact new message; each failed attempt consumes the rolling daily budget. There is no need to enable OpenAI billing for this test.
 
-The old generic message alone cannot identify the original upstream cause. The correction fixes a request/protocol discrepancy and missing error classification; it does not certify the saved key, model access or free-tier availability without a successful live request.
+The old generic message alone cannot identify the original upstream cause. The correction uses established output fields and fixes missing error classification; it does not certify the saved key, model access or free-tier availability without a successful live request.
 
 ## Current evidence, 2026-10-02
 

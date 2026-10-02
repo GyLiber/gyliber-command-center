@@ -81,6 +81,7 @@ pub(super) fn request(model: &str, intake: &Intake) -> Value {
 
 fn gemini_request(intake: &Intake) -> Value {
     json!({
+        "store": false,
         "systemInstruction": {"parts": [{"text": INSTRUCTIONS}]},
         "contents": [{"role": "user", "parts": [{"text": serde_json::to_string(&intake.files).expect("source serializes")}]}],
         "generationConfig": {
@@ -317,9 +318,12 @@ mod tests {
             Err("ai_request_refused")
         ));
         let body = gemini_request(&intake);
-        assert!(body.get("store").is_none());
+        assert_eq!(body["store"], false);
         assert!(body["generationConfig"].get("responseFormat").is_none());
-        assert_eq!(body["generationConfig"]["responseMimeType"], "application/json");
+        assert_eq!(
+            body["generationConfig"]["responseMimeType"],
+            "application/json"
+        );
         assert_eq!(body["generationConfig"]["responseJsonSchema"], schema());
         assert_eq!(body["generationConfig"]["candidateCount"], 1);
         assert_eq!(body["generationConfig"]["maxOutputTokens"], 8000);

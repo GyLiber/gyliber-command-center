@@ -111,6 +111,7 @@ try {
     assert.equal(await page.locator('#provider-consent').isChecked(),false);
     assert.match(await page.locator('#provider-consent-text').textContent(),/human review/);
     assert.match(await page.locator('#service-status').textContent(),/configured/);
+    await page.locator('#tex-files').setInputFiles({name:'concept.tex',mimeType:'text/plain',buffer:Buffer.from('C = 2\\pi r')});
     await page.locator('#provider-consent').check();
     for (const [code, message] of [
       ['ai_provider_key_invalid', 'Google Gemini rejected the API key'],
