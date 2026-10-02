@@ -17,6 +17,8 @@ pub(super) struct SourceFile {
 pub(super) struct Intake {
     pub files: Vec<SourceFile>,
     pub provider_consent: bool,
+    #[serde(default)]
+    pub ai_provider: super::generation::Provider,
 }
 
 impl Intake {
@@ -151,10 +153,10 @@ pub(super) fn valid_id(id: &str) -> bool {
 }
 
 #[cfg(test)]
-mod tests {
+pub(super) mod tests {
     use super::*;
 
-    pub(super) fn fixture() -> Concept {
+    pub(in crate::math_playground) fn fixture() -> Concept {
         Concept {
             title: "Pi's ribbon".into(),
             kind: Kind::Circle,
@@ -173,6 +175,7 @@ mod tests {
     #[test]
     fn intake_rejects_traversal_duplicates_and_missing_consent() {
         let mut intake = Intake {
+            ai_provider: super::super::generation::Provider::OpenAI,
             provider_consent: true,
             files: vec![SourceFile {
                 name: "../x.tex".into(),

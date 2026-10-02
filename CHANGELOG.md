@@ -29,6 +29,9 @@
 
 ## Unreleased — v0.3.0 development
 
+- Added explicit Gemini authoring as a free-tier pilot alternative to OpenAI, with provider-bound consent, unpaid-service data-use disclosure, quota/access messages and no automatic paid fallback.
+- Corrected the browser fixture's decimal range input and prevented its exception details from being returned as HTML.
+
 - Sol added the member Mathematical Playground: playful Canvas scenes, bounded `.tex` intake, AI concept drafting, a general formal reveal, private PostgreSQL derivatives and exact-byte, source-free Git artifact publishing.
 - Added reviewed Pi, reciprocal-sequence, permutation and mnemonic demonstrations that do not require AI credentials.
 - Added request-token checks, owner isolation, attempted-request budgets, draft expiry, source anchors, artifact digests and explicit unavailable/review states.

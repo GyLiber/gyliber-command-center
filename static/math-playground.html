@@ -43,7 +43,7 @@
 <label class="upload-zone" for="tex-files"><span class="upload-icon" aria-hidden="true">✦</span><strong>Choose .tex files</strong><span>Up to 8 files · 32 KiB each · 64 KiB total</span></label>
 <input id="tex-files" type="file" accept=".tex,text/plain" multiple>
 <p id="file-summary" class="muted small">Select a self-contained concept, with its macros if needed.</p>
-<label class="consent"><input type="checkbox" id="provider-consent" required><span>These are low-risk study notes I can share with the AI provider. I agree to send the selected text to OpenAI.</span></label>
+<label class="consent"><input type="checkbox" id="provider-consent" required><span id="provider-consent-text">These are low-risk study notes I can share with the selected AI provider.</span></label>
 <button type="submit" class="primary-btn" id="generate" disabled>Create a playful draft <span aria-hidden="true">✧</span></button>
 </form>
 <p class="service-status" id="service-status">Checking authoring availability…</p>

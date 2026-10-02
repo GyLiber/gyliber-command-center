@@ -22,6 +22,7 @@ mod store;
 
 #[derive(Default)]
 struct Settings {
+    provider: generation::Provider,
     key: Option<String>,
     model: Option<String>,
     publisher: Option<String>,
@@ -64,14 +65,23 @@ impl Service {
                 Err(error) => Err(error.into()),
             }
         }
-        let key = optional("MATH_OPENAI_API_KEY")?;
-        let model = optional("MATH_OPENAI_MODEL")?;
+        let provider = generation::Provider::from_setting(optional("MATH_AI_PROVIDER")?.as_deref())?;
+        let (key_name, model_name) = provider.environment_names();
+        let key = optional(key_name)?;
+        let model = optional(model_name)?;
         anyhow::ensure!(
             key.is_some() == model.is_some(),
-            "set both MATH_OPENAI_API_KEY and MATH_OPENAI_MODEL"
+            "set both {key_name} and {model_name} for the selected AI provider"
         );
+        if let Some(model) = &model {
+            anyhow::ensure!(
+                generation::valid_model(model),
+                "invalid mathematics model identifier"
+            );
+        }
         Ok(Self {
             settings: Settings {
+                provider,
                 key,
                 model,
                 publisher: optional("MATH_GITHUB_TOKEN")?,
@@ -208,6 +218,7 @@ async fn catalog(State(state): State<AppState>, session: Session) -> Response {
         Vec::new()
     };
     Json(json!({"csrf": token, "ai_ready": service.pool.is_some() && service.settings.key.is_some(),
+        "ai_provider": service.settings.provider.name(),
         "publishing_ready": service.pool.is_some() && service.settings.publisher.is_some(),
         "storage_ready": service.pool.is_some(), "exhibits": exhibits,
         "limits": {"files": 8, "file_bytes": 32768, "total_bytes": 65536, "requests_per_24_hours": 8},
@@ -228,6 +239,9 @@ async fn create(
         return failure(StatusCode::UNPROCESSABLE_ENTITY, error);
     }
     let service = &state.math;
+    if intake.ai_provider != service.settings.provider {
+        return failure(StatusCode::CONFLICT, "ai_provider_changed_refresh_consent");
+    }
     let (Some(pool), Some(key), Some(model)) = (
         &service.pool,
         &service.settings.key,
@@ -252,7 +266,15 @@ async fn create(
         }
         Err(_) => return storage_failure(),
     }
-    let concept = match generation::generate(&service.http, key, model, &intake).await {
+    let concept = match generation::generate(
+        &service.http,
+        service.settings.provider,
+        key,
+        model,
+        &intake,
+    )
+    .await
+    {
         Ok(value) => value,
         Err(error) => {
             tracing::warn!(
@@ -532,10 +554,11 @@ mod tests {
         session.save().await.unwrap();
         let key = Key::generate();
         let mut jar = CookieJar::new();
-        jar.private_mut(&key).add(Cookie::new(
-            "gyliber.sid",
-            session.id().unwrap().to_string(),
-        ));
+        jar.private_mut(&key).add(
+            Cookie::build(("gyliber.sid", session.id().unwrap().to_string()))
+                .secure(true)
+                .build(),
+        );
         let cookie = jar.get("gyliber.sid").unwrap().to_string();
         let state = AppState {
             github: None,

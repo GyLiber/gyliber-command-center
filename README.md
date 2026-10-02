@@ -54,6 +54,8 @@ The member Command Center now registers `/command/math-playground`: four playabl
 
 See [playground activation and acceptance](docs/operations/MATH_PLAYGROUND.md) and [ADR-0010](docs/architecture/ADR-0010-bounded-mathematical-playground.md). Exhibit engine 0.1.0, formal reveal 0.2.0 and deferred proof 0.3.0 are independent capability versions.
 
+AI authoring can explicitly select OpenAI or Google Gemini. For the current zero-spend pilot, Gemini requires an eligible free-tier account and provider-specific consent; its unpaid service may use submitted content for product improvement. The server never falls back to another provider. The four demonstrations need no AI account or billing.
+
 ### Deliberately absent from v0.2.0
 
 The first release does **not** authorize storage of:

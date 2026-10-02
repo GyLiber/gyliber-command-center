@@ -4,6 +4,9 @@ const messages = {
   authentication_required: 'Your member session has ended. Sign in again to continue.',
   ai_authoring_not_configured: 'AI authoring has not been activated for this deployment yet.',
   ai_provider_unavailable: 'The AI provider could not complete this request. Check its key, model access and billing, then retry.',
+  ai_provider_access_denied: 'The AI key or model access was refused. Check the selected provider’s configuration.',
+  ai_provider_quota_reached: 'The provider’s quota or credit limit was reached. No paid fallback was used. Try the demonstrations; do not repeatedly retry this request.',
+  ai_provider_changed_refresh_consent: 'The selected AI provider changed. Refresh and review the upload consent again.',
   ai_request_refused: 'The AI provider declined this request. Choose a different mathematical excerpt.',
   ai_response_incomplete: 'The AI response was incomplete. Select a smaller self-contained concept.',
   source_quote_not_found: 'The AI could not provide a reliable source anchor. Try a clearer, smaller excerpt.',
@@ -42,9 +45,15 @@ function updateButtons() {
     || !$('math-reviewed').checked || !$('public-code').checked;
 }
 async function refresh() {
-  catalog = await api('/api/math-playground');
+  const nextCatalog = await api('/api/math-playground');
+  if (catalog && catalog.ai_provider !== nextCatalog.ai_provider) $('provider-consent').checked = false;
+  catalog = nextCatalog;
+  const provider = catalog.ai_provider === 'gemini' ? 'Google Gemini' : 'OpenAI';
+  $('provider-consent-text').textContent = catalog.ai_provider === 'gemini'
+    ? 'I agree to send these non-sensitive study notes to Google Gemini. Its unpaid service may use inputs and outputs to improve products, including human review. I have permission to share this material.'
+    : 'These are low-risk study notes I have permission to share. I agree to send the selected text to OpenAI.';
   $('service-status').textContent = catalog.ai_ready
-    ? 'AI authoring is ready. Eight requests per member per 24 hours. Uploads are sent only when you choose Create.'
+    ? `${provider} authoring is configured; account access and quota are checked when you create a draft. Eight attempts per member per 24 hours. No automatic provider fallback.`
     : 'AI authoring needs activation. The playable demonstrations are ready now; uploading to AI is disabled until the service is configured.';
   renderShelf(); updateButtons();
 }
@@ -112,7 +121,7 @@ $('upload-form').addEventListener('submit', async (event) => {
   const button = $('generate'); button.disabled = true; button.textContent = 'Reading the mathematics…'; $('tex-files').disabled = true;
   notice('Creating one concept draft. This can take up to 90 seconds. The provider receives all selected text; LaTeX is never executed.');
   try {
-    const exhibit = await api('/api/math-playground/drafts', { method: 'POST', body: JSON.stringify({ files: selectedFiles, provider_consent: true }) });
+    const exhibit = await api('/api/math-playground/drafts', { method: 'POST', body: JSON.stringify({ files: selectedFiles, provider_consent: true, ai_provider: catalog.ai_provider || 'openai' }) });
     selectedFiles = []; $('tex-files').value = ''; $('file-summary').textContent = 'Draft prepared. Original uploads were not saved on the server.';
     await refresh(); await showExhibit(exhibit); notice('Your draft is ready. Play first; reveal the formal mathematics when you want to inspect it. Review before saving.');
   } catch (error) { notice(error.message); }

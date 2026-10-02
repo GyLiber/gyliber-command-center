@@ -10,7 +10,7 @@ import { chromium } from 'playwright';
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const prefix = '/api/math-playground';
 const id = '0123456789abcdef0123456789abcdef';
-let drafts = [], writes = [];
+let drafts = [], writes = [], provider = 'openai';
 const manifests = Object.fromEntries(await Promise.all(['giant-pi','snug-tails','creature-shuffle','memory-cloud'].map(async (id) =>
   [id, JSON.parse(await readFile(resolve(root, `math-playground/exhibits/${id}/0.1.0/manifest.json`)))])));
 const server = createServer(async (request, response) => {
@@ -20,13 +20,14 @@ const server = createServer(async (request, response) => {
       response.writeHead(status, {'Content-Type':type, 'Content-Security-Policy':"default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'"});
       response.end(typeof content === 'string' || Buffer.isBuffer(content) ? content : JSON.stringify(content));
     };
-    if (path === prefix) return send(200, {csrf:'test-csrf', ai_ready:true, publishing_ready:true, storage_ready:true, exhibits:drafts});
+    if (path === prefix) return send(200, {csrf:'test-csrf', ai_ready:true, ai_provider:provider, publishing_ready:true, storage_ready:true, exhibits:drafts});
     if (path.startsWith(prefix) && request.method === 'POST') {
       assert.equal(request.headers['x-math-csrf'], 'test-csrf');
       let body=''; for await (const chunk of request) body += chunk;
       const data=JSON.parse(body); writes.push({path,data});
       if (path === `${prefix}/drafts`) {
         assert.equal(data.files[0].name, 'concept.tex'); assert.equal(data.provider_consent, true);
+        assert.equal(data.ai_provider, provider);
         const exhibit=structuredClone(manifests['giant-pi']); exhibit.id=id; exhibit.review='ai_draft_unverified';
         exhibit.concept.title='<img src=x onerror=alert(1)>'; exhibit.concept.statement='For every Euclidean circle of radius r > 0, C = 2πr.';
         exhibit.concept.source_file='concept.tex'; exhibit.concept.source_quote=data.files[0].content;
@@ -52,7 +53,7 @@ const server = createServer(async (request, response) => {
     if (!file.startsWith(resolve(root,'static')+sep)) return send(404,{});
     const type=file.endsWith('.css')?'text/css':file.endsWith('.mjs')?'text/javascript':'text/html';
     return send(200,await readFile(file),type);
-  } catch (error) { response.writeHead(500); response.end(String(error)); }
+  } catch { response.writeHead(500, {'Content-Type':'application/json'}); response.end('{"error":"fixture_failure"}'); }
 });
 await new Promise((done) => server.listen(0,'127.0.0.1',done));
 const base=`http://127.0.0.1:${server.address().port}`;
@@ -73,7 +74,7 @@ try {
     await page.getByRole('button',{name:'Snug tails',exact:true}).click();
     await page.getByRole('slider',{name:'Blanket snugness'}).waitFor();
     await page.getByRole('slider',{name:'Choose a creature'}).fill('10');
-    await page.getByRole('slider',{name:'Blanket snugness'}).fill('.1');
+    await page.getByRole('slider',{name:'Blanket snugness'}).fill('0.1');
     assert.match(await page.locator('.scene-description').textContent(),/outside/);
     await page.getByRole('button',{name:'Creature shuffle',exact:true}).click();
     await page.getByRole('slider',{name:'How many creatures?'}).waitFor();
@@ -103,6 +104,12 @@ try {
     page.once('dialog',(dialog)=>dialog.accept()); await page.locator('#delete-exhibit').click();
     await page.waitForFunction(()=>document.getElementById('release-panel').hidden);
     assert.equal(drafts.length,0);
+    // Consent must follow the actual configured provider, including a provider change.
+    provider='gemini'; await page.locator('#refresh-shelf').click();
+    await page.waitForFunction(()=>document.getElementById('provider-consent-text').textContent.includes('Google Gemini'));
+    assert.equal(await page.locator('#provider-consent').isChecked(),false);
+    assert.match(await page.locator('#provider-consent-text').textContent(),/human review/);
+    assert.match(await page.locator('#service-status').textContent(),/configured/);
     await page.setViewportSize({width:390,height:844});
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth <= window.innerWidth),true);
     assert.deepEqual(errors,[]);
