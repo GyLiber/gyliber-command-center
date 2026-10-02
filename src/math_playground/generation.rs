@@ -81,13 +81,13 @@ pub(super) fn request(model: &str, intake: &Intake) -> Value {
 
 fn gemini_request(intake: &Intake) -> Value {
     json!({
-        "store": false,
         "systemInstruction": {"parts": [{"text": INSTRUCTIONS}]},
         "contents": [{"role": "user", "parts": [{"text": serde_json::to_string(&intake.files).expect("source serializes")}]}],
         "generationConfig": {
             "candidateCount": 1,
             "maxOutputTokens": 8000,
-            "responseFormat": {"text": {"mimeType": "APPLICATION_JSON", "schema": schema()}}
+            "responseMimeType": "application/json",
+            "responseJsonSchema": schema()
         }
     })
 }
@@ -158,9 +158,24 @@ fn parse_gemini(response: &Value, intake: &Intake) -> Result<Concept, &'static s
     parse_text(texts[0], intake)
 }
 
-fn provider_error(status: reqwest::StatusCode) -> &'static str {
+fn provider_error(status: reqwest::StatusCode, body: &Value) -> &'static str {
+    // Google reports invalid keys as HTTP 400, not necessarily 401/403.
+    // Inspect only its structured reason; never expose or log upstream prose.
+    if status == reqwest::StatusCode::BAD_REQUEST
+        && body["error"]["details"].as_array().is_some_and(|details| {
+            details.iter().any(|detail| {
+                detail["@type"] == "type.googleapis.com/google.rpc.ErrorInfo"
+                    && detail["domain"] == "googleapis.com"
+                    && detail["reason"] == "API_KEY_INVALID"
+            })
+        })
+    {
+        return "ai_provider_key_invalid";
+    }
     match status.as_u16() {
+        400 => "ai_provider_request_rejected",
         401 | 403 => "ai_provider_access_denied",
+        404 => "ai_provider_model_unavailable",
         429 => "ai_provider_quota_reached",
         _ => "ai_provider_unavailable",
     }
@@ -197,9 +212,31 @@ pub(super) async fn generate(
         .timeout(Duration::from_secs(90))
         .send()
         .await
-        .map_err(|_| "ai_provider_unavailable")?;
+        .map_err(|error| {
+            if error.is_timeout() {
+                "ai_provider_timeout"
+            } else {
+                "ai_provider_unavailable"
+            }
+        })?;
     if !response.status().is_success() {
-        return Err(provider_error(response.status()));
+        let status = response.status();
+        let body = if provider == Provider::Gemini && status == reqwest::StatusCode::BAD_REQUEST {
+            super::bounded_json(response, 16 * 1024)
+                .await
+                .unwrap_or(Value::Null)
+        } else {
+            Value::Null
+        };
+        let error = provider_error(status, &body);
+        tracing::warn!(
+            event_code = "MATH_AI_UPSTREAM_REJECTED",
+            provider = provider.name(),
+            upstream_status = status.as_u16(),
+            reason = error,
+            "Mathematics provider rejected request"
+        );
+        return Err(error);
     }
     let response = super::bounded_json(response, 96 * 1024)
         .await
@@ -280,7 +317,12 @@ mod tests {
             Err("ai_request_refused")
         ));
         let body = gemini_request(&intake);
-        assert_eq!(body["store"], false);
+        assert!(body.get("store").is_none());
+        assert!(body["generationConfig"].get("responseFormat").is_none());
+        assert_eq!(body["generationConfig"]["responseMimeType"], "application/json");
+        assert_eq!(body["generationConfig"]["responseJsonSchema"], schema());
+        assert_eq!(body["generationConfig"]["candidateCount"], 1);
+        assert_eq!(body["generationConfig"]["maxOutputTokens"], 8000);
         assert!(body.get("tools").is_none());
         assert!(
             body["systemInstruction"]["parts"][0]["text"]
@@ -295,9 +337,41 @@ mod tests {
                 .contains("circle.tex")
         );
         assert_eq!(
-            provider_error(reqwest::StatusCode::TOO_MANY_REQUESTS),
+            provider_error(reqwest::StatusCode::TOO_MANY_REQUESTS, &Value::Null),
             "ai_provider_quota_reached"
         );
+    }
+
+    #[test]
+    fn provider_errors_distinguish_invalid_keys_requests_models_and_quota_without_prose() {
+        let mut body = json!({"error": {
+            "message": "private upstream diagnostic must never be returned",
+            "details": [{"@type": "type.googleapis.com/google.rpc.ErrorInfo",
+                "domain": "googleapis.com", "reason": "API_KEY_INVALID"}]
+        }});
+        assert_eq!(
+            provider_error(reqwest::StatusCode::BAD_REQUEST, &body),
+            "ai_provider_key_invalid"
+        );
+        body["error"]["details"][0]["domain"] = json!("unrecognized.example");
+        assert_eq!(
+            provider_error(reqwest::StatusCode::BAD_REQUEST, &body),
+            "ai_provider_request_rejected"
+        );
+        for (status, expected) in [
+            (400, "ai_provider_request_rejected"),
+            (401, "ai_provider_access_denied"),
+            (403, "ai_provider_access_denied"),
+            (404, "ai_provider_model_unavailable"),
+            (429, "ai_provider_quota_reached"),
+            (500, "ai_provider_unavailable"),
+            (503, "ai_provider_unavailable"),
+        ] {
+            assert_eq!(
+                provider_error(reqwest::StatusCode::from_u16(status).unwrap(), &Value::Null),
+                expected
+            );
+        }
     }
 
     #[test]

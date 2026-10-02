@@ -296,6 +296,8 @@ Sol resumed development from Luna's PR #22 checkpoint on 2026-10-01 at Gyile's r
 
 PR #22 now also makes the production dependency graph reproducible and adds an automated production-container build/startup gate. The test uses a disposable PostgreSQL 18 database, verifies migration from an empty database, production refusal without `DATABASE_URL`, health/static assets, anonymous access controls and restart with persisted OAuth session metadata.
 
-The next action is to verify the expanded PR #22 at its exact head, merge when green, and obtain hosted deployment evidence. CI container evidence does not establish that Render is running the new revision. The canonical domain remains deferred.
+PR #22 and design PR #23 were merged after CI/Security. PR #24 added the member playground and was merged; its frontend was observed live after Gyile redeployed Render on 2026-10-02. Public health and anonymous access checks passed. Gyile's first real Gemini draft failed, so successful provider authoring and runtime Git publishing are still open gates; see [current evidence and recovery](MATH_PLAYGROUND.md).
 
-Once hosted activation is verified, resume section 3.3 (durable audit/event persistence) before activating any contract/engagement records.
+Gyile scoped the present work to the provider correction and documentation, then a temporary stop. On resumption, first record a successful synthetic live draft after deploying the correction. The next visual minor release follows the [calmer dark plan](../architecture/MATH_PLAYGROUND_DESIGN.md#next-minor-release-calmer-dark-visuals), including Canvas and formal/source surfaces, reduced motion and versioned artifact digests. Do not implement unrelated features during this stopping checkpoint.
+
+The canonical domain remains deferred. The wider company roadmap resumes section 3.3 (durable audit/event persistence) before activating any contract/engagement records; playground work does not satisfy those prerequisites.

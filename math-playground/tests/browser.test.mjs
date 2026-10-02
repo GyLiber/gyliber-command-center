@@ -10,7 +10,7 @@ import { chromium } from 'playwright';
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const prefix = '/api/math-playground';
 const id = '0123456789abcdef0123456789abcdef';
-let drafts = [], writes = [], provider = 'openai';
+let drafts = [], writes = [], provider = 'openai', draftError = null;
 const manifests = Object.fromEntries(await Promise.all(['giant-pi','snug-tails','creature-shuffle','memory-cloud'].map(async (id) =>
   [id, JSON.parse(await readFile(resolve(root, `math-playground/exhibits/${id}/0.1.0/manifest.json`)))])));
 const server = createServer(async (request, response) => {
@@ -28,6 +28,7 @@ const server = createServer(async (request, response) => {
       if (path === `${prefix}/drafts`) {
         assert.equal(data.files[0].name, 'concept.tex'); assert.equal(data.provider_consent, true);
         assert.equal(data.ai_provider, provider);
+        if (draftError) return send(502,{error:draftError});
         const exhibit=structuredClone(manifests['giant-pi']); exhibit.id=id; exhibit.review='ai_draft_unverified';
         exhibit.concept.title='<img src=x onerror=alert(1)>'; exhibit.concept.statement='For every Euclidean circle of radius r > 0, C = 2πr.';
         exhibit.concept.source_file='concept.tex'; exhibit.concept.source_quote=data.files[0].content;
@@ -110,6 +111,23 @@ try {
     assert.equal(await page.locator('#provider-consent').isChecked(),false);
     assert.match(await page.locator('#provider-consent-text').textContent(),/human review/);
     assert.match(await page.locator('#service-status').textContent(),/configured/);
+    await page.locator('#provider-consent').check();
+    for (const [code, message] of [
+      ['ai_provider_key_invalid', 'Google Gemini rejected the API key'],
+      ['ai_provider_request_rejected', 'rejected the request configuration'],
+      ['ai_provider_model_unavailable', 'model was not found'],
+      ['ai_provider_timeout', 'did not respond within 90 seconds'],
+      ['ai_provider_unavailable', 'temporarily unreachable or unavailable'],
+    ]) {
+      draftError=code; const before=writes.length;
+      await page.waitForFunction(()=>!document.getElementById('generate').disabled);
+      await page.locator('#generate').click();
+      await page.waitForFunction((text)=>document.getElementById('notice').textContent.includes(text),message);
+      assert.equal(writes.length,before+1);
+      assert.equal(drafts.length,0);
+      assert.ok(!(await page.locator('#notice').textContent()).includes('billing'));
+    }
+    draftError=null;
     await page.setViewportSize({width:390,height:844});
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth <= window.innerWidth),true);
     assert.deepEqual(errors,[]);

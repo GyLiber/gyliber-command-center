@@ -29,6 +29,11 @@
 
 ## Unreleased — v0.3.0 development
 
+- Corrected Gemini structured-output request fields to the published generateContent protocol, removing Gemini-only unsupported retention/format fields. OpenAI request behavior is unchanged.
+- Distinguish Gemini's HTTP-400 invalid-key reason, request rejection, unavailable model and timeout from transient provider failure. Error inspection is bounded and exposes/logs only fixed codes and status metadata.
+- Updated deployed-playground evidence and provider recovery instructions. Successful live generation/publication still require observation with the deployed credentials.
+- Documented Gyile's next-minor preference for calmer dark visuals matching the site, covering Canvas and formal/source panels. This visual change is planned, not included in the provider fix.
+
 - Added explicit Gemini authoring as a free-tier pilot alternative to OpenAI, with provider-bound consent, unpaid-service data-use disclosure, quota/access messages and no automatic paid fallback.
 - Corrected the browser fixture's decimal range input and prevented its exception details from being returned as HTML.
 
@@ -47,7 +52,7 @@
 - Documented the current temporary free PostgreSQL environment and its 2026-10-30 expiry.
 - Configured the private/internal `DATABASE_URL` in the Render web service environment without recording the secret value in source control.
 - Recorded the first controlled deployment failure caused by the Docker build context omitting `migrations/0001_sessions.sql`.
-- PR #22 adds the required Docker build-context correction; v0.3 deployment activation remains pending successful verification and redeployment.
+- PR #22 supplied the Docker build-context correction and was merged after successful CI/Security. Subsequent hosted playground deployment was observed; full provider/publishing acceptance remains pending as recorded in the playground runbook.
 - Sol resumed development from Luna's PR #22 checkpoint on 2026-10-01; see `docs/governance/DEVELOPMENT_HANDOFF.md`.
 - Production builds now use the committed `Cargo.lock`, locked resolution and the same Rust 1.98.1 toolchain as CI.
 - Added a production-container CI gate covering fail-closed configuration, PostgreSQL migration, HTTP health, static assets, anonymous access boundaries and restart with persisted session metadata.

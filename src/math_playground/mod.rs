@@ -280,6 +280,7 @@ async fn create(
         Err(error) => {
             tracing::warn!(
                 event_code = "MATH_AI_FAILED",
+                reason = error,
                 "Mathematics authoring failed"
             );
             return failure(StatusCode::BAD_GATEWAY, error);
