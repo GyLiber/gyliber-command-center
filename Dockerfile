@@ -4,6 +4,7 @@ COPY Cargo.toml Cargo.lock ./
 COPY src ./src
 COPY migrations ./migrations
 COPY static ./static
+COPY math-playground ./math-playground
 RUN cargo build --release --locked
 
 FROM debian:bookworm-slim

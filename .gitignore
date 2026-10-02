@@ -24,6 +24,7 @@ target/
 
 # Local databases / dumps
 *.sql
+!migrations/*.sql
 *.dump
 *.sqlite
 *.sqlite3

@@ -109,7 +109,10 @@ wait_for_health
 expect_status / 200
 expect_status /static/app.css 200
 expect_status /command 303
-for route in /api/state /api/modules /api/repository /api/resources; do
+expect_status /command/math-playground 303
+expect_status /static/math-playground.mjs 200
+[[ "$(query_database "SELECT to_regclass('public.gyliber_math_exhibits') IS NOT NULL")" == t ]]
+for route in /api/state /api/modules /api/repository /api/resources /api/math-playground /api/math-playground/demos/giant-pi/engine.mjs; do
   expect_status "$route" 401
 done
 

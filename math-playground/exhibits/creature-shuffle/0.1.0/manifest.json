@@ -1,0 +1,24 @@
+{
+  "id": "creature-shuffle",
+  "version": "0.1.0",
+  "formal_version": "0.2.0",
+  "concept": {
+    "title": "Creature shuffle",
+    "kind": "permutation",
+    "concept_type": "theorem",
+    "notation": "X is a finite set; |X| = n ∈ {0, 1, 2, …}; Sym(X) is the set of permutations of X; 0! = 1.",
+    "hypotheses": "A permutation of X is a bijection σ: X → X.",
+    "statement": "For every finite set X with n elements, |Sym(X)| = n!. Each permutation maps every element to exactly one element and every element has exactly one preimage.",
+    "visual_mapping": "Numbered creatures identify the elements of X; their positions represent a bijection to the original ordered positions. A slider enumerates each arrangement exactly once.",
+    "limitations": "The renderer allows 2 ≤ n ≤ 6; the statement is general for finite sets. It is a representation using a chosen ordering, not a claim that every set is naturally ordered.",
+    "source_file": "Sol-authored demonstration; no course upload",
+    "source_quote": "This is a synthetic demonstration, not an extraction from Gyile’s coursework.",
+    "palette": "sunset"
+  },
+  "source_sha256": null,
+  "engine_sha256": "d01d70e9eb4ddb92b08ecdbbd7e528f87e20f7dc4efb8f2d19f8b87fc677f0de",
+  "renderer_sha256": "2551efc952c039ba8b1e67ab8a69e82be0c5aa10e195206eb02722746bffded6",
+  "created_at": 0,
+  "review": "sol_reviewed_demo",
+  "repository_commit": null
+}

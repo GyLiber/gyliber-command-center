@@ -1,0 +1,11 @@
+{
+  "name": "gyliber-math-playground-checks",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/engine.test.mjs",
+    "test:browser": "node --test tests/browser.test.mjs"
+  },
+  "devDependencies": { "playwright": "1.62.1" }
+}

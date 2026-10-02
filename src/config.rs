@@ -12,6 +12,7 @@ use tower_sessions::cookie::Key;
 pub(crate) struct AppState {
     pub(crate) github: Option<Arc<GitHubConfig>>,
     pub(crate) http: Client,
+    pub(crate) math: Arc<crate::math_playground::Service>,
 }
 
 #[derive(Clone)]
@@ -77,6 +78,7 @@ pub(crate) fn load_state() -> Result<AppState> {
 
     Ok(AppState {
         github,
+        math: Arc::new(crate::math_playground::Service::from_environment()?),
         http: Client::builder()
             .user_agent("GyLiber-Command-Center/0.1.0")
             .redirect(reqwest::redirect::Policy::none())

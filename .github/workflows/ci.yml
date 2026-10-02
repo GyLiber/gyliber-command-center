@@ -13,6 +13,30 @@ permissions:
   contents: read
 
 jobs:
+  playground:
+    name: Mathematical playground
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: math-playground/package-lock.json
+      - run: npm ci --ignore-scripts
+        working-directory: math-playground
+      - run: npm audit --audit-level=high
+        working-directory: math-playground
+      - run: npm test
+        working-directory: math-playground
+      - run: npx playwright install --with-deps chromium
+        working-directory: math-playground
+      - run: npm run test:browser
+        working-directory: math-playground
+
   container:
     name: Production container
     runs-on: ubuntu-latest
