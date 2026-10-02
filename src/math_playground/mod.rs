@@ -65,7 +65,8 @@ impl Service {
                 Err(error) => Err(error.into()),
             }
         }
-        let provider = generation::Provider::from_setting(optional("MATH_AI_PROVIDER")?.as_deref())?;
+        let provider =
+            generation::Provider::from_setting(optional("MATH_AI_PROVIDER")?.as_deref())?;
         let (key_name, model_name) = provider.environment_names();
         let key = optional(key_name)?;
         let model = optional(model_name)?;
