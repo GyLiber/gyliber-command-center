@@ -70,7 +70,7 @@ The authoring specification preserves formal statements and hypotheses from v0.1
 
 ## 5. Creative direction and illustrative seeds
 
-Working theme: a small playground of mathematical creatures, tools and places. Use expressive silhouettes, limited palettes, tactile-looking outlines and coherent visual cues. Variety should arise from the concept, not a requirement to invent a new engine or dependency stack for every upload.
+Working theme: a small playground of mathematical creatures, tools and places. Gyile requires calmer, darker colors close to the existing site theme; the next visual minor release must remove bright white/cream backgrounds from the playground. Use expressive silhouettes, limited palettes, tactile-looking outlines and coherent visual cues. Variety should arise from the concept, not a requirement to invent a new engine or dependency stack for every upload.
 
 ### Giant Pi and the stretchy wheel
 
@@ -309,3 +309,16 @@ External sources consulted on 2026-10-01; the specific architecture above is Sol
 ## Implementation amendment — 2026-10-01
 
 Gyile authorized implementation by Sol. [ADR-0010](ADR-0010-bounded-mathematical-playground.md) records the first bounded service and its departures from this broader proposal: member access; constrained AI-to-specification-to-reviewed-code generation; smaller source/context limits; synchronous requests; trusted code playback rather than arbitrary generated-code execution; private derivatives with public source-free artifact packages; formal reveal with theorem proof deferred. The proposal remains the wider design, not a claim that every proposed capability is implemented. See the [activation runbook](../operations/MATH_PLAYGROUND.md) for manual dependencies and hosted acceptance.
+
+
+### Next minor release: calmer dark visuals
+
+**Requested by Gyile, 2026-10-02; planned, not implemented.** White backgrounds cause Gyile eye discomfort. Comfort and quick access to the primary mathematics take precedence over visual spectacle.
+
+- Reuse the site's dark background/surface/text tokens, or close charcoal/navy equivalents. Use restrained teal, lavender and amber accents rather than bright pastel expanses. Keep readable muted light text; avoid pure-white panels, canvas fills and broad highlights.
+- Cover the entire experience: Canvas background and every scene palette, formal reveal, source/code panels, upload controls, notices, badges, focus/hover states and small-screen layout. CSS alone cannot change colors embedded in stored renderer code.
+- Keep the giant Pi and other playful characters, mathematical behavior, source labels, formal reveal and private/public boundaries. Preserve pause controls and reduced-motion support; avoid flashing, large bright transitions and attention-seeking motion.
+- Check text/control contrast, keyboard focus and non-color cues. Review actual desktop/mobile screenshots with Gyile for comfort; accessibility checks alone cannot establish individual eye comfort.
+- Version renderer changes explicitly. Recompute affected demo/package digests and test exact-byte playback/publication. Preserve immutable published packages and existing saved renderer bytes; document any opt-in replay update rather than silently rewriting earlier artifacts. Application, engine and formal-reveal versions remain separate.
+
+Next session begins with live provider acceptance and recording its outcome, then this visual change. Confirm one correct formal draft and one reviewed source-free Git publication before claiming end-to-end completion. Theorem proof remains deferred to capability 0.3.0; no new authoring service, repository or paid dependency is required by this visual plan.

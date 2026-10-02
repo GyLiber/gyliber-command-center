@@ -3,7 +3,11 @@ let catalog = null, current = null, cleanup = null, selectedFiles = [], selectio
 const messages = {
   authentication_required: 'Your member session has ended. Sign in again to continue.',
   ai_authoring_not_configured: 'AI authoring has not been activated for this deployment yet.',
-  ai_provider_unavailable: 'The AI provider could not complete this request. Check its key, model access and billing, then retry.',
+  ai_provider_unavailable: 'The AI provider is temporarily unreachable or unavailable. No automatic retry occurred. Try the demonstrations and report this message if it persists.',
+  ai_provider_key_invalid: 'Google Gemini rejected the API key. Replace MATH_GEMINI_API_KEY in Render with a valid Google AI Studio key, then redeploy. Do not share the key in chat.',
+  ai_provider_request_rejected: 'The AI provider rejected the request configuration. Report this message to Sol; repeated retries will use the daily request budget.',
+  ai_provider_model_unavailable: 'The configured AI model was not found or does not support this operation. Check the selected model setting in Render, then redeploy.',
+  ai_provider_timeout: 'The AI provider did not respond within 90 seconds. No automatic retry occurred. Try a smaller self-contained excerpt later.',
   ai_provider_access_denied: 'The AI key or model access was refused. Check the selected provider’s configuration.',
   ai_provider_quota_reached: 'The provider’s quota or credit limit was reached. No paid fallback was used. Try the demonstrations; do not repeatedly retry this request.',
   ai_provider_changed_refresh_consent: 'The selected AI provider changed. Refresh and review the upload consent again.',
