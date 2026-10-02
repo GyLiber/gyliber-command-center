@@ -20,7 +20,7 @@ Set these values in the existing Render web service's private **Environment** se
 | --- | --- |
 | `MATH_AI_PROVIDER` | `gemini` or `openai`. When omitted, the legacy OpenAI configuration is selected. No automatic provider fallback occurs. |
 | `MATH_GEMINI_API_KEY` | A Gemini API key created privately in Google AI Studio; needed only when Gemini is selected. |
-| `MATH_GEMINI_MODEL` | An exact compatible model identifier, initially `gemini-2.5-flash`; set both Gemini values together. |
+| `MATH_GEMINI_MODEL` | An exact compatible model identifier for new projects, currently `gemini-3.5-flash-lite`; set both Gemini values together. |
 | `MATH_OPENAI_API_KEY` | A project API key from Gyile's OpenAI API account, authorized to create Responses. |
 | `MATH_OPENAI_MODEL` | An exact model ID available to that account which supports Responses and strict JSON-schema text output. Set both AI values together. No model alias is silently chosen by the application. |
 | `MATH_GITHUB_TOKEN` | A fine-grained GitHub access token restricted to `GyLiber/gyliber-command-center` with repository **Contents: read and write** and normal metadata read access. It must be permitted to create/update `math-playground-artifacts`. |
@@ -29,7 +29,7 @@ The existing GitHub OAuth token is used only for member authentication and is no
 
 OpenAI key creation does not establish funded model access. OpenAI lists the free tier as unsupported for `gpt-4.1-mini`. Do not require Gyile to buy API credits to play the reviewed demonstrations.
 
-For the current zero-spend pilot, select Gemini and use a Google AI Studio project that remains on the **Free tier**, without enabling paid billing. Google currently lists free input/output for `gemini-2.5-flash` and supports South Africa. Availability and account quotas must be checked in the account; free limits can change. The application cannot determine a project's billing tier from its API key. The site's eight-attempt budget is not a monetary cap. If the project is later upgraded, its requests can incur charges.
+For the current zero-spend pilot, select Gemini and use a Google AI Studio project that remains on the **Free tier**, without enabling paid billing. Google currently recommends `gemini-3.5-flash-lite` for new projects and lists free input/output on its Free tier; South Africa is an available region. Gemini 2.5 access is now limited to users who actively used those models previously, so the earlier `gemini-2.5-flash` setup recommendation is superseded. Availability and account quotas must be checked in the account; free limits can change. The application cannot determine a project's billing tier from its API key. The site's eight-attempt budget is not a monetary cap. If the project is later upgraded, its requests can incur charges.
 
 Google's unpaid services may use inputs/outputs to improve products, including human review. Use only non-sensitive material that the member has permission to share. Gemini is therefore an explicit alternative with provider-specific consent, not an invisible substitution for OpenAI. This member pilot is for Gyile's adult study use in an available region; public/expanded access requires reassessing provider eligibility and terms. Both providers receive `store: false`, which is not a zero-retention guarantee. Gemini's request logging setting does not override unpaid-service product-improvement/human-review terms.
 
@@ -37,7 +37,7 @@ Google's unpaid services may use inputs/outputs to improve products, including h
 
 1. Open [Google AI Studio API keys](https://aistudio.google.com/api-keys), sign in with a Google account and read/accept the terms if appropriate.
 2. New users may receive a default project/key. Otherwise create a key using a new personal project or an existing suitable project. Keep the project on **Free tier**; do not choose paid billing or an upgrade. If key creation asks for payment or account permissions are unclear, stop and report the visible options.
-3. Copy the key directly into the Render web service's private Environment page as `MATH_GEMINI_API_KEY`. Also add `MATH_GEMINI_MODEL=gemini-2.5-flash` and `MATH_AI_PROVIDER=gemini` together. Leave the GitHub token and existing authentication/database/session settings unchanged. Unselected OpenAI values are ignored.
+3. Copy the key directly into the Render web service's private Environment page as `MATH_GEMINI_API_KEY`. Also add `MATH_GEMINI_MODEL=gemini-3.5-flash-lite` and `MATH_AI_PROVIDER=gemini` together. Leave the GitHub token and existing authentication/database/session settings unchanged. Unselected OpenAI values are ignored.
 4. After the relevant correction has passed CI/Security and merged, deploy the latest `main` revision. For saved environment changes use **Save, rebuild and deploy**; if no settings changed, use **Manual Deploy → Deploy latest commit**. Wait for the deployment to become **Live** before retrying.
 5. On the member playground, confirm that the consent and status name **Google Gemini**. Create one small synthetic draft. If quota/access fails, report the message rather than repeatedly using up the eight-attempt budget. Do not send the key to Sol.
 
@@ -53,6 +53,8 @@ Useful primary references:
 - [Gemini pricing and free-tier availability](https://ai.google.dev/gemini-api/docs/pricing)
 - [Gemini API keys](https://ai.google.dev/gemini-api/docs/api-key)
 - [Gemini data-use terms](https://ai.google.dev/gemini-api/terms)
+- [Gemini model access and deprecation notices](https://ai.google.dev/gemini-api/docs/deprecations)
+- [Gemini 3 migration requirements](https://ai.google.dev/gemini-api/docs/generate-content/latest-model)
 - [Gemini available regions](https://ai.google.dev/gemini-api/docs/available-regions)
 - [GitHub fine-grained access tokens](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)
 - [GitHub Git trees and token permissions](https://docs.github.com/en/rest/git/trees)
@@ -100,13 +102,13 @@ The existing development database expires on 2026-10-30 unless replaced. Preserv
 
 ## Provider failure recovery
 
-The Gemini request uses `responseMimeType: "application/json"` and `responseJsonSchema` under `generationConfig`. It retains `store: false` and does not send `responseFormat`. Both output formats are recognized by Google's live REST discovery; this compatibility change alone cannot establish the original failure cause. OpenAI keeps its existing Responses request. Both remain bounded and use the same independent concept/source validation.
+The Gemini request uses `responseMimeType: "application/json"` and `responseJsonSchema` under `generationConfig`. It retains `store: false` and does not send `responseFormat`. Both output formats are recognized by Google's live REST discovery; this compatibility change alone cannot establish the original failure cause. OpenAI keeps its existing Responses request. Both remain bounded and use the same independent concept/source validation. Gemini requests omit `candidateCount`, which Google documents as unsupported in Gemini 3 and later. The response parser still requires exactly one candidate.
 
 | Visible failure | Action |
 | --- | --- |
 | Google Gemini rejected the API key | In Google AI Studio, select the intended free-tier project and copy a valid key directly into Render's private `MATH_GEMINI_API_KEY`. Redeploy; never paste the key into chat or Git. |
 | Provider rejected request configuration | Report the visible message and deployed commit. Sol can inspect the fixed `MATH_AI_UPSTREAM_REJECTED` status/reason in Render logs. Do not repeatedly retry or enable billing as a speculative fix. |
-| Model was not found / operation unsupported | Check `MATH_GEMINI_MODEL=gemini-2.5-flash` and the account's current model access; redeploy after a settings correction. |
+| Model was not found / operation unsupported | Check `MATH_GEMINI_MODEL=gemini-3.5-flash-lite` and the account's current model access; redeploy after a settings correction. |
 | Key or model access refused | Check the selected project's API permissions, key restrictions and provider eligibility. |
 | Quota reached | Keep paid billing disabled for the zero-spend pilot. Use demos and check the provider's free quota/reset time. |
 | 90-second timeout / temporarily unavailable | Use demos; later try a smaller self-contained excerpt. No automatic retry occurred. |
@@ -122,3 +124,20 @@ The old generic message alone cannot identify the original upstream cause. The c
 - Gyile reports working member login, saved Gemini settings and a 30-day GitHub publishing token. Sol has not inspected secret values. The first real generation reported a generic provider failure; successful hosted AI generation and runtime Git publication remain unverified.
 - The compatibility correction adds request/schema and structured-error regression coverage and browser checks for distinct safe failure messages. Its exact-head check/merge evidence belongs to its corrective PR; live acceptance must be recorded after deployment and a successful real request.
 - Next-session work is the [calmer dark visual plan](../architecture/MATH_PLAYGROUND_DESIGN.md#next-minor-release-calmer-dark-visuals). It is documented, not implemented in this correction. Stop feature development after this provider correction and documentation update, as Gyile requested.
+
+
+### Follow-up model-access failure, 2026-10-03 (South Africa)
+
+After deploying the diagnostic correction, Gyile reported **configured model not found / operation unsupported**. This identifies an upstream HTTP 404; it does not prove which model/provider was configured or certify the key. Google's current model/deprecation pages limit Gemini 2.5 to previous active users and recommend 3.5 Flash-Lite or 3.8 Flash for new projects. The earlier new-account recommendation was therefore unsuitable and has been corrected to `gemini-3.5-flash-lite`, a supported structured-output model with listed free-tier input/output.
+
+Sol removed the Gemini-3-unsupported `candidateCount` request field and added regression coverage for its absence, preserving the exactly-one-candidate response check, token/schema limits, explicit model selection and no fallback. Account-specific access and successful live drafting remain unverified.
+
+After this follow-up has passed CI/Security and merged:
+
+1. Open the existing Render service's **Environment** page and click **Edit**.
+2. Confirm `MATH_AI_PROVIDER` is exactly `gemini` and set `MATH_GEMINI_MODEL` to exactly `gemini-3.5-flash-lite` (no quotes, spaces or `models/` prefix). Keep the existing privately saved Gemini key.
+3. Choose **Save, rebuild and deploy**. Confirm the service deploys the latest `main` containing the candidate-count correction, then wait for **Live**.
+4. Refresh `/command/math-playground`, confirm the consent names **Google Gemini**, and submit one small self-contained synthetic `.tex` excerpt. Record success or the exact new message. Keep the Google project on **Free tier** with paid billing disabled.
+5. If HTTP 404 persists with the exact settings above, verify project-specific model access using Google's `models.list` and `supportedGenerationMethods` guidance; do not guess model identifiers or switch to a paid provider. A successful AI Studio chat alone does not certify API access for the saved project/key.
+
+This follow-up changes no visual feature; the darker-color plan remains the next-session work after live provider acceptance.

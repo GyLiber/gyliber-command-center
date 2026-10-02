@@ -29,6 +29,9 @@
 
 ## Unreleased — v0.3.0 development
 
+- Corrected new-project Gemini setup to gemini-3.5-flash-lite after the live model-unavailable error and Google's published restriction of Gemini 2.5 to prior active users. No automatic model fallback is introduced.
+- Removed candidateCount from Gemini requests for Gemini 3 compatibility, retaining exactly-one-candidate response validation and the existing bounded structured-output contract. Updated private Render recovery steps; live generation still needs observation after redeploy.
+
 - Use Gemini's established responseMimeType/responseJsonSchema output configuration while retaining store: false. The live API recognizes the earlier format too, so this compatibility change is not a proven production root-cause fix. OpenAI request behavior is unchanged.
 - Distinguish Gemini's HTTP-400 invalid-key reason, request rejection, unavailable model and timeout from transient provider failure. Error inspection is bounded and exposes/logs only fixed codes and status metadata.
 - Updated deployed-playground evidence and provider recovery instructions. Successful live generation/publication still require observation with the deployed credentials.

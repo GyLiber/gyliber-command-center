@@ -85,7 +85,6 @@ fn gemini_request(intake: &Intake) -> Value {
         "systemInstruction": {"parts": [{"text": INSTRUCTIONS}]},
         "contents": [{"role": "user", "parts": [{"text": serde_json::to_string(&intake.files).expect("source serializes")}]}],
         "generationConfig": {
-            "candidateCount": 1,
             "maxOutputTokens": 8000,
             "responseMimeType": "application/json",
             "responseJsonSchema": schema()
@@ -298,6 +297,12 @@ mod tests {
             {"text": serde_json::to_string(&concept).unwrap()}
         ]}}]});
         assert!(parse_gemini(&response, &intake).is_ok());
+        let candidate = response["candidates"][0].clone();
+        let multiple = json!({"candidates": [candidate.clone(), candidate]});
+        assert!(matches!(
+            parse_gemini(&multiple, &intake),
+            Err("ai_response_invalid")
+        ));
         concept.source_quote = "invented source anchor".into();
         response["candidates"][0]["content"]["parts"][1]["text"] =
             json!(serde_json::to_string(&concept).unwrap());
@@ -325,7 +330,7 @@ mod tests {
             "application/json"
         );
         assert_eq!(body["generationConfig"]["responseJsonSchema"], schema());
-        assert_eq!(body["generationConfig"]["candidateCount"], 1);
+        assert!(body["generationConfig"].get("candidateCount").is_none());
         assert_eq!(body["generationConfig"]["maxOutputTokens"], 8000);
         assert!(body.get("tools").is_none());
         assert!(
@@ -387,6 +392,7 @@ mod tests {
         );
         assert!(Provider::from_setting(Some("auto")).is_err());
         assert!(valid_model("gemini-2.5-flash"));
+        assert!(valid_model("gemini-3.5-flash-lite"));
         for model in [
             "",
             "../models/other",
