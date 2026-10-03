@@ -6,7 +6,7 @@
 
 ## What works without additional accounts
 
-An allowlisted member can play four repository-backed demonstrations, change their parameters, pause motion and reveal formal mathematics. The source labels explicitly identify these as Sol-authored demonstrations, not Gyile's coursework. Reduced-motion preferences default to a paused scene.
+An allowlisted member can play four repository-backed demonstrations, change their parameters, pause motion and reveal formal mathematics. The source labels explicitly identify these as Sol-authored demonstrations, not Gyile's coursework. New 0.2.0 visual bundles always start paused; choose Animate to start motion. Their scenes, formal/source surfaces and controls use the dark site palette. A later reduced-motion preference pauses animation; hidden pages stop scheduling frames.
 
 The initial authoring models are circle circumference, the sequence `1/n` converging to zero and finite permutations. Other mathematical concepts receive a labelled mnemonic scene. Formal definitions/theorems, hypotheses and notation are revealed separately from the drawing; theorem proofs remain deferred to exhibit capability 0.3.0.
 
@@ -69,7 +69,7 @@ Useful primary references:
 5. Choose a small, low-risk UTF-8 concept excerpt with its needed macros. Confirm the displayed provider and applicable data-use terms. Check provider consent and create one draft. The full selected text is sent to the configured AI provider; raw uploads are not saved as source files by this app. A changed provider requires fresh consent.
 6. Confirm the selected source quote is verbatim, all hypotheses and quantifiers are preserved, and the scene's model actually matches the source. An exact quote alone does not prove a correct interpretation. If incorrect, delete the draft and submit a clearer excerpt; the first release has no formal-statement editor.
 7. Verify the draft is labelled unverified, is private to the creating member, and shows its source and engine/renderer SHA-256 values. Download the exact code package and check it contains no course excerpt, course title or member identity.
-8. After mathematical review, approve public source-free code publication and save to Git. Confirm the receipt's immutable commit contains `math-playground/exhibits/<id>/0.1.0/{engine.mjs,renderer.mjs,manifest.json}` on the artifact branch. Compare both code files' SHA-256 values with the private exhibit. Replay uses those exact stored bytes and makes no new AI call.
+8. After mathematical review, approve public source-free code publication and save to Git. Confirm the receipt's immutable commit contains `math-playground/exhibits/<id>/<version>/{engine.mjs,renderer.mjs,manifest.json}` (new bundles use `0.2.0`; earlier bundles retain `0.1.0`) on the artifact branch. Compare both code files' SHA-256 values with the private exhibit. Replay uses those exact stored bytes and makes no new AI call.
 9. Restart/redeploy the service and confirm the member's saved exhibit is still readable and playable. This requires the same surviving PostgreSQL database and session key. Published Git code alone does not restore the private reveal/source mapping.
 10. Delete a disposable private fixture. Confirm it disappears from the shelf while any published generic code remains in Git. Confirm budget/retention semantics in ADR-0010 are understood.
 
@@ -98,6 +98,8 @@ The artifact branch is an append-only application convention, not an indestructi
 
 A downloaded `.json` packet contains `manifest` and exact `files` entries for the pure engine and renderer. Extract them unchanged. The engine is an ES module suitable for Node; the renderer's `mount(container, engineModule)` function needs a browser DOM/Canvas. A saved Git package has the same two modules as separate files. The public package intentionally excludes the private formal/source mapping; the original LaTeX remains the authoritative primary record.
 
+Bundle 0.2.0 updates the renderer and leaves engine mathematics unchanged. The compatible manifest field `engine_version` identifies the entire executable bundle, including renderer. Saved 0.1.0 code remains exact. Opening an older exhibit shows a dark choice before drawing: **Dim original colours** filters its Canvas display, while **Show original (light colours)** explicitly displays the original palette. Downloads and public Git code preserve the original palette either way; the filter is not embedded in them. New demonstrations/drafts need no dim filter.
+
 The existing development database expires on 2026-10-30 unless replaced. Preserve primary mathematics in its existing LaTeX/Git/Obsidian homes; do not treat this temporary derivative shelf as their archive.
 
 ## Provider failure recovery
@@ -123,7 +125,7 @@ The old generic message alone cannot identify the original upstream cause. The c
 - After Gyile's Render rebuild/deploy, public health returned HTTP 200, version `0.2.0`; the live playground frontend exactly matched that implementation. Anonymous playground-page access redirected to login and anonymous API access returned HTTP 401. Application version `0.2.0` does not mean the unreleased v0.3 development line has been tagged.
 - Gyile reports working member login, saved Gemini settings and a 30-day GitHub publishing token. Sol has not inspected secret values. The first real generation reported a generic provider failure; successful hosted AI generation and runtime Git publication remain unverified.
 - The compatibility correction adds request/schema and structured-error regression coverage and browser checks for distinct safe failure messages. Its exact-head check/merge evidence belongs to its corrective PR; live acceptance must be recorded after deployment and a successful real request.
-- Next-session work is the [calmer dark visual plan](../architecture/MATH_PLAYGROUND_DESIGN.md#next-minor-release-calmer-dark-visuals). It is documented, not implemented in this correction. Stop feature development after this provider correction and documentation update, as Gyile requested.
+- The provider correction contained no visual work and ended at Gyile’s stopping checkpoint. The explicitly resumed 2026-10-03 visual work is recorded below.
 
 
 ### Follow-up model-access failure, 2026-10-03 (South Africa)
@@ -140,4 +142,20 @@ After this follow-up has passed CI/Security and merged:
 4. Refresh `/command/math-playground`, confirm the consent names **Google Gemini**, and submit one small self-contained synthetic `.tex` excerpt. Record success or the exact new message. Keep the Google project on **Free tier** with paid billing disabled.
 5. If HTTP 404 persists with the exact settings above, verify project-specific model access using Google's `models.list` and `supportedGenerationMethods` guidance; do not guess model identifiers or switch to a paid provider. A successful AI Studio chat alone does not certify API access for the saved project/key.
 
-This follow-up changes no visual feature; the darker-color plan remains the next-session work after live provider acceptance.
+This follow-up changed no visual feature. The later resumed visual work proceeds independently with synthetic demos; provider acceptance remains pending.
+
+## Resumed visual work and remaining acceptance, 2026-10-03
+
+PR #25 merged the safe diagnostics and PR #26 merged the Gemini 3/model guidance correction after exact-head CI/Security. On resumption Gyile reported the live retest **not tested yet**. No successful live draft or runtime Git publication is claimed.
+
+Sol’s dark bundle 0.2.0 includes all four demos and three palettes, dark formal/source/upload/action surfaces, paused-by-default motion and legacy package preservation. Browser CI exercises the real frontend with synthetic fixtures and records `dark-desktop.png` and `dark-mobile.png` in the seven-day `playground-visual-review` Actions artifact. Automated contrast/focus/mobile checks and screenshot review do not establish individual eye comfort.
+
+After the visual PR has passed CI/Security and merged:
+
+1. In the existing Render service, deploy the latest verified **main** commit. Wait for **Live** and check the authenticated deployment revision. Do not deploy `math-playground-artifacts`.
+2. Open the member playground. Confirm **visual 0.2.0 · reveal 0.2.0**, a dark Canvas/formal/source area, and an **Animate** button before any motion. Try all four demonstrations and mobile/keyboard controls. Report any surface still too bright or uncomfortable.
+3. If an older saved exhibit exists, confirm opening it initially displays the dark palette-choice screen. Choose the dim view if desired. Its download must retain its original 0.1.0 renderer bytes/digest.
+4. Follow the private Gemini model-setting steps above and perform one synthetic draft. Record success or the exact error. Keep paid billing disabled; demonstrations need no provider.
+5. Only after a correct mathematical review, complete the runbook’s source-free Git publication and saved replay checks. These are the remaining end-to-end activation gates.
+
+The free PostgreSQL instance still expires on 2026-10-30. The publishing token was reported with a 30-day lifetime; check its actual expiry privately before testing. Neither temporary storage nor the playground replaces primary LaTeX/Git/Obsidian work.

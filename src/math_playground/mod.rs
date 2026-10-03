@@ -117,6 +117,10 @@ pub(crate) fn routes() -> Router<AppState> {
             "/api/math-playground/runtime/renderer.mjs",
             get(demo_renderer),
         )
+        .route(
+            "/api/math-playground/runtime/{version}/renderer.mjs",
+            get(versioned_demo_renderer),
+        )
         .route("/api/math-playground/drafts", post(create))
         .route(
             "/api/math-playground/exhibits/{id}",
@@ -292,7 +296,7 @@ async fn create(
     let source = serde_json::to_vec(&intake.files).expect("source serializes");
     let exhibit = Exhibit {
         id,
-        version: "0.1.0".into(),
+        version: "0.2.0".into(),
         formal_version: "0.2.0".into(),
         concept,
         source_sha256: digest(&source),
@@ -476,28 +480,28 @@ pub(super) async fn bounded_json(mut response: reqwest::Response, limit: usize) 
 fn demo_artifact(id: &str, code: bool) -> Option<&'static str> {
     match (id, code) {
         ("giant-pi", false) => Some(include_str!(
-            "../../math-playground/exhibits/giant-pi/0.1.0/manifest.json"
+            "../../math-playground/exhibits/giant-pi/0.2.0/manifest.json"
         )),
         ("giant-pi", true) => Some(include_str!(
-            "../../math-playground/exhibits/giant-pi/0.1.0/engine.mjs"
+            "../../math-playground/exhibits/giant-pi/0.2.0/engine.mjs"
         )),
         ("snug-tails", false) => Some(include_str!(
-            "../../math-playground/exhibits/snug-tails/0.1.0/manifest.json"
+            "../../math-playground/exhibits/snug-tails/0.2.0/manifest.json"
         )),
         ("snug-tails", true) => Some(include_str!(
-            "../../math-playground/exhibits/snug-tails/0.1.0/engine.mjs"
+            "../../math-playground/exhibits/snug-tails/0.2.0/engine.mjs"
         )),
         ("creature-shuffle", false) => Some(include_str!(
-            "../../math-playground/exhibits/creature-shuffle/0.1.0/manifest.json"
+            "../../math-playground/exhibits/creature-shuffle/0.2.0/manifest.json"
         )),
         ("creature-shuffle", true) => Some(include_str!(
-            "../../math-playground/exhibits/creature-shuffle/0.1.0/engine.mjs"
+            "../../math-playground/exhibits/creature-shuffle/0.2.0/engine.mjs"
         )),
         ("memory-cloud", false) => Some(include_str!(
-            "../../math-playground/exhibits/memory-cloud/0.1.0/manifest.json"
+            "../../math-playground/exhibits/memory-cloud/0.2.0/manifest.json"
         )),
         ("memory-cloud", true) => Some(include_str!(
-            "../../math-playground/exhibits/memory-cloud/0.1.0/engine.mjs"
+            "../../math-playground/exhibits/memory-cloud/0.2.0/engine.mjs"
         )),
         _ => None,
     }
@@ -525,6 +529,17 @@ async fn demo_renderer(session: Session) -> Response {
         return error.into_response();
     }
     javascript(model::RENDERER.to_owned())
+}
+
+async fn versioned_demo_renderer(session: Session, Path(version): Path<String>) -> Response {
+    if let Err(error) = auth::require_api_member(&session).await {
+        return error.into_response();
+    }
+    match version.as_str() {
+        "0.1.0" => javascript(model::LEGACY_RENDERER.to_owned()),
+        "0.2.0" => javascript(model::RENDERER.to_owned()),
+        _ => failure(StatusCode::NOT_FOUND, "exhibit_not_found"),
+    }
 }
 
 #[cfg(test)]
@@ -586,6 +601,8 @@ mod tests {
             "/api/math-playground/demos/giant-pi",
             "/api/math-playground/demos/giant-pi/engine.mjs",
             "/api/math-playground/runtime/renderer.mjs",
+            "/api/math-playground/runtime/0.1.0/renderer.mjs",
+            "/api/math-playground/runtime/0.2.0/renderer.mjs",
             "/api/math-playground/exhibits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
             "/api/math-playground/exhibits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/engine.mjs",
         ] {
@@ -615,6 +632,8 @@ mod tests {
             "/command/math-playground",
             "/api/math-playground/demos/giant-pi/engine.mjs",
             "/api/math-playground/runtime/renderer.mjs",
+            "/api/math-playground/runtime/0.1.0/renderer.mjs",
+            "/api/math-playground/runtime/0.2.0/renderer.mjs",
         ] {
             let response = app
                 .clone()
@@ -645,6 +664,55 @@ mod tests {
         assert_eq!(body["ai_ready"], false);
         assert_eq!(body["publishing_ready"], false);
         assert_eq!(body["csrf"], "test-request-token");
+    }
+
+    #[tokio::test]
+    async fn demo_and_versioned_renderers_preserve_package_provenance() {
+        let (app, cookie) = app_with_member().await;
+        for (version, expected) in [
+            ("0.1.0", model::LEGACY_RENDERER),
+            ("0.2.0", model::RENDERER),
+        ] {
+            let response = app
+                .clone()
+                .oneshot(
+                    Request::builder()
+                        .uri(format!(
+                            "/api/math-playground/runtime/{version}/renderer.mjs"
+                        ))
+                        .header("cookie", &cookie)
+                        .body(Body::empty())
+                        .unwrap(),
+                )
+                .await
+                .unwrap();
+            assert_eq!(response.status(), StatusCode::OK);
+            let bytes = to_bytes(response.into_body(), 64 * 1024).await.unwrap();
+            assert_eq!(bytes.as_ref(), expected.as_bytes());
+        }
+        let document: Value =
+            serde_json::from_str(demo_artifact("giant-pi", false).unwrap()).unwrap();
+        assert_eq!(document["version"], "0.2.0");
+        assert_eq!(document["formal_version"], "0.2.0");
+        assert_eq!(
+            document["renderer_sha256"],
+            digest(model::RENDERER.as_bytes())
+        );
+        assert_eq!(
+            document["engine_sha256"],
+            digest(demo_artifact("giant-pi", true).unwrap().as_bytes())
+        );
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri("/api/math-playground/runtime/unknown/renderer.mjs")
+                    .header("cookie", &cookie)
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(response.status(), StatusCode::NOT_FOUND);
     }
 
     #[tokio::test]

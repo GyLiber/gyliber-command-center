@@ -81,12 +81,35 @@ function renderFormal(exhibit) {
     link.target = '_blank'; link.rel = 'noopener noreferrer'; $('repository-receipt').append(link);
   } else $('repository-receipt').textContent = exhibit.demo ? 'Reviewed engine is stored in the application repository.' : 'Private draft; code has not been published to Git.';
 }
+function mountScene(exhibit, renderer, engine, ticket) {
+  const scene = $('scene'); scene.classList.remove('dim-legacy');
+  if (exhibit.version !== '0.1.0') return renderer.mount(scene, engine);
+  // Old stored code stays exact. A separate, explicitly chosen display filter
+  // can dim its light palette without changing the downloaded/public package.
+  let dispose = null;
+  const note = document.createElement('p'); note.className = 'legacy-scene';
+  note.textContent = 'Older palette. Choose a dim view, or show the original light colours. Downloads retain the original palette.';
+  const actions = document.createElement('div'); actions.className = 'actions legacy-scene';
+  for (const [dim, label] of [[true, 'Dim original colours'], [false, 'Show original (light colours)']]) {
+    const button = document.createElement('button'); button.type = 'button'; button.className = 'secondary-btn'; button.textContent = label;
+    button.addEventListener('click', () => {
+      if (ticket !== sceneVersion) return;
+      scene.classList.toggle('dim-legacy', dim); dispose = renderer.mount(scene, engine);
+      // Use the legacy renderer's existing pause control; do not rewrite its code.
+      for (const control of scene.querySelectorAll('button')) if (control.textContent === 'Pause motion') control.click();
+      $('scene-version').textContent = `visual ${exhibit.version} · reveal ${exhibit.formal_version} · ${dim ? 'dim view' : 'original colours'}`;
+    });
+    actions.append(button);
+  }
+  scene.replaceChildren(note, actions);
+  return () => { dispose?.(); scene.classList.remove('dim-legacy'); scene.replaceChildren(); };
+}
 async function showExhibit(exhibit) {
   const ticket = ++sceneVersion;
   const prefix = exhibit.demo ? `/api/math-playground/demos/${exhibit.id}` : `/api/math-playground/exhibits/${exhibit.id}`;
-  const [engine, renderer] = await Promise.all([import(`${prefix}/engine.mjs`), import(exhibit.demo ? '/api/math-playground/runtime/renderer.mjs' : `${prefix}/renderer.mjs`)]);
+  const [engine, renderer] = await Promise.all([import(`${prefix}/engine.mjs`), import(exhibit.demo ? `/api/math-playground/runtime/${encodeURIComponent(exhibit.version)}/renderer.mjs` : `${prefix}/renderer.mjs`)]);
   if (ticket !== sceneVersion) return;
-  cleanup?.(); current = exhibit; cleanup = renderer.mount($('scene'), engine);
+  cleanup?.(); current = exhibit; cleanup = mountScene(exhibit, renderer, engine, ticket);
   $('scene-title').textContent = exhibit.concept.title;
   $('scene-kind').textContent = exhibit.concept.kind === 'metaphor' ? 'MNEMONIC METAPHOR'
     : !exhibit.demo && !exhibit.repository_commit ? 'UNVERIFIED MODEL DRAFT' : 'MATHEMATICAL MODEL';
@@ -150,7 +173,7 @@ $('download').addEventListener('click', async () => {
     const manifest = { format: 1, id: exhibit.id, engine_version: exhibit.version, kind: exhibit.concept.kind,
       palette: exhibit.concept.palette, engine_sha256: exhibit.engine_sha256, renderer_sha256: exhibit.renderer_sha256 };
     const blob = new Blob([JSON.stringify({ manifest, files: { 'engine.mjs': engine, 'renderer.mjs': renderer } }, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob), link = document.createElement('a'); link.href = url; link.download = `math-exhibit-${exhibit.id}-0.1.0.json`; link.click();
+    const url = URL.createObjectURL(blob), link = document.createElement('a'); link.href = url; link.download = `math-exhibit-${exhibit.id}-${exhibit.version}.json`; link.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000); notice('Downloaded the exact engine and renderer. The package excludes your private source mapping.');
   } catch (error) { notice(error.message); }
 });

@@ -1,10 +1,10 @@
 # Mathematical Playground: source-driven, playful interactive exhibits
 
-Status: Proposed design; no upload, AI generation or exhibit runtime is implemented by this document.
+Status: Design and staged roadmap. The bounded implementation is recorded in ADR-0010; broader capabilities described here remain proposals unless explicitly recorded as implemented.
 
-Design version: 0.1.1
+Design version: 0.2.0
 
-Date: 2026-10-01
+Date: 2026-10-01; updated 2026-10-03
 
 Author: Sol, continuing the GyLiber engineering collaboration at Gyile's request.
 
@@ -313,7 +313,7 @@ Gyile authorized implementation by Sol. [ADR-0010](ADR-0010-bounded-mathematical
 
 ### Next minor release: calmer dark visuals
 
-**Requested by Gyile, 2026-10-02; planned, not implemented.** White backgrounds cause Gyile eye discomfort. Comfort and quick access to the primary mathematics take precedence over visual spectacle.
+**Requested by Gyile, 2026-10-02; implementation resumed by Sol, 2026-10-03.** White backgrounds cause Gyile eye discomfort. Comfort and quick access to the primary mathematics take precedence over visual spectacle.
 
 - Reuse the site's dark background/surface/text tokens, or close charcoal/navy equivalents. Use restrained teal, lavender and amber accents rather than bright pastel expanses. Keep readable muted light text; avoid pure-white panels, canvas fills and broad highlights.
 - Cover the entire experience: Canvas background and every scene palette, formal reveal, source/code panels, upload controls, notices, badges, focus/hover states and small-screen layout. CSS alone cannot change colors embedded in stored renderer code.
@@ -321,4 +321,8 @@ Gyile authorized implementation by Sol. [ADR-0010](ADR-0010-bounded-mathematical
 - Check text/control contrast, keyboard focus and non-color cues. Review actual desktop/mobile screenshots with Gyile for comfort; accessibility checks alone cannot establish individual eye comfort.
 - Version renderer changes explicitly. Recompute affected demo/package digests and test exact-byte playback/publication. Preserve immutable published packages and existing saved renderer bytes; document any opt-in replay update rather than silently rewriting earlier artifacts. Application, engine and formal-reveal versions remain separate.
 
-Next session begins with live provider acceptance and recording its outcome, then this visual change. Confirm one correct formal draft and one reviewed source-free Git publication before claiming end-to-end completion. Theorem proof remains deferred to capability 0.3.0; no new authoring service, repository or paid dependency is required by this visual plan.
+The resumed work implements a separately named renderer `renderer-0.2.0.mjs`, bundle 0.2.0 demos and dark page surfaces. All scene palettes use subdued accents on the site navy background. Motion starts paused for everyone, respects a later reduced-motion preference, and stops scheduling frames when paused or hidden. Mathematics and formal reveal remain unchanged.
+
+Legacy 0.1.0 renderer/demo files remain exact. Stored legacy exhibits open behind a dark palette choice before drawing; an explicit dim option filters their Canvas display, or the member may explicitly show the original light colors. Neither option changes downloaded or published bytes. New bundles contain updated renderer digests; the existing manifest field `engine_version` denotes the executable bundle version, including its renderer, rather than a change to mathematical algorithms.
+
+Gyile has not tested live provider generation yet. This visual work can proceed with synthetic demonstrations, while one correct live formal draft and one reviewed source-free Git publication remain required before claiming end-to-end completion. Review dark desktop/mobile screenshots and actual member-page comfort with Gyile after deployment. Theorem proof remains deferred to capability 0.3.0; no new authoring service, repository or paid dependency is required.

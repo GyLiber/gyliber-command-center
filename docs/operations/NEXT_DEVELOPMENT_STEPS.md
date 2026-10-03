@@ -2,7 +2,7 @@
 
 **Document status:** Active roadmap  
 **Planning date:** 2026-09-30  
-**Last development update:** 2026-10-01
+**Last development update:** 2026-10-03
 **Current release:** v0.2.0 Live Product Foundation  
 **Next development line:** v0.3.x operational hardening  
 **Product principle:** maximize useful state and action per unit of human attention.
@@ -30,7 +30,7 @@ The Command Center has a verified live vertical slice:
 - deployment and demonstration runbooks
 - documented provider-independent public-domain strategy
 
-The current live service remains on the v0.2 product foundation while the durable-session deployment correction is completed. The current environment remains an engineering/demo environment. It is **not** an authorization to load critical company information.
+The current live service remains on the v0.2 product foundation with the durable-session/container correction merged and subsequent hosted activation observed. The current environment remains an engineering/demo environment. It is **not** an authorization to load critical company information.
 
 ## 2. Deferred external dependency
 
@@ -51,13 +51,13 @@ The next development line should strengthen the platform before expanding the am
 
 ### 3.1 Durable application/session boundary
 
-**Implementation status: merged into main; deployment correction in progress in PR #22.**
+**Implementation status: merged through PR #22; subsequent hosted deployment observed. Full signed-in session continuity across a hosted restart remains an acceptance check.**
 
 The application now uses a PostgreSQL-backed session store in production and retains an in-memory store only for local/development operation. Production refuses to start without `DATABASE_URL`.
 
 Automated CI exercises the PostgreSQL store against an ephemeral PostgreSQL 18 service and verifies session create/save/load/delete behavior.
 
-The first controlled Render deployment of the merged implementation failed at Docker build time because the `migrations/` directory was omitted from the image build context. PR #22 adds the missing `COPY migrations ./migrations` step.
+The first controlled Render deployment of the merged implementation failed at Docker build time because the `migrations/` directory was omitted from the image build context. Merged PR #22 adds the missing `COPY migrations ./migrations` step.
 
 Acceptance evidence:
 
@@ -71,7 +71,7 @@ Acceptance evidence:
 
 ### 3.2 Database foundation
 
-**Implementation status: schema and migration foundation complete; Render connection configured; hosted activation pending successful PR #22 deployment.**
+**Implementation status: schema/migrations and PR #22 container correction merged; subsequent hosted activation observed. Managed-database durability, backup and restore remain unverified.**
 
 PostgreSQL is introduced as a controlled platform capability, not as a reason to load sensitive company data immediately.
 
@@ -298,6 +298,18 @@ PR #22 now also makes the production dependency graph reproducible and adds an a
 
 PR #22 and design PR #23 were merged after CI/Security. PR #24 added the member playground and was merged; its frontend was observed live after Gyile redeployed Render on 2026-10-02. Public health and anonymous access checks passed. Gyile's first real Gemini draft failed, so successful provider authoring and runtime Git publishing are still open gates; see [current evidence and recovery](MATH_PLAYGROUND.md).
 
-Gyile scoped the present work to the provider correction and documentation, then a temporary stop. On resumption, first record a successful synthetic live draft after deploying the correction. The next visual minor release follows the [calmer dark plan](../architecture/MATH_PLAYGROUND_DESIGN.md#next-minor-release-calmer-dark-visuals), including Canvas and formal/source surfaces, reduced motion and versioned artifact digests. Do not implement unrelated features during this stopping checkpoint.
+The 2026-10-02 provider/documentation stopping scope ended when Gyile explicitly resumed development on 2026-10-03. PR #25 merged the safe provider diagnostics; PR #26 merged the Gemini 3 compatibility correction, each after exact-head CI/Security. The recommended private model setting is `gemini-3.5-flash-lite`; its configuration and real account access are not independently certified.
+
+On resumption Gyile answered **“Not tested yet”** for the live draft retest. Sol therefore keeps AI generation and runtime Git publication pending and proceeds independently with the requested [calmer dark visual release](../architecture/MATH_PLAYGROUND_DESIGN.md#next-minor-release-calmer-dark-visuals), testable using synthetic demonstrations without a provider account.
+
+Current visual work adds exhibit bundle 0.2.0, a dark renderer and panels, all three subdued palettes, explicit animation opt-in, and exact-byte preservation of older packages. The mathematical engine algorithms and formal reveal are unchanged; proofs remain deferred to capability 0.3.0. Browser CI records desktop/mobile screenshots for review. Automated contrast checks do not establish Gyile's individual eye comfort.
+
+Next actions, in order:
+
+1. Merge the dark visual work only after its exact-head CI/Security, PostgreSQL preservation and browser checks pass; review the generated screenshots.
+2. Deploy verified `main` to Render, verify the running revision, and ask Gyile to assess the dark demonstrations and formal/source panels for comfort.
+3. Privately confirm the runbook's Gemini settings and make one small synthetic live draft; record success or the exact error without repeated quota-consuming retries.
+4. After mathematical review, verify one source-free runtime Git publication and saved-exhibit replay. Do not claim end-to-end activation before these pass.
+5. Evaluate one relevant course concept for recall/usefulness. Continue proofs or broader visuals only when they support primary work; avoid duplicating LaTeX, Git or Obsidian workflows.
 
 The canonical domain remains deferred. The wider company roadmap resumes section 3.3 (durable audit/event persistence) before activating any contract/engagement records; playground work does not satisfy those prerequisites.

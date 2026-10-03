@@ -36,6 +36,14 @@ jobs:
         working-directory: math-playground
       - run: npm run test:browser
         working-directory: math-playground
+        env:
+          PLAYGROUND_SCREENSHOT_DIR: ${{ github.workspace }}/test-results/playground
+      - uses: actions/upload-artifact@v7
+        with:
+          name: playground-visual-review
+          path: test-results/playground/*.png
+          retention-days: 7
+          if-no-files-found: error
 
   container:
     name: Production container

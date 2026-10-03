@@ -29,13 +29,18 @@
 
 ## Unreleased — v0.3.0 development
 
+- Sol resumed on 2026-10-03 and added dark executable exhibit bundle 0.2.0: subdued Canvas palettes, matching formal/source/control surfaces, explicit animation opt-in and no animation scheduling while paused or hidden.
+- Retained original 0.1.0 renderer/demo bytes and private saved packages, added authenticated versioned demo renderers and an explicit dim/original choice for legacy playback. Downloads retain original code and use the actual bundle version in their filename.
+- Extended old/new package digest, PostgreSQL preservation and browser coverage; CI records synthetic desktop/mobile screenshots. Mathematical algorithms and formal reveal are unchanged; theorem proofs remain deferred to 0.3.0.
+- Updated Next Steps and Sol’s handoff. Gyile reported live AI retest not yet performed; successful authoring/publication and dark hosted comfort remain acceptance gates.
+
 - Corrected new-project Gemini setup to gemini-3.5-flash-lite after the live model-unavailable error and Google's published restriction of Gemini 2.5 to prior active users. No automatic model fallback is introduced.
 - Removed candidateCount from Gemini requests for Gemini 3 compatibility, retaining exactly-one-candidate response validation and the existing bounded structured-output contract. Updated private Render recovery steps; live generation still needs observation after redeploy.
 
 - Use Gemini's established responseMimeType/responseJsonSchema output configuration while retaining store: false. The live API recognizes the earlier format too, so this compatibility change is not a proven production root-cause fix. OpenAI request behavior is unchanged.
 - Distinguish Gemini's HTTP-400 invalid-key reason, request rejection, unavailable model and timeout from transient provider failure. Error inspection is bounded and exposes/logs only fixed codes and status metadata.
 - Updated deployed-playground evidence and provider recovery instructions. Successful live generation/publication still require observation with the deployed credentials.
-- Documented Gyile's next-minor preference for calmer dark visuals matching the site, covering Canvas and formal/source panels. This visual change is planned, not included in the provider fix.
+- Documented Gyile's next-minor preference for calmer dark visuals matching the site, covering Canvas and formal/source panels. It was not included in the provider fix and is implemented by the later visual work above.
 
 - Added explicit Gemini authoring as a free-tier pilot alternative to OpenAI, with provider-bound consent, unpaid-service data-use disclosure, quota/access messages and no automatic paid fallback.
 - Corrected the browser fixture's decimal range input and prevented its exception details from being returned as HTML.
@@ -43,7 +48,7 @@
 - Sol added the member Mathematical Playground: playful Canvas scenes, bounded `.tex` intake, AI concept drafting, a general formal reveal, private PostgreSQL derivatives and exact-byte, source-free Git artifact publishing.
 - Added reviewed Pi, reciprocal-sequence, permutation and mnemonic demonstrations that do not require AI credentials.
 - Added request-token checks, owner isolation, attempted-request budgets, draft expiry, source anchors, artifact digests and explicit unavailable/review states.
-- Exhibit engine capability 0.1.0 and reveal capability 0.2.0 remain separate from application releases; theorem proofs are deferred to exhibit capability 0.3.0.
+- The initial exhibit bundle 0.1.0 and reveal capability 0.2.0 remain separate from application releases; theorem proofs are deferred to exhibit capability 0.3.0.
 - Added mathematical invariant, browser-fixture and PostgreSQL/HTTP-boundary checks. Hosted authoring/publishing requires the activation gates in `docs/operations/MATH_PLAYGROUND.md`.
 
 - Added the reserved Contracts & Engagements module to the authenticated registry as a Confidential, security-gated capability for future active/planned client engagement tracking.
