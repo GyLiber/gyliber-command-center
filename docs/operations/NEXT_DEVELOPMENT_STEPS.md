@@ -3,7 +3,7 @@
 **Document status:** Active roadmap  
 **Planning date:** 2026-09-30  
 **Last development update:** 2026-10-03
-**Prepared release:** v0.3.0 Reviewed Mathematical Playground; live release identity pending
+**Current release:** v0.3.0 Reviewed Mathematical Playground; maintainer-reported live acceptance
 **Next development line:** remaining operational hardening and evidence-led playground iteration
 **Product principle:** maximize useful state and action per unit of human attention.
 
@@ -30,7 +30,7 @@ The Command Center has a verified live vertical slice:
 - deployment and demonstration runbooks
 - documented provider-independent public-domain strategy
 
-The prepared v0.3.0 application release includes the durable-session/container correction and reviewed mathematical playground. Gyile reports all four hosted pilot checks passed; the exact deployed revision and new release label still need confirmation. The current environment remains an engineering/demo environment. It is **not** an authorization to load critical company information.
+The live v0.3.0 application release includes the durable-session/container correction and reviewed mathematical playground. Gyile confirmed final deployment, all four playground checks, health status/version, Live State version and deployment commit; see [the release evidence](RELEASE_0_3_0.md). The current environment remains an engineering/demo environment. It is **not** an authorization to load critical company information.
 
 ## 2. Deferred external dependency
 
@@ -343,3 +343,9 @@ Gyile explicitly resumed development and asked whether the completed playground 
 Gyile answered **“All four passed”** for signed-in metric/definition/prompt/archive checks. Record this as maintainer-reported pilot acceptance, without inventing a deployed commit. Sol prepares the shared Cargo-driven release identity, current README/changelog and [v0.3.0 release record](RELEASE_0_3_0.md), then runs CI/Security and merges after success.
 
 Next actions are: deploy the tested release revision if necessary; record health version 0.3.0 and Live State deployment commit; confirm the four pilot checks still pass; update the release record with that evidence. Then seek personal comfort/recall feedback and one permitted course-source proposal. Further feature work follows that evidence, rather than reopening the initial implementation. The wider audit/session-continuity/backup/contract gates and 2026-10-30 database expiry remain open.
+
+### v0.3.0 live acceptance completed — 2026-10-03
+
+Gyile reported the final commit deployed Live and playground tests passed, then explicitly confirmed health `status=ok`, health/Live State version **0.3.0**, and deployment commit `ae80a6d04b0753dd4f6bd6a90f75dc003ec37d3d`. Sol recorded this as maintainer-reported end-to-end acceptance in [the release record](RELEASE_0_3_0.md); no independent signed-in production observation is claimed. This supersedes the pending release gates above. The documentation-only acceptance record needs no deployment/retest.
+
+The scoped application minor release is complete. Next development waits for Gyile's direction and evidence of eye comfort/recall benefit, then one permitted actual course-source proposal. GitHub tag/listing publication remains optional and unclaimed; wider operational hardening and deferred exhibit proofs are not completed by this acceptance.

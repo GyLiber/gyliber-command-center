@@ -71,3 +71,7 @@ If deployment or any check fails, report the failing step and visible error with
 ## Release resumption and reported pilot acceptance — 2026-10-03
 
 Gyile subsequently reported **all four hosted pilot checks passed** and authorized continued development. This supersedes the temporary pause above and establishes maintainer-reported functional acceptance of the pilot; it does not supply an exact deployed revision or independently prove hosting conditions. The same workflow forms the prepared **application v0.3.0** release. After its checked commit is merged and deployed, confirm health version 0.3.0 and the Live State deployment commit, then recheck the four actions. See [the release record and exact final steps](RELEASE_0_3_0.md). Exhibit packages/capability versions are independent; no accepted package bytes or deferred proof status change.
+
+## Application v0.3.0 live acceptance — 2026-10-03
+
+Gyile confirmed the final commit was Live and the playground checks passed, then explicitly confirmed health `status=ok`, health/Live State version **0.3.0** and deployment commit `ae80a6d04b0753dd4f6bd6a90f75dc003ec37d3d`. This closes the pending application release gate above through maintainer-reported evidence. See [the completed release record](RELEASE_0_3_0.md). Sol did not independently inspect the signed-in site. No new deployment or retest is required for this documentation-only update; comfort/recall benefit and future course-source review remain next-work evidence.

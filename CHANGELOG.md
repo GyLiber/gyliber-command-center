@@ -6,7 +6,7 @@
 
 ## [0.3.0] — Reviewed mathematical playground
 
-Release preparation: 2026-10-03. Gyile reports all four hosted pilot checks passed; deployment of this version label and exact revision remains the final release gate. See [release evidence and completion](docs/operations/RELEASE_0_3_0.md).
+Live acceptance: 2026-10-03, reported by Gyile. Final deployment, four playground checks, health `status=ok`, health/Live State version 0.3.0 and deployed commit `ae80a6d04b0753dd4f6bd6a90f75dc003ec37d3d` confirmed. See [release evidence and completion](docs/operations/RELEASE_0_3_0.md).
 
 - Promoted the existing tested playground work into the next application minor version; health, Live State Monitor and public/member page labels share the Cargo package version.
 
