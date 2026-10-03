@@ -2,7 +2,8 @@
 
 **Implementation:** Sol's continuation of Luna's foundation, 2026-10-01.
 **Member entry:** `/command/math-playground`, also registered in the Command Center.
-**Architecture:** [ADR-0010](../architecture/ADR-0010-bounded-mathematical-playground.md).
+**Deployed architecture:** [ADR-0010](../architecture/ADR-0010-bounded-mathematical-playground.md).
+**Next work direction:** [ADR-0011](../architecture/ADR-0011-manual-math-authoring.md), external authoring and reviewed repository packages. Provider setup below describes the existing implementation; it is not a required dependency of the new pilot.
 
 ## What works without additional accounts
 
@@ -174,3 +175,12 @@ Sol supplied `metric-spaces-test.tex`, an original 1,477-byte UTF-8 test, and ve
 5. Check that the source quote appears verbatim in the file. A correct quote alone does not establish mathematical fidelity. Downloading the exact source-free packet is enough for this initial smoke test; public publication is a separate explicit review/consent action.
 
 Gyile also requested the [reusable authoring policy and controlled-scope plan](../architecture/MATH_PLAYGROUND_DESIGN.md#next-minor-release-reusable-authoring-policy-and-controlled-scope) for the next minor iteration. The existing automatic prompt already extracts one concept; candidate selection, context-needed states, prompt/model provenance and controlled document segmentation are planned improvements, not present functionality. Existing input limits remain enforced before AI.
+
+
+## Reported metric-test failure and design change, 2026-10-03
+
+Gyile's single synthetic test returned **The AI provider is temporarily unreachable or unavailable. No automatic retry occurred.** The safe error covers transport failures and otherwise unclassified upstream statuses; it does not prove a permanent outage or identify the root cause. Real provider drafting and runtime artifact publication remain unverified.
+
+Gyile requests progress through external/manual authoring rather than continued provider troubleshooting. [ADR-0011](../architecture/ADR-0011-manual-math-authoring.md) and the [external authoring template](prompts/MATH_PLAYGROUND_EXTERNAL_AUTHORING.md) record that plan. Initially send the template and a complete `.tex` concept to an accessible AI, then return its proposal to Sol for review and repository integration. This is a proposed handoff, not a newly deployed upload/import feature.
+
+Do not paste generated programs into the current `.tex` upload, developer console or member page. The existing application loads trusted reviewed modules; generic executable proposals need review before integration. Further provider attempts, model changes or billing activation are not requested by this plan. Demonstrations and accepted package replay should remain available independently of authoring-provider access.

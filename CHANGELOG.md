@@ -29,6 +29,8 @@
 
 ## Unreleased — v0.3.0 development
 
+- Recorded Gyile's failed synthetic metric-space generation and prioritized external authoring, reviewed repository packages and provider-independent playback in ADR-0011. Added a reusable external authoring template and updated Next Steps/runbook/handoff; no runtime or automatic code-import change is made by this plan.
+
 - Sol resumed on 2026-10-03 and added dark executable exhibit bundle 0.2.0: subdued Canvas palettes, matching formal/source/control surfaces, explicit animation opt-in and no animation scheduling while paused or hidden.
 - Retained original 0.1.0 renderer/demo bytes and private saved packages, added authenticated versioned demo renderers and an explicit dim/original choice for legacy playback. Downloads retain original code and use the actual bundle version in their filename.
 - Extended old/new package digest, PostgreSQL preservation and browser coverage; CI records synthetic desktop/mobile screenshots. Mathematical algorithms and formal reveal are unchanged; theorem proofs remain deferred to 0.3.0.

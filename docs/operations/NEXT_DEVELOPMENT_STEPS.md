@@ -306,12 +306,18 @@ PR #27 merged after exact-head CI/Security and screenshot review. It adds exhibi
 
 On 2026-10-03 Gyile reported manually deploying the latest commit and that the site is Live. Sol independently observed HTTP 200 health and live frontend/CSS bytes matching PR #27; the authenticated running-revision field was not inspected. Real AI generation and runtime Git publication still require the independent acceptance checks below. Sol prepared an original 1,477-byte metric-space `.tex` smoke test, successfully compiled locally; it is synthetic material, not coursework. The current renderer should use a mnemonic and the reveal must preserve the complete general definition.
 
+### New direction after the metric-space request failed
+
+Gyile's one synthetic metric-space attempt returned the safe `ai_provider_unavailable` message on 2026-10-03. The error does not identify its network/upstream cause. At Gyile's direction, further provider recovery is not a prerequisite for the next work unit. The three fixed outcomes remain LaTeX input, interactive mathematics and reproducible repository code.
+
 Next actions, in order:
 
-1. Confirm the running revision and assess the dark demonstrations/formal/source panels for Gyile's comfort.
-2. Privately confirm the runbook's Gemini settings and make one small synthetic live draft. Record success or the exact error without repeated quota-consuming retries.
-3. After mathematical review, verify one source-free runtime Git publication and saved-exhibit replay. Do not claim end-to-end activation before these pass.
-4. In the next minor playground iteration, implement the [reusable authoring policy and controlled scope](../architecture/MATH_PLAYGROUND_DESIGN.md#next-minor-release-reusable-authoring-policy-and-controlled-scope): versioned automatic instructions, one complete concept, explicit selection/context-needed states and bounded large-input handling. This is planned; those result states are not supported by the current schema/UI.
-5. Evaluate one relevant course concept for recall/usefulness. Continue proofs or new mathematical engines only when they support primary work; avoid duplicating LaTeX, Git or Obsidian workflows.
+1. Use the [external authoring template](prompts/MATH_PLAYGROUND_EXTERNAL_AUTHORING.md) and [ADR-0011](../architecture/ADR-0011-manual-math-authoring.md). Initially Gyile returns the generated proposal to Sol for review/integration; the site has no arbitrary-package Import action yet.
+2. Deliver one reviewed interactive metric example from the synthetic LaTeX: the finite real-line subset `{1,3,4}`, direct/detour distances from `|x-y|`, and the full general metric definition in the reveal. Keep the existing dark/paused controls and classify the finite illustration accurately.
+3. Preserve the complete accepted code/tests/manifest in Git, register it in an approved catalog, pass CI/Security, deploy and verify exact live bytes. A directory on an artifact branch alone is not a deployed gallery entry.
+4. Verify no-AI replay from a fresh checkout without the private derivative database, mathematical/source fidelity, archived-version retention, keyboard/mobile behavior and Gyile's practical comfort/usefulness.
+5. Generalize curated catalog/archive access. Add bounded data-only recipe import for registered models only after the pilot works. General executable uploads require separate isolation/review design; never run pasted programs in the signed-in member page.
+
+The PR #28 prompt-control plan remains useful for source selection, missing context and output limits, but external authoring and publication now have priority. Existing hosted authoring/publishing acceptance is still incomplete; no new paid service or account is required for the pilot, and this planning change does not remove the deployed integration.
 
 The canonical domain remains deferred. The wider company roadmap resumes section 3.3 (durable audit/event persistence) before activating any contract/engagement records; playground work does not satisfy those prerequisites.

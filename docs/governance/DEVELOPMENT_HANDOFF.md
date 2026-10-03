@@ -77,3 +77,10 @@ PR #27 merged after exact-head CI/Security and desktop/mobile screenshot review.
 At Gyile's request, Sol recorded the reusable automatic-prompt/controlled-scope improvement for the next minor playground iteration rather than implementing it in this documentation work unit. The design covers prompt provenance, complete-concept selection, explicit context/selection-needed states and bounded large-input handling; coordinated API/schema/UI work is required. No renderer, provider payload, source limit or proof capability changes in this work unit.
 
 Sol prepared an original 1,477-byte `metric-spaces-test.tex` for Gyile to upload once and compiled it successfully. Its metric-space definition and real-line illustration are synthetic test material. Current support is a labelled mnemonic with formal reveal, not a computed metric-space engine. The runbook records the expected formal fields and safe one-attempt test procedure.
+
+
+## External authoring plan after the synthetic failure, 2026-10-03
+
+Gyile reported the safe provider-unavailable error for the one metric-space `.tex` test and explicitly requested a redesigned plan retaining LaTeX input, interactive mathematical visuals and reproducible repository code. Sol records external authoring plus reviewed repository publication in ADR-0011 and a reusable template. No provider root cause is claimed; no further quota-consuming probe or paid dependency is introduced.
+
+The next work unit is one reviewed finite real-line metric exhibit and catalog/publication/replay verification, followed by scalable archived access. Initially Sol handles the package handoff through normal development review; a site import UI is future work. Arbitrary generated programs are not promoted automatically into the member application's trust boundary. The earlier prompt-control requirements carry forward, while further embedded-provider recovery is deprioritized. This turn changes planning/documentation only.
