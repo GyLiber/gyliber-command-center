@@ -2,7 +2,7 @@
 
 Prepared by **Sol**, continuing Luna's foundation, at Gyile's instruction on 2026-10-03.
 
-**Status: tested release source merged; final hosted version/revision acceptance pending.** This development is the next minor application release. It does not require completion of every item in the longer-term roadmap. A successful build alone is not an end-to-end release demonstration.
+**Status: v0.3.0 demonstrated end to end through maintainer-reported live acceptance on 2026-10-03.** This development is the next minor application release. It does not require completion of every item in the longer-term roadmap. A successful build alone is not an end-to-end release demonstration.
 
 ## Scope and versions
 
@@ -25,15 +25,19 @@ This release does not claim arbitrary executable import, automatic universal TeX
 | Pilot implementation | [PR #30](https://github.com/GyLiber/gyliber-command-center/pull/30), merge `1d790442ea8dcddfa036d666d85879fbf2c147ed`; checked head `8058d6a1f920c7e908cef3340e5c2d8219a16805` |
 | Pilot automated checks | [CI 37106568446](https://github.com/GyLiber/gyliber-command-center/actions/runs/37106568446) and [Security 37106568444](https://github.com/GyLiber/gyliber-command-center/actions/runs/37106568444) succeeded: 42 Rust, ten Node and two browser tests, production-container checks and security scans |
 | Reproducibility | Separate fresh-checkout Node checks passed; standalone viewer and desktop/mobile screenshots reviewed in the implementation checkpoint |
-| Hosted pilot behavior | Gyile reported **“All four passed”** on 2026-10-03 for signed-in metric/definition/prompt/archive checks. Exact deployed revision not supplied; this is maintainer-reported evidence |
+| Hosted pilot behavior | Gyile initially reported **“All four passed”**, then confirmed the final commit was live and the playground tests still passed. Signed-in metric/definition/prompt/archive checks accepted on 2026-10-03; maintainer-reported evidence |
 | Release identity change | [PR #33](https://github.com/GyLiber/gyliber-command-center/pull/33) merged as `f35f465db30c19f3975a7329f37267fe5861929d`; checked head `e8c87a96036fc9e90877b5b0c2913eaec70da61c`. Shared Cargo-derived page labels and package/lockfile version 0.3.0 |
 | Release automated checks | [CI 37113351022](https://github.com/GyLiber/gyliber-command-center/actions/runs/37113351022) and [Security 37113350986](https://github.com/GyLiber/gyliber-command-center/actions/runs/37113350986) succeeded for that checked head: format/check/Clippy/advisory audit, 42 Rust, ten Node and two browser tests, production-container startup/migration/access/restart, secret scan and CodeQL Rust/JavaScript/Actions |
-| Hosted application 0.3.0 identity | **Pending:** deployment commit, health version and signed-in Live State comparison |
+| Hosted application 0.3.0 identity | Gyile explicitly confirmed **“Yes, all match”**: health `status=ok`, health/Live State version `0.3.0`, and deployment commit `ae80a6d04b0753dd4f6bd6a90f75dc003ec37d3d` (PR #34 merge, retaining PR #33 runtime code). Maintainer-reported acceptance on 2026-10-03 |
 | GitHub version tag/release | Not yet published; publish only against the accepted release commit |
 
-The prior cloud-browser URL-policy block prevents Sol from certifying this hosting step through that browser. No bypass or inspection of secrets is needed. The [manual-authoring runbook](MATH_PLAYGROUND_MANUAL_AUTHORING.md) retains the functional test and replay details.
+Sol records Gyile’s explicit observations rather than independent browser verification. The prior cloud-browser URL-policy block remains; no bypass or inspection of secrets occurred. The [manual-authoring runbook](MATH_PLAYGROUND_MANUAL_AUTHORING.md) retains the functional test and replay details.
 
-## Final steps for Gyile after the release PR is merged
+## Live acceptance recorded — 2026-10-03
+
+Gyile reported **“Final commit deployed live and the playground tests pass.”** Sol then asked specifically about health status, both displayed release versions and the deployed commit; Gyile confirmed all matched the values above. This closes the scoped application v0.3.0 live-release gate. No repeat deployment or playground retest is required for this documentation-only record. The GitHub tag/release listing is a separate optional publication step and is not yet claimed.
+
+## Acceptance procedure retained for future deployments
 
 1. Open the existing Render web service for [the live site](https://gyliber-command-center-1bym.onrender.com). In **Deploys**, compare the deployed commit with release merge `f35f465db30c19f3975a7329f37267fe5861929d` or a later reviewed main commit retaining it. If needed choose **Manual Deploy → Deploy latest commit**, then wait for **Live**. No new account, environment variable or paid API is required.
 2. Open [health](https://gyliber-command-center-1bym.onrender.com/api/health). Wait for a cold start if necessary. It must report `status: "ok"` and `version: "0.3.0"`. A waking page or older version is not acceptance.
@@ -41,7 +45,7 @@ The prior cloud-browser URL-policy block prevents Sol from certifying this hosti
 4. Open **Mathematical Playground** and confirm the four checks still pass: x=1/y=4/z=3 gives direct 2/detour 4; Reveal shows the complete general definition; the synthetic `.tex` prompt downloads; the archive package downloads and stable replay link opens. Use [metric-spaces-test.tex](../examples/metric-spaces-test.tex) for the prompt check.
 5. Return the deployed commit, health version, Live State version and four-check outcome to Sol. If a check fails, give its step and visible error. Sol records the evidence or fixes the concrete failure; never infer a live result from GitHub merge alone.
 
-After this evidence is recorded, application v0.3.0 is demonstrated end to end. Optionally create the GitHub release from **Releases → Draft a new release**, tag `v0.3.0`, select the accepted deployment commit as target, title **v0.3.0 — Reviewed Mathematical Playground**, and use this document/changelog for notes. Do not select an untested newer main revision or describe pending proof/provider/operational capabilities as released. The connector currently has no tag/release-creation operation; repository publication and site deployment are separate milestones.
+The evidence above establishes maintainer-reported end-to-end application v0.3.0 acceptance. Optionally create the GitHub release from **Releases → Draft a new release**, tag `v0.3.0`, select accepted deployment commit `ae80a6d04b0753dd4f6bd6a90f75dc003ec37d3d` as target, title **v0.3.0 — Reviewed Mathematical Playground**, and use this document/changelog for notes. Do not select an untested newer main revision or describe pending proof/provider/operational capabilities as released. The connector currently has no tag/release-creation operation; repository publication and site deployment are separate milestones.
 
 ## Next work
 

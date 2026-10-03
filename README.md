@@ -4,7 +4,7 @@
 >
 > **Ever Toward Liberation.**
 
-![Status](https://img.shields.io/badge/release-v0.3.0--prepared-slate)
+![Status](https://img.shields.io/badge/release-v0.3.0--live-slate)
 ![Backend](https://img.shields.io/badge/backend-Rust-orange)
 
 ## 1. Product
@@ -21,7 +21,7 @@ The interface is deliberately calm, dark and information-forward. Its design tar
 
 ### v0.3.0 Reviewed mathematical playground
 
-The tested playground workflow is the next application minor release. Source identifies as **0.3.0**; Gyile reports the four hosted pilot checks passed on 2026-10-03. Deployment of this release revision and live version confirmation remain pending. See [release scope, evidence and final steps](docs/operations/RELEASE_0_3_0.md). This release retains the existing foundation:
+The tested playground workflow is the next application minor release. Gyile confirmed the final deployment, four hosted playground checks, health `status=ok`, health/Live State version **0.3.0** and deployed commit `ae80a6d04b0753dd4f6bd6a90f75dc003ec37d3d` on 2026-10-03. This is maintainer-reported live acceptance; Sol did not independently inspect the signed-in production site. See [release scope, evidence and final steps](docs/operations/RELEASE_0_3_0.md). This release retains the existing foundation:
 
 
 - public GyLiber landing page
