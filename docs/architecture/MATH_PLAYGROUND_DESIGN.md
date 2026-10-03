@@ -2,13 +2,15 @@
 
 Status: Design and staged roadmap. The bounded implementation is recorded in ADR-0010; broader capabilities described here remain proposals unless explicitly recorded as implemented.
 
-Design version: 0.2.0
+Design version: 0.2.1
 
 Date: 2026-10-01; updated 2026-10-03
 
 Author: Sol, continuing the GyLiber engineering collaboration at Gyile's request.
 
 Home: GyLiber Command Center, with independently versioned exhibit packages.
+
+**Current next-iteration direction, 2026-10-03:** Gyile requests external/manual authoring with reviewed repository packages and provider-independent replay. [ADR-0011](ADR-0011-manual-math-authoring.md) now takes priority over further embedded-provider recovery and the prompt-control plan below. The deployed implementation is unchanged by this planning update.
 
 ## 1. Product responsibility
 
@@ -330,7 +332,7 @@ Gyile has not tested live provider generation yet. This visual work can proceed 
 
 ### Next minor release: reusable authoring policy and controlled scope
 
-**Requested by Gyile, 2026-10-03. Status: planned; not implemented.** The server already sends shared instructions with every upload in `src/math_playground/generation.rs`. This change strengthens that existing boundary; it does not require Gyile to maintain or paste a prompt for each file.
+**Requested by Gyile, 2026-10-03. Status: planned; not implemented; reprioritized by ADR-0011.** Its source-fidelity and scope rules carry into external authoring. The server already sends shared instructions with every upload in `src/math_playground/generation.rs`. This change strengthens that existing boundary; it does not require Gyile to maintain or paste a prompt for each file.
 
 The intended outcome is one focused, inspectable exhibit per explicit generation request. Consistency means stable selection rules, mathematical fidelity requirements, output structure and failure behavior. It does not mean identical fresh AI responses or a universal compiler for arbitrary mathematics. Exact repeatability comes from replaying the accepted stored package.
 
