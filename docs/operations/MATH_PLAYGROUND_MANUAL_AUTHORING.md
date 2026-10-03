@@ -48,3 +48,22 @@ Tests cover all nine finite distances and 27 triples, invalid inputs, exact pack
 The review/publication step is intentionally performed by Sol through normal repository development. Data-only recipe import for registered models is a later iteration after practical pilot feedback. General executable upload requires its own isolated staging/review design and is not quietly enabled here. Proof capability remains deferred. Provider recovery is optional and does not block playback.
 
 Before processing many course files, Gyile should judge whether this one example actually aids recall. The temporary database expiry on 2026-10-30, durable audit work and the wider company roadmap remain separate open issues.
+
+## Verified repository checkpoint and hosted handoff
+
+[PR #30](https://github.com/GyLiber/gyliber-command-center/pull/30) merged as `1d790442ea8dcddfa036d666d85879fbf2c147ed` after exact-head verification of `8058d6a1f920c7e908cef3340e5c2d8219a16805`:
+
+- [CI 37106568446](https://github.com/GyLiber/gyliber-command-center/actions/runs/37106568446): successful format/check/Clippy/audit, **42 Rust tests**, **10 Node mathematics/package/prompt tests**, **2 browser tests**, and production-container startup/migration/access checks.
+- [Security 37106568444](https://github.com/GyLiber/gyliber-command-center/actions/runs/37106568444): successful secret scan and CodeQL Rust/JavaScript/Actions.
+- A separate fresh checkout of the checked head passed all ten Node tests. The browser tests also exercised the standalone viewer without private shelf/provider use. Desktop/mobile screenshots were reviewed; personal eye comfort is still for Gyile to assess.
+
+**Hosted acceptance remains pending.** The cloud browser reached Render's cold-start surface, then its URL policy blocked live inspection. Sol did not attempt a workaround, inspect credentials or infer deployment from the merge. No signed-in production metric/prompt/package check is claimed.
+
+Gyile's final manual step is to open the existing Render web service whose public address is `https://gyliber-command-center-1bym.onrender.com`, open **Deploys → Manual Deploy → Deploy latest commit**, and wait for **Live**. If the service already shows the current merged `main` commit as Live, no duplicate deployment is needed. No new environment settings are required. Record the deployed commit (the implementation merge above or a later main commit retaining it), then sign in and verify:
+
+1. Metric couriers loads; x=1, y=4, z=3 gives direct 2 and detour 4.
+2. The reveal shows the general definition with all three universally quantified axioms and nonnegativity.
+3. Choosing the synthetic `.tex` and downloading the authoring prompt succeeds without using hosted AI.
+4. The archive package download succeeds; the version remains addressable by the stable replay link.
+
+If deployment or any check fails, report the failing step and visible error without sharing keys or database URLs. Stop the day's development after this hosted check; broader work remains deferred until Gyile resumes it.
