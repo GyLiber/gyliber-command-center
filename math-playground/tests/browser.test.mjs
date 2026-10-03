@@ -277,6 +277,9 @@ try {
       const still=await page.locator('canvas').evaluate(c=>c.toDataURL());await page.waitForTimeout(120);assert.equal(await page.locator('canvas').evaluate(c=>c.toDataURL()),still);
       await page.getByRole('button',{name:'Animate',exact:true}).click();await page.waitForTimeout(200);
       assert.notEqual(await page.locator('canvas').evaluate(c=>c.toDataURL()),still);
+      await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});document.dispatchEvent(new Event('visibilitychange'));});
+      const hidden=await page.locator('canvas').evaluate(c=>c.toDataURL());await page.waitForTimeout(120);assert.equal(await page.locator('canvas').evaluate(c=>c.toDataURL()),hidden);
+      await page.evaluate(()=>{delete document.hidden;document.dispatchEvent(new Event('visibilitychange'));});
       await page.getByRole('button',{name:'Pause motion',exact:true}).click();
       await page.locator('#formal-drawer > summary').click();
       assert.match(await page.locator('#formal-statement').textContent(),/For every x, y, z ∈ X/);
@@ -301,6 +304,13 @@ try {
       // Changing scenes disposes the metric renderer; returning starts paused.
       await page.getByRole('button',{name:'Pi’s ribbon',exact:true}).click();await page.getByRole('slider',{name:'Unroll the ribbon'}).waitFor();
       await page.locator('#archive-select').selectOption('metric-couriers/0.1.0');await page.getByRole('combobox',{name:'Via y',exact:true}).waitFor();await assertDarkScene(page);
+      await page.goto(`${base}/api/math-playground/curated/metric-couriers/0.1.0/viewer.html`);
+      await page.getByRole('combobox',{name:'Via y',exact:true}).waitFor();await assertDarkScene(page);
+      await page.getByRole('combobox',{name:'Via y',exact:true}).selectOption('4');
+      await page.getByRole('combobox',{name:'Finish z',exact:true}).selectOption('3');
+      assert.match(await page.locator('.scene-description').textContent(),/longer by 2/);
+      await page.getByText('Reveal the actual mathematics',{exact:true}).click();
+      assert.match(await page.locator('#formal').textContent(),/For every x, y, z ∈ X/);
       assert.deepEqual(errors,[]);
     } finally {shelfUnavailable=false;archiveOnly=false;await page.close();}
   });

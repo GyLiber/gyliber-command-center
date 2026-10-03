@@ -52,7 +52,9 @@ function updateButtons() {
     || !$('math-reviewed').checked || !$('public-code').checked;
 }
 async function refresh() {
-  const nextCatalog = await api('/api/math-playground');
+  let nextCatalog;
+  try { nextCatalog = await api('/api/math-playground'); }
+  catch(error) { $('exhibit-list').textContent = 'The optional private shelf is unavailable. Approved exhibits and prompt preparation remain available.'; throw error; }
   if (catalog && catalog.ai_provider !== nextCatalog.ai_provider) $('provider-consent').checked = false;
   catalog = nextCatalog;
   const provider = catalog.ai_provider === 'gemini' ? 'Google Gemini' : 'OpenAI';
@@ -80,7 +82,8 @@ function renderFormal(exhibit) {
   $('repository-receipt').replaceChildren();
   if (exhibit.curated) {
     const link = document.createElement('a'); link.textContent = 'View reviewed version in Git';
-    link.href = `https://github.com/GyLiber/gyliber-command-center/tree/main/math-playground/exhibits/${exhibit.id}/${exhibit.version}`;
+    const revision = /^[a-fA-F0-9]{40}$/.test(approved?.deployment_commit || '') ? approved.deployment_commit : 'main';
+    link.href = `https://github.com/GyLiber/gyliber-command-center/tree/${revision}/math-playground/exhibits/${exhibit.id}/${exhibit.version}`;
     link.target = '_blank'; link.rel = 'noopener noreferrer'; $('repository-receipt').append(link);
   } else if (exhibit.repository_commit) {
     const link = document.createElement('a'); link.textContent = `View immutable Git snapshot ${exhibit.repository_commit.slice(0, 12)}`;

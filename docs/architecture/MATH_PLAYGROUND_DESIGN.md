@@ -355,4 +355,4 @@ A small original metric-space definition is an appropriate initial smoke test. I
 
 ## Implemented external-authoring first delivery, 2026-10-03
 
-ADR-0011 now has a reviewed metric-couriers package, local prompt preparation, approved catalog, archive-version playback and complete package download, plus standalone replay without AI or private derivative storage. See [runbook](../operations/MATH_PLAYGROUND_MANUAL_AUTHORING.md). Initial rights/review scope is public synthetic mathematics; arbitrary imports and proofs remain deferred. The old provider integration is optional.
+ADR-0011 now has a reviewed metric-couriers package, local prompt preparation, approved catalog, archive-version playback and complete package download, plus standalone replay without AI or private derivative storage. See [runbook](../operations/MATH_PLAYGROUND_MANUAL_AUTHORING.md). The pilot uses public synthetic mathematics; other packages require developer source/code/rights review; arbitrary imports and proofs remain deferred. The old provider integration is optional.

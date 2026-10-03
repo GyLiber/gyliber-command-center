@@ -7,7 +7,7 @@ const root=fileURLToPath(new URL('../',import.meta.url));
 export function validateRelease(release,manifest,files) {
   if(!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(release.id)||!/^\d+\.\d+\.\d+$/.test(release.version)||typeof release.in_gallery!=='boolean'||release.visibility!=='member')throw new Error('Invalid catalog identity or visibility');
   if(typeof release.title!=='string'||!release.title.trim()||release.title.length>160)throw new Error('Invalid catalog title');
-  if(manifest.format!==2||manifest.id!==release.id||manifest.version!==release.version||manifest.review!==release.review||release.review!=='sol_reviewed_public_synthetic'||!manifest.publication_rights)throw new Error('Release not reviewed or identity mismatch');
+  if(manifest.format!==2||manifest.id!==release.id||manifest.version!==release.version||manifest.review!==release.review||!['sol_reviewed_public_synthetic','developer_reviewed_public'].includes(release.review)||!manifest.publication_rights)throw new Error('Release not reviewed or identity mismatch');
   if(!['mathematical_model','representative_example','mnemonic_metaphor'].includes(manifest.classification)||typeof manifest.runtime_contract!=='string')throw new Error('Missing model contract');
   for(const required of ['engine.mjs','renderer.mjs','viewer.html','viewer.mjs','viewer.css','tests.mjs','README.md'])if(!manifest.files?.[required])throw new Error('Incomplete replay package');
   if(Object.keys(files).sort().join('|')!==Object.keys(manifest.files).sort().join('|'))throw new Error('Unmanifested package bytes');
