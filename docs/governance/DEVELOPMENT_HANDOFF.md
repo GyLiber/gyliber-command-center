@@ -68,3 +68,12 @@ Sol continues Luna's foundation with the requested calmer presentation, independ
 Earlier 0.1.0 demo files and renderer are retained unchanged. Private older exhibits keep their stored bytes and initially show a dark palette-choice screen; an explicit dim view applies a display filter, while downloads/publication retain original code. New packages record the new renderer digest. No source migration or paid dependency is introduced.
 
 The merge gate is the existing CI/Security workflow, including PostgreSQL old/new-byte preservation, versioned authenticated runtime routes, mathematical invariant checks and browser fixtures. CI supplies synthetic desktop/mobile screenshots for visual review. Hosted revision, personal comfort, successful Gemini authoring and live artifact publication are subsequent acceptance gates in the runbook. The wider durable-audit/contract roadmap remains unchanged.
+
+
+## Controlled authoring plan and metric-space test, 2026-10-03
+
+PR #27 merged after exact-head CI/Security and desktop/mobile screenshot review. Gyile subsequently reported deploying latest main manually and that the site is Live. Sol independently observed HTTP 200 health and live frontend/CSS bytes matching PR #27; the authenticated running-revision field was not inspected. Successful account-backed AI generation and runtime Git publication remain unverified.
+
+At Gyile's request, Sol recorded the reusable automatic-prompt/controlled-scope improvement for the next minor playground iteration rather than implementing it in this documentation work unit. The design covers prompt provenance, complete-concept selection, explicit context/selection-needed states and bounded large-input handling; coordinated API/schema/UI work is required. No renderer, provider payload, source limit or proof capability changes in this work unit.
+
+Sol prepared an original 1,477-byte `metric-spaces-test.tex` for Gyile to upload once and compiled it successfully. Its metric-space definition and real-line illustration are synthetic test material. Current support is a labelled mnemonic with formal reveal, not a computed metric-space engine. The runbook records the expected formal fields and safe one-attempt test procedure.

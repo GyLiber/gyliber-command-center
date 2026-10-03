@@ -159,3 +159,18 @@ After the visual PR has passed CI/Security and merged:
 5. Only after a correct mathematical review, complete the runbook’s source-free Git publication and saved replay checks. These are the remaining end-to-end activation gates.
 
 The free PostgreSQL instance still expires on 2026-10-30. The publishing token was reported with a 30-day lifetime; check its actual expiry privately before testing. Neither temporary storage nor the playground replaces primary LaTeX/Git/Obsidian work.
+
+
+## Metric-space smoke test and next authoring iteration, 2026-10-03
+
+Gyile reports manually deploying latest main and that the service is Live. PR #27 merged as `cd17c60945057214c960aea00e17e57cdf228104`; its implementation head `20673119f749bd56af655b788c0e11ce72e94db5` passed CI `37094994366` and Security `37094994364`, including 41 Rust tests, five Node checks, browser coverage and the production-container gate. Sol reviewed the synthetic desktop/mobile screenshots. Sol independently observed HTTP 200 health and live frontend/CSS bytes matching PR #27; the authenticated running-revision field was not inspected. Personal comfort and real AI/Git operations remain separate checks.
+
+Sol supplied `metric-spaces-test.tex`, an original 1,477-byte UTF-8 test, and verified successful LaTeX compilation locally. It contains one general metric-space definition, the usual real-line metric as an illustration, and explicit synthetic provenance. No account information or private course text is needed.
+
+1. On the member playground, select this `.tex` file only. Confirm the consent names the intended provider and review its terms.
+2. Check consent, then choose **Create a playful draft** once. If it fails, report the exact visible message rather than repeatedly retrying.
+3. A successful result should be an unverified **mnemonic metaphor**: a general metric space is not one of the current computed scene models. Creativity may vary.
+4. Reveal the mathematics. Check `d:X×X → [0,∞)`, all-point quantification, `d(x,y)=0` iff `x=y`, symmetry, and `d(x,z) ≤ d(x,y)+d(y,z)`. The numeric real-line example must not replace the definition. A picture does not prove these axioms or equip its drawn points with a metric.
+5. Check that the source quote appears verbatim in the file. A correct quote alone does not establish mathematical fidelity. Downloading the exact source-free packet is enough for this initial smoke test; public publication is a separate explicit review/consent action.
+
+Gyile also requested the [reusable authoring policy and controlled-scope plan](../architecture/MATH_PLAYGROUND_DESIGN.md#next-minor-release-reusable-authoring-policy-and-controlled-scope) for the next minor iteration. The existing automatic prompt already extracts one concept; candidate selection, context-needed states, prompt/model provenance and controlled document segmentation are planned improvements, not present functionality. Existing input limits remain enforced before AI.

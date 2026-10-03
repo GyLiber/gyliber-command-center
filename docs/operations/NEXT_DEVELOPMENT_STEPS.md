@@ -302,14 +302,16 @@ The 2026-10-02 provider/documentation stopping scope ended when Gyile explicitly
 
 On resumption Gyile answered **“Not tested yet”** for the live draft retest. Sol therefore keeps AI generation and runtime Git publication pending and proceeds independently with the requested [calmer dark visual release](../architecture/MATH_PLAYGROUND_DESIGN.md#next-minor-release-calmer-dark-visuals), testable using synthetic demonstrations without a provider account.
 
-Current visual work adds exhibit bundle 0.2.0, a dark renderer and panels, all three subdued palettes, explicit animation opt-in, and exact-byte preservation of older packages. The mathematical engine algorithms and formal reveal are unchanged; proofs remain deferred to capability 0.3.0. Browser CI records desktop/mobile screenshots for review. Automated contrast checks do not establish Gyile's individual eye comfort.
+PR #27 merged after exact-head CI/Security and screenshot review. It adds exhibit bundle 0.2.0, a dark renderer and panels, all three subdued palettes, explicit animation opt-in, and exact-byte preservation of older packages. The mathematical engine algorithms and formal reveal are unchanged; proofs remain deferred to capability 0.3.0. Browser CI records desktop/mobile screenshots for review. Automated contrast checks do not establish Gyile's individual eye comfort.
+
+On 2026-10-03 Gyile reported manually deploying the latest commit and that the site is Live. Sol independently observed HTTP 200 health and live frontend/CSS bytes matching PR #27; the authenticated running-revision field was not inspected. Real AI generation and runtime Git publication still require the independent acceptance checks below. Sol prepared an original 1,477-byte metric-space `.tex` smoke test, successfully compiled locally; it is synthetic material, not coursework. The current renderer should use a mnemonic and the reveal must preserve the complete general definition.
 
 Next actions, in order:
 
-1. Merge the dark visual work only after its exact-head CI/Security, PostgreSQL preservation and browser checks pass; review the generated screenshots.
-2. Deploy verified `main` to Render, verify the running revision, and ask Gyile to assess the dark demonstrations and formal/source panels for comfort.
-3. Privately confirm the runbook's Gemini settings and make one small synthetic live draft; record success or the exact error without repeated quota-consuming retries.
-4. After mathematical review, verify one source-free runtime Git publication and saved-exhibit replay. Do not claim end-to-end activation before these pass.
-5. Evaluate one relevant course concept for recall/usefulness. Continue proofs or broader visuals only when they support primary work; avoid duplicating LaTeX, Git or Obsidian workflows.
+1. Confirm the running revision and assess the dark demonstrations/formal/source panels for Gyile's comfort.
+2. Privately confirm the runbook's Gemini settings and make one small synthetic live draft. Record success or the exact error without repeated quota-consuming retries.
+3. After mathematical review, verify one source-free runtime Git publication and saved-exhibit replay. Do not claim end-to-end activation before these pass.
+4. In the next minor playground iteration, implement the [reusable authoring policy and controlled scope](../architecture/MATH_PLAYGROUND_DESIGN.md#next-minor-release-reusable-authoring-policy-and-controlled-scope): versioned automatic instructions, one complete concept, explicit selection/context-needed states and bounded large-input handling. This is planned; those result states are not supported by the current schema/UI.
+5. Evaluate one relevant course concept for recall/usefulness. Continue proofs or new mathematical engines only when they support primary work; avoid duplicating LaTeX, Git or Obsidian workflows.
 
 The canonical domain remains deferred. The wider company roadmap resumes section 3.3 (durable audit/event persistence) before activating any contract/engagement records; playground work does not satisfy those prerequisites.
