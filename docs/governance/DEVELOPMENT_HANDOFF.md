@@ -5,6 +5,16 @@
 **Continuing AI engineering collaborator:** Sol
 **Inherited checkpoint:** PR #22, `fix/include-migrations-in-docker`
 
+## Current temporary pause checkpoint — 2026-10-03
+
+At Gyile's latest instruction, **Sol** reviewed the repository and updated the handoff before a temporary stop. This checkpoint takes precedence over the historical next-work instructions below.
+
+- Audited `main`: `70a2177e952138f174a90dc6aee7c9253f6e22b4`. Implementation [PR #30](https://github.com/GyLiber/gyliber-command-center/pull/30) and evidence [PR #31](https://github.com/GyLiber/gyliber-command-center/pull/31) are merged; there were no open pull requests at the audit.
+- Post-merge [CI 37107340539](https://github.com/GyLiber/gyliber-command-center/actions/runs/37107340539) and [Security 37107340552](https://github.com/GyLiber/gyliber-command-center/actions/runs/37107340552) both succeeded for that exact main revision. The implementation test evidence remains recorded below and in the runbook.
+- This stopping review changes documentation only. The reviewed metric pilot, local prompt preparation and reproducible archive are safely committed. **Development may pause now; hosted deployment and signed-in acceptance remain pending.** This is a repository checkpoint, not a production acceptance claim.
+
+On resumption, first confirm the deployed revision and perform the four [hosted acceptance checks](../operations/MATH_PLAYGROUND_MANUAL_AUTHORING.md#verified-repository-checkpoint-and-hosted-handoff), recording the result or failing step. Then obtain Gyile's comfort and recall feedback before processing real course material or extending import/automation. Provider troubleshooting, arbitrary executable imports and broader features do not resume automatically. The temporary database expiry on 2026-10-30 and wider operational gates remain open in [Next Steps](../operations/NEXT_DEVELOPMENT_STEPS.md).
+
 ## Attribution and authority
 
 At Gyile's explicit request, Sol is continuing development from where Luna left off and moving the Command Center toward its next required actions. Luna and Sol are the conversational identities used by Gyile for the AI engineering collaborators; GitHub commit authorship remains the authenticated contributor identity. This record does not rewrite or independently certify the authorship of earlier commits.

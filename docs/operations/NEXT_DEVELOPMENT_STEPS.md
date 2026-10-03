@@ -310,7 +310,7 @@ On 2026-10-03 Gyile reported manually deploying the latest commit and that the s
 
 Gyile's one synthetic metric-space attempt returned the safe `ai_provider_unavailable` message on 2026-10-03. The error does not identify its network/upstream cause. At Gyile's direction, further provider recovery is not a prerequisite for the next work unit. The three fixed outcomes remain LaTeX input, interactive mathematics and reproducible repository code.
 
-Next actions, in order:
+Original delivery sequence (historical; implementation and the current pause/resumption checkpoint follow below):
 
 1. Use the [external authoring template](prompts/MATH_PLAYGROUND_EXTERNAL_AUTHORING.md) and [ADR-0011](../architecture/ADR-0011-manual-math-authoring.md). Initially Gyile returns the generated proposal to Sol for review/integration; the site has no arbitrary-package Import action yet.
 2. Deliver one reviewed interactive metric example from the synthetic LaTeX: the finite real-line subset `{1,3,4}`, direct/detour distances from `|x-y|`, and the full general metric definition in the reveal. Keep the existing dark/paused controls and classify the finite illustration accurately.
@@ -326,4 +326,12 @@ The canonical domain remains deferred. The wider company roadmap resumes section
 
 On 2026-10-03 Sol completed the initial reviewed publication workflow in source: browser-local LaTeX prompt preparation; metric-couriers with deterministic distances and full general definition; immutable hashed replay package; build-time approved member catalog; archive-only/direct version access; full package download; standalone no-AI/no-database viewer and CI coverage. See [usage, acceptance and replay](MATH_PLAYGROUND_MANUAL_AUTHORING.md). The pilot uses original synthetic content. Other packages need explicit developer review and public rights approval. Existing hosted authoring remains optional.
 
-After exact-head CI/Security and deployment verification, stop this work unit as Gyile requested. Next time prioritize practical feedback on this pilot before converting many concepts. Review an actual course-source proposal before extending storage or automation; consider bounded data-only recipes after that evidence. Arbitrary executable import, proof checking, provider retesting and the wider audit roadmap remain deferred, not prerequisites of today's reviewed workflow. Gyile's individual comfort/recall benefit and hosted member acceptance must be recorded honestly.
+### Temporary pause and ordered resumption — 2026-10-03
+
+Gyile requested a repository review and documentation update before stopping temporarily. Sol audited `main` at `70a2177e952138f174a90dc6aee7c9253f6e22b4`: PR #30 implementation and PR #31 evidence are merged, no pull requests were open, and post-merge CI `37107340539` and Security `37107340552` succeeded. See the [current handoff](../governance/DEVELOPMENT_HANDOFF.md#current-temporary-pause-checkpoint--2026-10-03) for linked evidence. **Development may pause now. Hosted acceptance remains pending and may wait until resumption.**
+
+1. Confirm the Render deployed revision includes PR #30; deploy latest main only if necessary. Complete and record the four [member-site acceptance checks](MATH_PLAYGROUND_MANUAL_AUTHORING.md#verified-repository-checkpoint-and-hosted-handoff). Fix a concrete failure before expanding the feature.
+2. Ask Gyile to judge the pilot's eye comfort and recall benefit. Record the result; automated tests cannot establish personal usefulness.
+3. Review one actual course-source proposal, including source rights, complete-concept selection and mathematical fidelity, before converting many concepts or extending storage/automation. Consider bounded data-only recipes after that evidence.
+
+The existing catalog, archived replay, prompt preparation, formal definition and fresh-checkout tests are completed work; do not repeat their initial implementation. Arbitrary executable import, proof checking, provider retesting and the wider audit roadmap remain deferred. The temporary database expiry on 2026-10-30 still applies; this pause does not establish durable hosting or backup readiness.
