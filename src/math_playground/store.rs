@@ -202,7 +202,12 @@ mod tests {
         assert_eq!(old.1, engine);
         assert_eq!(old.2, model::LEGACY_RENDERER);
         assert_eq!(old.0.renderer_sha256, model::digest(old.2.as_bytes()));
-        assert!(get(&pool, "other-member", &legacy_id).await.unwrap().is_none());
+        assert!(
+            get(&pool, "other-member", &legacy_id)
+                .await
+                .unwrap()
+                .is_none()
+        );
         delete(&pool, &owner, &legacy_id).await.unwrap();
         delete(&pool, "other-member", &id).await.unwrap();
         assert!(get(&pool, &owner, &id).await.unwrap().is_some());

@@ -73,8 +73,8 @@ async function assertTextContrast(page) {
   const results=await page.evaluate(()=>{
     const rgb=s=>s.match(/[\d.]+/g).map(Number);
     const lum=c=>c.slice(0,3).map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4}).reduce((n,v,i)=>n+v*[.2126,.7152,.0722][i],0);
-    return [...document.querySelectorAll('.intro,.badge,.version,.scene-description,.formal dt,.formal dd,.formal pre,.review-status,.proof-note,.demo-tabs button')].filter(e=>e.getClientRects().length).map(e=>{
-      let p=e,bg; do {
+    function background(e) {
+      let p=e,bg;do {
         const style=getComputedStyle(p);bg=rgb(style.backgroundColor);
         if(style.backgroundImage!=='none') {
           const stops=[...style.backgroundImage.matchAll(/rgba?\([^)]+\)/g)].map(m=>rgb(m[0]));
@@ -82,11 +82,20 @@ async function assertTextContrast(page) {
         }
         p=p.parentElement;
       } while(bg[3]===0&&p);
+      return bg;
+    }
+    const ratio=(a,b)=>(Math.max(lum(a),lum(b))+.05)/(Math.min(lum(a),lum(b))+.05);
+    const borders=[...document.querySelectorAll('.playground button:not(:disabled),.upload-zone')].filter(e=>e.getClientRects().length).map(e=>({tag:`${e.className} border`,ratio:ratio(rgb(getComputedStyle(e).borderTopColor),background(e)),minimum:3}));
+    const file=getComputedStyle(document.getElementById('tex-files'),'::file-selector-button');
+    borders.push({tag:'file button text',ratio:ratio(rgb(file.color),rgb(file.backgroundColor)),minimum:4.5});
+    borders.push({tag:'file button border',ratio:ratio(rgb(file.borderTopColor),rgb(file.backgroundColor)),minimum:3});
+    return [...borders,...[...document.querySelectorAll('.intro,.badge,.version,.scene-description,.formal dt,.formal dd,.formal pre,.review-status,.proof-note,.demo-tabs button')].filter(e=>e.getClientRects().length).map(e=>{
+      const bg=background(e);
       const fg=rgb(getComputedStyle(e).color),a=lum(fg),b=lum(bg);
-      return {tag:e.className||e.tagName,ratio:(Math.max(a,b)+.05)/(Math.min(a,b)+.05)};
-    });
+      return {tag:e.className||e.tagName,ratio:(Math.max(a,b)+.05)/(Math.min(a,b)+.05),minimum:4.5};
+    })];
   });
-  for (const {tag,ratio} of results) assert.ok(ratio>=4.5,`${tag} contrast ${ratio}`);
+  for (const {tag,ratio,minimum} of results) assert.ok(ratio>=minimum,`${tag} contrast ${ratio}`);
 }
 let browser;
 try {
@@ -130,6 +139,7 @@ try {
     await page.locator('#formal-drawer > summary').click();
     assert.match(await page.locator('#formal-statement').textContent(),/For every/);
     assert.match(await page.locator('#proof-status').textContent(),/0.3.0/);
+    await page.locator('.formal-body details > summary').click();
     await assertTextContrast(page);
     await page.locator('[data-demo=giant-pi]').focus();
     await page.keyboard.press('Tab');
@@ -219,6 +229,7 @@ try {
     assert.equal(oldPacket.files['renderer.mjs'],await readFile(resolve(root,'math-playground/runtime/renderer.mjs'),'utf8'));
     assert.equal(hash(oldPacket.files['renderer.mjs']),legacy.renderer_sha256);
     await page.getByRole('button',{name:'Pi’s ribbon',exact:true}).click();
+    await page.waitForFunction(()=>document.getElementById('scene-version').textContent==='visual 0.2.0 · reveal 0.2.0');
     await page.getByRole('slider',{name:'Unroll the ribbon'}).waitFor();
     assert.equal(await page.locator('.dim-legacy').count(),0);
     await assertDarkScene(page);

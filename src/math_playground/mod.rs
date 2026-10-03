@@ -677,7 +677,9 @@ mod tests {
                 .clone()
                 .oneshot(
                     Request::builder()
-                        .uri(format!("/api/math-playground/runtime/{version}/renderer.mjs"))
+                        .uri(format!(
+                            "/api/math-playground/runtime/{version}/renderer.mjs"
+                        ))
                         .header("cookie", &cookie)
                         .body(Body::empty())
                         .unwrap(),
@@ -688,10 +690,14 @@ mod tests {
             let bytes = to_bytes(response.into_body(), 64 * 1024).await.unwrap();
             assert_eq!(bytes.as_ref(), expected.as_bytes());
         }
-        let document: Value = serde_json::from_str(demo_artifact("giant-pi", false).unwrap()).unwrap();
+        let document: Value =
+            serde_json::from_str(demo_artifact("giant-pi", false).unwrap()).unwrap();
         assert_eq!(document["version"], "0.2.0");
         assert_eq!(document["formal_version"], "0.2.0");
-        assert_eq!(document["renderer_sha256"], digest(model::RENDERER.as_bytes()));
+        assert_eq!(
+            document["renderer_sha256"],
+            digest(model::RENDERER.as_bytes())
+        );
         assert_eq!(
             document["engine_sha256"],
             digest(demo_artifact("giant-pi", true).unwrap().as_bytes())
