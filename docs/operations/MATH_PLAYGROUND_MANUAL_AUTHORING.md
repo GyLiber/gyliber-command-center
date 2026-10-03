@@ -59,11 +59,11 @@ Before processing many course files, Gyile should judge whether this one example
 
 **Hosted acceptance remains pending.** The cloud browser reached Render's cold-start surface, then its URL policy blocked live inspection. Sol did not attempt a workaround, inspect credentials or infer deployment from the merge. No signed-in production metric/prompt/package check is claimed.
 
-Gyile's final manual step is to open the existing Render web service whose public address is `https://gyliber-command-center-1bym.onrender.com`, open **Deploys → Manual Deploy → Deploy latest commit**, and wait for **Live**. If the service already shows the current merged `main` commit as Live, no duplicate deployment is needed. No new environment settings are required. Record the deployed commit (the implementation merge above or a later main commit retaining it), then sign in and verify:
+On resumption, Gyile's first manual step is to open the existing Render web service whose public address is `https://gyliber-command-center-1bym.onrender.com`, open **Deploys → Manual Deploy → Deploy latest commit**, and wait for **Live**. If the service already shows the current merged `main` commit as Live, no duplicate deployment is needed. No new environment settings are required. Record the deployed commit (the implementation merge above or a later main commit retaining it), then sign in and verify:
 
 1. Metric couriers loads; x=1, y=4, z=3 gives direct 2 and detour 4.
 2. The reveal shows the general definition with all three universally quantified axioms and nonnegativity.
 3. Choosing the synthetic `.tex` and downloading the authoring prompt succeeds without using hosted AI.
 4. The archive package download succeeds; the version remains addressable by the stable replay link.
 
-If deployment or any check fails, report the failing step and visible error without sharing keys or database URLs. Stop the day's development after this hosted check; broader work remains deferred until Gyile resumes it.
+If deployment or any check fails, report the failing step and visible error without sharing keys or database URLs. At Gyile's latest instruction, development may stop temporarily now, with these hosted checks explicitly pending until resumption. Sol's [repository pause checkpoint](../governance/DEVELOPMENT_HANDOFF.md#current-temporary-pause-checkpoint--2026-10-03) records the audited main revision and successful post-merge checks. Broader work remains deferred until Gyile resumes it.
