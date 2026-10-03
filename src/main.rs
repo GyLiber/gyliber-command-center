@@ -242,7 +242,10 @@ async fn command_resources(session: Session) -> Response {
         Err(failure) => return failure.into_response(),
     };
 
-    Html(render_release_page(include_str!("../static/resources.html"))).into_response()
+    Html(render_release_page(include_str!(
+        "../static/resources.html"
+    )))
+    .into_response()
 }
 
 async fn command_repository(session: Session) -> Response {
@@ -251,7 +254,10 @@ async fn command_repository(session: Session) -> Response {
         Err(failure) => return failure.into_response(),
     };
 
-    Html(render_release_page(include_str!("../static/repository.html"))).into_response()
+    Html(render_release_page(include_str!(
+        "../static/repository.html"
+    )))
+    .into_response()
 }
 
 async fn command_state(session: Session) -> Response {
