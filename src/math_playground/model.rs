@@ -2,7 +2,8 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
 pub(super) const ENGINE: &str = include_str!("../../math-playground/runtime/engine-core.mjs");
-pub(super) const RENDERER: &str = include_str!("../../math-playground/runtime/renderer.mjs");
+pub(super) const LEGACY_RENDERER: &str = include_str!("../../math-playground/runtime/renderer.mjs");
+pub(super) const RENDERER: &str = include_str!("../../math-playground/runtime/renderer-0.2.0.mjs");
 pub(super) const MAX_SOURCE_BYTES: usize = 64 * 1024;
 
 #[derive(Clone, Deserialize, Serialize)]

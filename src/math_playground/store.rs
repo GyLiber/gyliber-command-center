@@ -153,7 +153,7 @@ mod tests {
         let engine = model::engine(&id, &concept);
         let exhibit = Exhibit {
             id: id.clone(),
-            version: "0.1.0".into(),
+            version: "0.2.0".into(),
             formal_version: "0.2.0".into(),
             concept,
             source_sha256: "fixture".into(),
@@ -163,12 +163,31 @@ mod tests {
             review: "ai_draft_unverified".into(),
             repository_commit: None,
         };
+        // Seed an earlier saved package before creating the current dark package.
+        // Loading/publishing current code must never replace the earlier bytes.
+        let legacy_id = model::digest(format!("{owner}:legacy").as_bytes())[..32].to_owned();
+        let mut legacy = exhibit.clone();
+        legacy.id = legacy_id.clone();
+        legacy.version = "0.1.0".into();
+        legacy.renderer_sha256 = model::digest(model::LEGACY_RENDERER.as_bytes());
+        sqlx::query(
+            "INSERT INTO gyliber_math_exhibits (id, owner, document, engine, renderer)
+             VALUES ($1, $2, $3, $4, $5)",
+        )
+        .bind(&legacy_id)
+        .bind(&owner)
+        .bind(serde_json::to_string(&legacy).unwrap())
+        .bind(&engine)
+        .bind(model::LEGACY_RENDERER)
+        .execute(&pool)
+        .await
+        .unwrap();
         save(&pool, &owner, &exhibit, &engine).await.unwrap();
         assert!(get(&pool, "other-member", &id).await.unwrap().is_none());
         let loaded = get(&pool, &owner, &id).await.unwrap().unwrap();
         assert_eq!(loaded.1, engine);
         assert_eq!(loaded.2, RENDERER);
-        assert_eq!(list(&pool, &owner).await.unwrap().len(), 1);
+        assert_eq!(list(&pool, &owner).await.unwrap().len(), 2);
         for _ in 0..8 {
             assert!(reserve_attempt(&pool, &owner).await.unwrap());
         }
@@ -178,6 +197,13 @@ mod tests {
             get(&pool, &owner, &id).await.unwrap().unwrap().0.review,
             "member_reviewed"
         );
+        let old = get(&pool, &owner, &legacy_id).await.unwrap().unwrap();
+        assert_eq!(old.0.version, "0.1.0");
+        assert_eq!(old.1, engine);
+        assert_eq!(old.2, model::LEGACY_RENDERER);
+        assert_eq!(old.0.renderer_sha256, model::digest(old.2.as_bytes()));
+        assert!(get(&pool, "other-member", &legacy_id).await.unwrap().is_none());
+        delete(&pool, &owner, &legacy_id).await.unwrap();
         delete(&pool, "other-member", &id).await.unwrap();
         assert!(get(&pool, &owner, &id).await.unwrap().is_some());
         sqlx::query("UPDATE gyliber_math_exhibits SET expires_at = CURRENT_TIMESTAMP - INTERVAL '1 second' WHERE id = $1")

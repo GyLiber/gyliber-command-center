@@ -1,0 +1,24 @@
+{
+  "id": "memory-cloud",
+  "version": "0.2.0",
+  "formal_version": "0.2.0",
+  "concept": {
+    "title": "Memory cloud",
+    "kind": "metaphor",
+    "concept_type": "definition",
+    "notation": "A is an arbitrary set; x is an object.",
+    "hypotheses": "Sets and membership are understood in the chosen foundational theory.",
+    "statement": "Membership x ∈ A asserts that x is an element of A. The negation x ∉ A asserts that x is not an element of A.",
+    "visual_mapping": "The creatures are a mnemonic for the idea of membership. The cloud edges and positions are decorative and are not a mathematical map.",
+    "limitations": "This is a memory scene only: the centre, links, distances, number of creatures and motion imply no formal relation, theorem, hierarchy or proof.",
+    "source_file": "Sol-authored demonstration; no course upload",
+    "source_quote": "This is a synthetic demonstration, not an extraction from Gyile’s coursework.",
+    "palette": "candy"
+  },
+  "source_sha256": null,
+  "engine_sha256": "6fbaf4fd864364fd8bce913f745ebadbdaad3d7d1ae4c7ead0d41b9fb46b919e",
+  "renderer_sha256": "9858feb8fead6d488f17f5c1fa1f32a33f347c0453723f1b81b8f4d60055bd0c",
+  "created_at": 0,
+  "review": "sol_reviewed_demo",
+  "repository_commit": null
+}

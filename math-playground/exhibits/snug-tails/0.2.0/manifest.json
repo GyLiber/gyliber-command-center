@@ -1,0 +1,24 @@
+{
+  "id": "snug-tails",
+  "version": "0.2.0",
+  "formal_version": "0.2.0",
+  "concept": {
+    "title": "Snug tails",
+    "kind": "sequence",
+    "concept_type": "theorem",
+    "notation": "ℕ = {1, 2, …}; aₙ = 1/n; L = 0; ε > 0.",
+    "hypotheses": "The reciprocal sequence a: ℕ → ℝ, aₙ = 1/n.",
+    "statement": "A sequence a converges to L iff ∀ε > 0, ∃N ∈ ℕ, ∀n ≥ N, |aₙ − L| < ε. For aₙ = 1/n, limₙ→∞ aₙ = 0. For each ε > 0, N = ⌊1/ε⌋ + 1 is a valid threshold.",
+    "visual_mapping": "Creature heights are aₙ. The blanket is the positive part of the ε-neighbourhood of zero. Every creature from the threshold onward fits strictly inside.",
+    "limitations": "Only 50 terms are drawn and the selected term is enlarged. The scene demonstrates one convergent sequence; it does not model every convergent sequence or prove convergence.",
+    "source_file": "Sol-authored demonstration; no course upload",
+    "source_quote": "This is a synthetic demonstration, not an extraction from Gyile’s coursework.",
+    "palette": "ocean"
+  },
+  "source_sha256": null,
+  "engine_sha256": "0ff45919116e4c418a6e61f1bd0786cae7308fc17a8b961051525b84c6a721b6",
+  "renderer_sha256": "9858feb8fead6d488f17f5c1fa1f32a33f347c0453723f1b81b8f4d60055bd0c",
+  "created_at": 0,
+  "review": "sol_reviewed_demo",
+  "repository_commit": null
+}

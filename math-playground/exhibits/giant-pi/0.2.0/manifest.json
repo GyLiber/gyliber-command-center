@@ -1,0 +1,24 @@
+{
+  "id": "giant-pi",
+  "version": "0.2.0",
+  "formal_version": "0.2.0",
+  "concept": {
+    "title": "Pi’s ribbon",
+    "kind": "circle",
+    "concept_type": "theorem",
+    "notation": "r ∈ ℝ, r > 0; C is circumference; d = 2r; π = 3.141592653589793…",
+    "hypotheses": "A circle of radius r in the Euclidean plane. Circumference denotes its arc length.",
+    "statement": "For every such circle, C = 2πr and C/d = π.",
+    "visual_mapping": "Pi wears a circumference ribbon. Unrolling reveals its length; changing the radius scales both the circle and ribbon.",
+    "limitations": "A numerical illustration of the circle relation, not a proof. The character and its eyes are decoration; the displayed π is a finite approximation.",
+    "source_file": "Sol-authored demonstration; no course upload",
+    "source_quote": "This is a synthetic demonstration, not an extraction from Gyile’s coursework.",
+    "palette": "candy"
+  },
+  "source_sha256": null,
+  "engine_sha256": "eee21041f1edd39bd6c6ab0d6b975cee04c7d72daf5498bb0a51e323e3ff5da3",
+  "renderer_sha256": "9858feb8fead6d488f17f5c1fa1f32a33f347c0453723f1b81b8f4d60055bd0c",
+  "created_at": 0,
+  "review": "sol_reviewed_demo",
+  "repository_commit": null
+}
