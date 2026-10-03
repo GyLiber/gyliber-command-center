@@ -1,6 +1,6 @@
 # ADR-0011: External authoring and reproducible mathematics exhibits
 
-**Status:** Accepted planning direction at Gyile's instruction; not implemented.
+**Status:** Accepted; initial external-authoring handoff and reviewed metric/catalog/archive implementation completed in source on 2026-10-03. Release/deployment evidence is recorded in the implementation PR and runbook. Data-only/general executable import remains deferred.
 **Date:** 2026-10-03
 **Collaborator:** Sol, continuing the GyLiber engineering collaboration.
 **Supersedes:** The next-iteration priority of improving embedded AI authoring in ADR-0010 and the PR #28 plan. Existing deployed behavior and its history remain intact.
@@ -69,3 +69,7 @@ The current repository is public. Raw course files, verbatim source quotes, priv
 The pilot succeeds when Gyile can author/handoff without a deployed provider key, view a reviewed interactive metric example, reveal the complete formal concept, and reproduce exact archived code from a fresh checkout without AI or the private derivative database. Invalid/ambiguous proposals do not become playable or silently discard source. No paid dependency is activated implicitly.
 
 This plan improves operational independence; it does not guarantee universal LaTeX understanding, automatic correctness, zero human review, hosted uptime or learning/income outcomes. Judge its practical value using one relevant concept before converting many files. The broader audit/contract roadmap and proof capability remain unchanged.
+
+## Implementation checkpoint
+
+Sol implemented the first reviewed `metric-couriers/0.1.0` package, browser-local prompt preparation, compile-time approved catalog, stable archive access, complete package download and standalone replay. See [manual authoring and replay runbook](../operations/MATH_PLAYGROUND_MANUAL_AUTHORING.md). No embedded provider request or private derivative database is required for these new playback/preparation routes; the optional older integration remains. The first exhibit uses original public synthetic content. Other independently authored public replay packages require the `developer_reviewed_public` class and explicit source/mathematics/code/rights review; private mapping stays outside public Git.

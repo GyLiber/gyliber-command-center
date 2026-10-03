@@ -1,0 +1,37 @@
+{
+  "format": 2,
+  "id": "metric-couriers",
+  "version": "0.1.0",
+  "formal_version": "0.2.0",
+  "classification": "representative_example",
+  "runtime_contract": "mount(container, engine) -> cleanup; evaluate({x,y,z}); local-es-modules-v1",
+  "review": "sol_reviewed_public_synthetic",
+  "publication_rights": "Original Sol-authored synthetic source and independently authored generic definition; no private coursework.",
+  "concept": {
+    "title": "Metric couriers",
+    "kind": "metric",
+    "concept_type": "definition",
+    "notation": "X ≠ ∅; d: X × X → [0, ∞). The pair (X, d) is a metric space.",
+    "hypotheses": "The conditions below hold for every x, y, z ∈ X. X need not be a set of Euclidean points.",
+    "statement": "For every x, y, z ∈ X:\n(1) d(x,y) = 0 if and only if x = y;\n(2) d(x,y) = d(y,x);\n(3) d(x,z) ≤ d(x,y) + d(y,z).\nNonnegativity is required by the codomain [0, ∞).",
+    "visual_mapping": "A finite representative example: X = {1,3,4}, d(a,b) = |a−b|, restricted from the usual metric on ℝ. Choose a start, a via point and a finish. Direct and detour lengths come from the engine.",
+    "limitations": "This finite example does not replace the general definition or prove the axioms on all real numbers. Vertical lanes, faces and cosmetic movement assert no additional mathematics.",
+    "source_file": "Sol-authored original synthetic example",
+    "source_quote": "No private course quotation is published. Original synthetic test: docs/examples/metric-spaces-test.tex.",
+    "palette": "ocean"
+  },
+  "source_sha256": null,
+  "engine_sha256": "93de3d0ee9d3928854b420bff7b5d0da10b0e8ee91448cd9854e599c9fda30ab",
+  "renderer_sha256": "f0aec47454b0bbac688eca129d3a30dc546dc141ad016f37e4b3fc5f7dbdac04",
+  "repository_commit": null,
+  "files": {
+    "README.md": "096eb2fedfed0ec61e0bbd4d96999dab640420705c8e5e994edeec80c7700489",
+    "engine.mjs": "93de3d0ee9d3928854b420bff7b5d0da10b0e8ee91448cd9854e599c9fda30ab",
+    "formal.mjs": "5514d0559f64e7961acde92e739eb98c05fb80a30f06abbcf78d9ce6e7530a06",
+    "renderer.mjs": "f0aec47454b0bbac688eca129d3a30dc546dc141ad016f37e4b3fc5f7dbdac04",
+    "tests.mjs": "9a2d6a48b327be13bd64674548481c05f0c91f1238239c7c2fed8762524e38f9",
+    "viewer.css": "e73d73c28da5195fdaf957f432f7a47afabf959f1abdd0aa8a8899c743e3424c",
+    "viewer.html": "39ca993dc3b3cf71dcec03498bc4e5250c04024b4468bfa3d766dece260ea2b6",
+    "viewer.mjs": "32287d03d79ac6172a09e5914b42f98def1e256212154857eec08ced3fd06a01"
+  }
+}

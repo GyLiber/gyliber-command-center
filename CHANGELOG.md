@@ -1,5 +1,14 @@
 # Changelog
 
+## [Unreleased] — Reviewed external mathematics authoring
+
+- Sol implemented browser-local LaTeX prompt preparation, with explicit source/size validation and no upload/provider call.
+- Added the reviewed metric-couriers finite example, full metric definition, opt-in dark animation and tests of all nine pairs and 27 triples.
+- Added hashed immutable replay packages, approved member catalog, archive access, stable version links, full package downloads and standalone no-AI/no-database replay.
+- Enforced compile-time file embedding and PR-base package immutability; preserved previous exhibit bytes and optional hosted authoring.
+- Documented developer review/publication, explicit developer review and publication rights, deployment acceptance and deferred data-only/general executable import.
+
+
 ## [0.2.0] — Live product foundation
 
 - Centralized authenticated-member access policy for protected browser and API surfaces.

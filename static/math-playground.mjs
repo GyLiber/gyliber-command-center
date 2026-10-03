@@ -1,4 +1,6 @@
+import { buildPrompt, validateFiles } from '/static/math-authoring.mjs';
 const $ = (id) => document.getElementById(id);
+let approved = null, authoringTemplate = null;
 let catalog = null, current = null, cleanup = null, selectedFiles = [], selectionVersion = 0, sceneVersion = 0;
 const messages = {
   authentication_required: 'Your member session has ended. Sign in again to continue.',
@@ -40,16 +42,19 @@ function renderShelf() {
     button.append(title, state); button.addEventListener('click', () => showExhibit(exhibit).catch((error) => notice(error.message))); list.append(button);
   }
   if (!catalog.exhibits.length) {
-    const text = document.createElement('p'); text.className = 'muted small'; text.textContent = 'Your new exhibits will live here. Try a demonstration while the AI service is being prepared.'; list.append(text);
+    const text = document.createElement('p'); text.className = 'muted small'; text.textContent = 'Optional hosted drafts appear here. Approved exhibits are available in the gallery and archive.'; list.append(text);
   }
 }
 function updateButtons() {
+  $('prepare-prompt').disabled = !selectedFiles.length;
   $('generate').disabled = !catalog?.ai_ready || !selectedFiles.length || !$('provider-consent').checked;
   $('publish').disabled = !current || current.demo || Boolean(current.repository_commit) || !catalog?.publishing_ready
     || !$('math-reviewed').checked || !$('public-code').checked;
 }
 async function refresh() {
-  const nextCatalog = await api('/api/math-playground');
+  let nextCatalog;
+  try { nextCatalog = await api('/api/math-playground'); }
+  catch(error) { $('exhibit-list').textContent = 'The optional private shelf is unavailable. Approved exhibits and prompt preparation remain available.'; throw error; }
   if (catalog && catalog.ai_provider !== nextCatalog.ai_provider) $('provider-consent').checked = false;
   catalog = nextCatalog;
   const provider = catalog.ai_provider === 'gemini' ? 'Google Gemini' : 'OpenAI';
@@ -67,7 +72,7 @@ function renderFormal(exhibit) {
     'formal-statement': c.statement, 'formal-mapping': c.visual_mapping, 'formal-limitations': c.limitations,
     'source-name': c.source_file, 'source-quote': c.source_quote };
   for (const [id, text] of Object.entries(fields)) $(id).textContent = text;
-  $('review-status').textContent = exhibit.demo ? 'Sol-reviewed synthetic demonstration. It was not generated from your coursework.'
+  $('review-status').textContent = exhibit.curated ? 'Sol-reviewed representative example from original synthetic LaTeX. Finite checks are not a general proof.' : exhibit.demo ? 'Sol-reviewed synthetic demonstration. It was not generated from your coursework.'
     : exhibit.repository_commit ? 'Mathematics reviewed by the saving member; this is not machine verification.'
       : 'AI draft — unverified. Check the source, hypotheses and conclusion before relying on it.';
   $('proof-status').textContent = c.concept_type === 'theorem' ? 'Proof deferred to exhibit capability v0.3.0. Animation is not a proof.'
@@ -75,7 +80,12 @@ function renderFormal(exhibit) {
   $('source-digest').textContent = exhibit.source_sha256 ? `Source SHA-256: ${exhibit.source_sha256}` : 'Source: original synthetic demonstration.';
   $('artifact-digest').textContent = `Engine SHA-256: ${exhibit.engine_sha256}\nRenderer SHA-256: ${exhibit.renderer_sha256}`;
   $('repository-receipt').replaceChildren();
-  if (exhibit.repository_commit) {
+  if (exhibit.curated) {
+    const link = document.createElement('a'); link.textContent = 'View reviewed version in Git';
+    const revision = /^[a-fA-F0-9]{40}$/.test(approved?.deployment_commit || '') ? approved.deployment_commit : 'main';
+    link.href = `https://github.com/GyLiber/gyliber-command-center/tree/${revision}/math-playground/exhibits/${exhibit.id}/${exhibit.version}`;
+    link.target = '_blank'; link.rel = 'noopener noreferrer'; $('repository-receipt').append(link);
+  } else if (exhibit.repository_commit) {
     const link = document.createElement('a'); link.textContent = `View immutable Git snapshot ${exhibit.repository_commit.slice(0, 12)}`;
     link.href = `https://github.com/GyLiber/gyliber-command-center/tree/${exhibit.repository_commit}/math-playground/exhibits/${exhibit.id}/${exhibit.version}`;
     link.target = '_blank'; link.rel = 'noopener noreferrer'; $('repository-receipt').append(link);
@@ -83,7 +93,7 @@ function renderFormal(exhibit) {
 }
 function mountScene(exhibit, renderer, engine, ticket) {
   const scene = $('scene'); scene.classList.remove('dim-legacy');
-  if (exhibit.version !== '0.1.0') return renderer.mount(scene, engine);
+  if (exhibit.curated || exhibit.version !== '0.1.0') return renderer.mount(scene, engine);
   // Old stored code stays exact. A separate, explicitly chosen display filter
   // can dim its light palette without changing the downloaded/public package.
   let dispose = null;
@@ -106,22 +116,28 @@ function mountScene(exhibit, renderer, engine, ticket) {
 }
 async function showExhibit(exhibit) {
   const ticket = ++sceneVersion;
-  const prefix = exhibit.demo ? `/api/math-playground/demos/${exhibit.id}` : `/api/math-playground/exhibits/${exhibit.id}`;
-  const [engine, renderer] = await Promise.all([import(`${prefix}/engine.mjs`), import(exhibit.demo ? `/api/math-playground/runtime/${encodeURIComponent(exhibit.version)}/renderer.mjs` : `${prefix}/renderer.mjs`)]);
+  const prefix = exhibit.curated ? `/api/math-playground/curated/${exhibit.id}/${exhibit.version}` : exhibit.demo ? `/api/math-playground/demos/${exhibit.id}` : `/api/math-playground/exhibits/${exhibit.id}`;
+  const [engine, renderer] = await Promise.all([import(`${prefix}/engine.mjs`), import(exhibit.curated ? `${prefix}/renderer.mjs` : exhibit.demo ? `/api/math-playground/runtime/${encodeURIComponent(exhibit.version)}/renderer.mjs` : `${prefix}/renderer.mjs`)]);
   if (ticket !== sceneVersion) return;
   cleanup?.(); current = exhibit; cleanup = mountScene(exhibit, renderer, engine, ticket);
   $('scene-title').textContent = exhibit.concept.title;
-  $('scene-kind').textContent = exhibit.concept.kind === 'metaphor' ? 'MNEMONIC METAPHOR'
+  $('scene-kind').textContent = exhibit.curated ? 'REPRESENTATIVE EXAMPLE' : exhibit.concept.kind === 'metaphor' ? 'MNEMONIC METAPHOR'
     : !exhibit.demo && !exhibit.repository_commit ? 'UNVERIFIED MODEL DRAFT' : 'MATHEMATICAL MODEL';
   $('scene-kind').classList.toggle('metaphor', exhibit.concept.kind === 'metaphor');
   $('scene-version').textContent = `visual ${exhibit.version} · reveal ${exhibit.formal_version}`;
   $('formal-drawer').open = false; renderFormal(exhibit);
-  $('release-panel').hidden = Boolean(exhibit.demo);
+  $('release-panel').hidden = Boolean(exhibit.demo || exhibit.curated);
+  $('curated-actions').hidden = !exhibit.curated;
+  if(exhibit.curated) {
+    const url = new URL(location.href); url.search = new URLSearchParams({exhibit:exhibit.id,version:exhibit.version});
+    $('replay-link').href = url; $('archive-select').value = `${exhibit.id}/${exhibit.version}`;
+  } else $('archive-select').value = '';
   $('math-reviewed').checked = false; $('public-code').checked = false;
   $('publishing-status').textContent = exhibit.repository_commit ? 'The exact code is saved in Git. The private source mapping remains on your shelf.'
     : catalog?.publishing_ready ? 'Drafts expire after 24 hours. A reviewed, saved exhibit stays on your private shelf.'
       : 'Git publishing needs activation. Drafts expire after 24 hours; download the package to keep a local copy.';
   for (const button of document.querySelectorAll('[data-demo]')) button.setAttribute('aria-pressed', String(exhibit.demo && button.dataset.demo === exhibit.id));
+  for(const button of document.querySelectorAll('[data-curated]'))button.setAttribute('aria-pressed',String(exhibit.curated && button.dataset.curated===`${exhibit.id}/${exhibit.version}`));
   updateButtons();
 }
 async function demo(id) { const exhibit = await api(`/api/math-playground/demos/${id}`); exhibit.demo = true; await showExhibit(exhibit); }
@@ -138,7 +154,7 @@ $('tex-files').addEventListener('change', async (event) => {
     if (names.size !== files.length) throw new Error('Each selected file needs a distinct filename.');
     const parsed = await Promise.all(files.map(async (file) => ({ name: file.name, content: new TextDecoder('utf-8', { fatal: true }).decode(await file.arrayBuffer()) })));
     if (ticket !== selectionVersion) return;
-    selectedFiles = parsed;
+    validateFiles(parsed); selectedFiles = parsed;
     $('file-summary').textContent = `${files.map((file) => file.name).join(', ')} · ${files.reduce((sum, file) => sum + file.size, 0)} bytes. No upload has been sent yet.`;
   } catch (error) { if (ticket === selectionVersion) { $('file-summary').textContent = error.message; selectedFiles = []; } }
   updateButtons();
@@ -186,5 +202,40 @@ $('delete-exhibit').addEventListener('click', async () => {
   } catch (error) { notice(error.message); }
 });
 window.addEventListener('pagehide', () => { cleanup?.(); selectedFiles = []; });
-try { await refresh(); } catch (error) { notice(error.message); }
-try { await demo('giant-pi'); } catch (error) { $('scene').textContent = 'Scene unavailable. Sign in or refresh to try again.'; notice(error.message); }
+function downloadText(name,content,type='application/json') {
+  const url=URL.createObjectURL(new Blob([content],{type})),link=document.createElement('a');
+  link.href=url;link.download=name;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+$('prepare-prompt').addEventListener('click',async()=>{
+  const files=selectedFiles.map(file=>({...file})), focus=$('concept-focus').value;
+  try {
+    if(!authoringTemplate) { const response=await fetch('/api/math-playground/authoring-template',{credentials:'same-origin',cache:'no-store'}); if(!response.ok)throw new Error('Template unavailable. Sign in or refresh.'); authoringTemplate=await response.text(); }
+    downloadText('gyliber-math-authoring-prompt.txt',buildPrompt(authoringTemplate,files,focus),'text/plain;charset=utf-8');
+    notice('Prompt prepared locally. Share it with your chosen AI, then return the proposal and original source to Sol for review. No source was uploaded to this site.');
+  } catch(error) {notice(error.message);}
+});
+async function curated(id,version) {
+  if(!approved?.releases.some(release=>release.id===id&&release.version===version))throw new Error('That approved version is not in this deployment. Choose one from the archive.');
+  const exhibit=await api(`/api/math-playground/curated/${encodeURIComponent(id)}/${encodeURIComponent(version)}/manifest.json`);
+  exhibit.curated=true;await showExhibit(exhibit);
+}
+$('archive-select').addEventListener('change',()=>{if($('archive-select').value){const [id,version]=$('archive-select').value.split('/');curated(id,version).catch(error=>notice(error.message));}});
+$('download-curated').addEventListener('click',async()=>{
+  const exhibit=current;if(!exhibit?.curated)return;
+  try {const data=await api(`/api/math-playground/curated/${exhibit.id}/${exhibit.version}/package`);downloadText(`${exhibit.id}-${exhibit.version}.json`,JSON.stringify(data,null,2));notice('Downloaded all archived files and their manifest. Replay instructions are in README.md.');} catch(error){notice(error.message);}
+});
+async function loadApproved() {
+  approved=await api('/api/math-playground/curated');
+  for(const release of approved.releases) {
+    const option=document.createElement('option');option.value=`${release.id}/${release.version}`;option.textContent=`${release.title} · ${release.version}${release.in_gallery?'':' · archived'}`;$('archive-select').append(option);
+    if(release.in_gallery) {const button=document.createElement('button');button.type='button';button.textContent=release.title;button.dataset.curated=option.value;button.setAttribute('aria-pressed','false');button.addEventListener('click',()=>curated(release.id,release.version).catch(error=>notice(error.message)));document.querySelector('.demo-tabs').append(button);}
+  }
+  const params=new URLSearchParams(location.search);
+  if(params.has('exhibit')||params.has('version'))await curated(params.get('exhibit'),params.get('version'));
+  else if(approved.releases.some(release=>release.in_gallery)) {const first=approved.releases.find(release=>release.in_gallery);await curated(first.id,first.version);}
+  else await demo('giant-pi');
+}
+await Promise.allSettled([
+  refresh().catch(error=>notice(error.message)),
+  loadApproved().catch(async error=>{notice(error.message);try{await demo('giant-pi');}catch{ $('scene').textContent='Scene unavailable. Sign in or refresh.';}})
+]);

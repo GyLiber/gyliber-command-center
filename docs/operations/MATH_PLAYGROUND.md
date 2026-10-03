@@ -3,11 +3,12 @@
 **Implementation:** Sol's continuation of Luna's foundation, 2026-10-01.
 **Member entry:** `/command/math-playground`, also registered in the Command Center.
 **Deployed architecture:** [ADR-0010](../architecture/ADR-0010-bounded-mathematical-playground.md).
-**Next work direction:** [ADR-0011](../architecture/ADR-0011-manual-math-authoring.md), external authoring and reviewed repository packages. Provider setup below describes the existing implementation; it is not a required dependency of the new pilot.
+**Provider-independent workflow:** [Manual authoring and replay](MATH_PLAYGROUND_MANUAL_AUTHORING.md) is the new default. Browser-local prompt preparation and the reviewed metric example do not require provider setup.
+**Design direction:** [ADR-0011](../architecture/ADR-0011-manual-math-authoring.md), external authoring and reviewed repository packages. Provider setup below describes the existing implementation; it is not a required dependency of the new pilot.
 
 ## What works without additional accounts
 
-An allowlisted member can play four repository-backed demonstrations, change their parameters, pause motion and reveal formal mathematics. The source labels explicitly identify these as Sol-authored demonstrations, not Gyile's coursework. New 0.2.0 visual bundles always start paused; choose Animate to start motion. Their scenes, formal/source surfaces and controls use the dark site palette. A later reduced-motion preference pauses animation; hidden pages stop scheduling frames.
+An allowlisted member can play the approved metric-space pilot and four preserved repository-backed demonstrations, change their parameters, pause motion and reveal formal mathematics. The source labels explicitly identify these as Sol-authored demonstrations, not Gyile's coursework. New 0.2.0 visual bundles always start paused; choose Animate to start motion. Their scenes, formal/source surfaces and controls use the dark site palette. A later reduced-motion preference pauses animation; hidden pages stop scheduling frames.
 
 The initial authoring models are circle circumference, the sequence `1/n` converging to zero and finite permutations. Other mathematical concepts receive a labelled mnemonic scene. Formal definitions/theorems, hypotheses and notation are revealed separately from the drawing; theorem proofs remain deferred to exhibit capability 0.3.0.
 
@@ -184,3 +185,7 @@ Gyile's single synthetic test returned **The AI provider is temporarily unreacha
 Gyile requests progress through external/manual authoring rather than continued provider troubleshooting. [ADR-0011](../architecture/ADR-0011-manual-math-authoring.md) and the [external authoring template](prompts/MATH_PLAYGROUND_EXTERNAL_AUTHORING.md) record that plan. Initially send the template and a complete `.tex` concept to an accessible AI, then return its proposal to Sol for review and repository integration. This is a proposed handoff, not a newly deployed upload/import feature.
 
 Do not paste generated programs into the current `.tex` upload, developer console or member page. The existing application loads trusted reviewed modules; generic executable proposals need review before integration. Further provider attempts, model changes or billing activation are not requested by this plan. Demonstrations and accepted package replay should remain available independently of authoring-provider access.
+
+## 2026-10-03 external-authoring implementation
+
+Sol implemented ADR-0011's initial handoff and reviewed playback path. The member page prepares the standard prompt locally, offers the versioned metric-couriers example, retains archive identities outside gallery navigation and downloads complete replay packages. Packages are validated and embedded at build time; CI rejects overwriting accepted versions. The private shelf can fail without blocking the curated scene or local prompt. See [complete procedure and limits](MATH_PLAYGROUND_MANUAL_AUTHORING.md). Hosted deployment is a distinct acceptance step recorded after merge; a provider-success or automatic importer claim is not made.

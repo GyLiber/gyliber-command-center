@@ -90,3 +90,8 @@
 .legacy-scene{padding:24px 30px;color:var(--muted);line-height:1.6}
 .actions.legacy-scene{margin-top:16px}
 .scene.dim-legacy canvas{filter:invert(1) hue-rotate(180deg) brightness(1.3)}
+.scene-controls select{color:var(--text);background:#24313e;border:1px solid #708192;border-radius:8px;padding:10px;font:inherit;width:100%}
+.authoring details>summary{cursor:pointer;font-weight:700}
+.authoring textarea{box-sizing:border-box;width:100%;background:#111922;color:var(--text);border:1px solid #708192;border-radius:8px;font:inherit;padding:8px}
+.archive-controls{padding:10px 30px}.archive-controls select{max-width:100%;font:inherit;color:var(--text);background:#24313e;border:1px solid #708192;border-radius:8px;padding:8px;margin:8px 0}
+.authoring a{color:var(--play-lavender)}
