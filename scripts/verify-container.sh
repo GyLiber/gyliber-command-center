@@ -112,7 +112,7 @@ expect_status /command 303
 expect_status /command/math-playground 303
 expect_status /static/math-playground.mjs 200
 [[ "$(query_database "SELECT to_regclass('public.gyliber_math_exhibits') IS NOT NULL")" == t ]]
-for route in /api/state /api/modules /api/repository /api/resources /api/math-playground /api/math-playground/demos/giant-pi/engine.mjs; do
+for route in /api/state /api/modules /api/repository /api/resources /api/math-playground /api/math-playground/demos/giant-pi/engine.mjs /api/math-playground/curated /api/math-playground/authoring-template /api/math-playground/curated/metric-couriers/0.1.0/engine.mjs; do
   expect_status "$route" 401
 done
 

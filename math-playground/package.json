@@ -4,8 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test tests/engine.test.mjs",
+    "test": "node scripts/verify-curated.mjs && node --test tests/engine.test.mjs tests/curated.test.mjs exhibits/metric-couriers/0.1.0/tests.mjs",
     "test:browser": "node --test tests/browser.test.mjs"
   },
-  "devDependencies": { "playwright": "1.62.1" }
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
 }

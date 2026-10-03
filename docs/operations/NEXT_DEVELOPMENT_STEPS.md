@@ -321,3 +321,9 @@ Next actions, in order:
 The PR #28 prompt-control plan remains useful for source selection, missing context and output limits, but external authoring and publication now have priority. Existing hosted authoring/publishing acceptance is still incomplete; no new paid service or account is required for the pilot, and this planning change does not remove the deployed integration.
 
 The canonical domain remains deferred. The wider company roadmap resumes section 3.3 (durable audit/event persistence) before activating any contract/engagement records; playground work does not satisfy those prerequisites.
+
+### Implemented external-authoring checkpoint
+
+On 2026-10-03 Sol completed the initial reviewed publication workflow in source: browser-local LaTeX prompt preparation; metric-couriers with deterministic distances and full general definition; immutable hashed replay package; build-time approved member catalog; archive-only/direct version access; full package download; standalone no-AI/no-database viewer and CI coverage. See [usage, acceptance and replay](MATH_PLAYGROUND_MANUAL_AUTHORING.md). The first review class accepts original synthetic content only. Existing hosted authoring remains optional.
+
+After exact-head CI/Security and deployment verification, stop this work unit as Gyile requested. Next time prioritize practical feedback on this pilot before converting many concepts. Extend public/private review classes only when an actual course-source proposal needs publication; consider bounded data-only recipes after that evidence. Arbitrary executable import, proof checking, provider retesting and the wider audit roadmap remain deferred, not prerequisites of today's reviewed workflow. Gyile's individual comfort/recall benefit and hosted member acceptance must be recorded honestly.

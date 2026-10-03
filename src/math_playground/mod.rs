@@ -15,6 +15,7 @@ use std::{env, time::Duration};
 use tokio::sync::Semaphore;
 use tower_sessions::Session;
 
+mod curated;
 mod generation;
 mod model;
 mod publisher;
@@ -108,6 +109,10 @@ pub(crate) fn routes() -> Router<AppState> {
     Router::new()
         .route("/command/math-playground", get(page))
         .route("/api/math-playground", get(catalog))
+        .route("/api/math-playground/curated", get(curated::catalog))
+        .route("/api/math-playground/authoring-template", get(curated::template))
+        .route("/api/math-playground/curated/{id}/{version}/package", get(curated::package))
+        .route("/api/math-playground/curated/{id}/{version}/{name}", get(curated::artifact))
         .route("/api/math-playground/demos/{id}", get(demo))
         .route(
             "/api/math-playground/demos/{id}/engine.mjs",
@@ -598,6 +603,12 @@ mod tests {
         let (app, _) = app_with_member().await;
         for path in [
             "/api/math-playground",
+            "/api/math-playground/curated",
+            "/api/math-playground/authoring-template",
+            "/api/math-playground/curated/metric-couriers/0.1.0/manifest.json",
+            "/api/math-playground/curated/metric-couriers/0.1.0/package",
+            "/api/math-playground/curated/metric-couriers/0.1.0/engine.mjs",
+            "/api/math-playground/curated/metric-couriers/0.1.0/viewer.html",
             "/api/math-playground/demos/giant-pi",
             "/api/math-playground/demos/giant-pi/engine.mjs",
             "/api/math-playground/runtime/renderer.mjs",
@@ -713,6 +724,36 @@ mod tests {
             .await
             .unwrap();
         assert_eq!(response.status(), StatusCode::NOT_FOUND);
+    }
+
+    #[tokio::test]
+    async fn curated_archive_replays_exact_bytes_without_provider_or_database() {
+        let (app, cookie) = app_with_member().await;
+        for (path, status) in [
+            ("/api/math-playground/curated", StatusCode::OK),
+            ("/api/math-playground/authoring-template", StatusCode::OK),
+            ("/api/math-playground/curated/metric-couriers/0.1.0/viewer.html", StatusCode::OK),
+            ("/api/math-playground/curated/metric-couriers/0.1.0/unknown.mjs", StatusCode::NOT_FOUND),
+            ("/api/math-playground/curated/metric-couriers/99.0.0/engine.mjs", StatusCode::NOT_FOUND),
+        ] {
+            let response = app.clone().oneshot(Request::builder().uri(path).header("cookie", &cookie).body(Body::empty()).unwrap()).await.unwrap();
+            assert_eq!(response.status(), status, "{path}");
+        }
+        let response = app.clone().oneshot(Request::builder().uri("/api/math-playground/curated/metric-couriers/0.1.0/package").header("cookie", &cookie).body(Body::empty()).unwrap()).await.unwrap();
+        assert_eq!(response.status(), StatusCode::OK);
+        let bytes = to_bytes(response.into_body(), 128 * 1024).await.unwrap();
+        let package: Value = serde_json::from_slice(&bytes).unwrap();
+        for (name, hash) in package["manifest"]["files"].as_object().unwrap() {
+            let content = package["files"][name].as_str().unwrap();
+            assert_eq!(digest(content.as_bytes()), hash.as_str().unwrap());
+            let path = format!("/api/math-playground/curated/metric-couriers/0.1.0/{name}");
+            let response = app.clone().oneshot(Request::builder().uri(path).header("cookie", &cookie).body(Body::empty()).unwrap()).await.unwrap();
+            assert_eq!(response.status(), StatusCode::OK);
+            let served = to_bytes(response.into_body(), 128 * 1024).await.unwrap();
+            assert_eq!(served.as_ref(), content.as_bytes());
+        }
+        let response = app.oneshot(Request::builder().uri("/api/math-playground/curated/metric-couriers/0.1.0/engine.mjs").method("POST").header("cookie", &cookie).body(Body::empty()).unwrap()).await.unwrap();
+        assert_eq!(response.status(), StatusCode::METHOD_NOT_ALLOWED);
     }
 
     #[tokio::test]

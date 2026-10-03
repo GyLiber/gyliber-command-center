@@ -24,6 +24,7 @@
 <button type="button" data-demo="creature-shuffle" aria-pressed="false">Creature shuffle</button>
 <button type="button" data-demo="memory-cloud" aria-pressed="false">Memory cloud</button>
 </div>
+<div class="archive-controls"><label for="archive-select">Approved archive</label> <select id="archive-select"><option value="">Choose an accepted version</option></select><div class="actions" id="curated-actions" hidden><button type="button" class="secondary-btn" id="download-curated">Download archived package</button><a id="replay-link" href="#">Stable replay link</a></div></div>
 <div id="scene" class="scene"><p>Preparing the creatures…</p></div>
 <details class="formal" id="formal-drawer">
 <summary>Reveal the actual mathematics <span>↗</span></summary>
@@ -38,16 +39,21 @@
 <aside class="authoring">
 <section class="panel intake">
 <span class="eyebrow">YOUR MATHEMATICS, A NEW VIEW</span><h2>Bring an idea.</h2>
-<p>Upload a concept from your LaTeX. AI reads it and prepares a playful scene with a formal reveal.</p>
+<p>Two steps: prepare a prompt from one complete LaTeX concept, then return the AI proposal and original source to Sol for review and publication. Approved exhibits play without AI.</p>
 <form id="upload-form">
 <label class="upload-zone" for="tex-files"><span class="upload-icon" aria-hidden="true">✦</span><strong>Choose .tex files</strong><span>Up to 8 files · 32 KiB each · 64 KiB total</span></label>
 <input id="tex-files" type="file" accept=".tex,text/plain" multiple>
 <p id="file-summary" class="muted small">Select a self-contained concept, with its macros if needed.</p>
+<label for="concept-focus">Optional concept focus</label><textarea id="concept-focus" rows="2" maxlength="500" placeholder="One definition, theorem or example"></textarea>
+<button type="button" class="primary-btn" id="prepare-prompt" disabled>Download authoring prompt</button>
+<p class="muted small">Preparation stays in this browser; nothing is uploaded. Share the downloaded prompt only with an AI platform you choose and have permission to use. Return its proposal to Sol; do not run unreviewed code.</p>
+<details id="embedded-authoring"><summary>Optional hosted AI authoring</summary>
 <label class="consent"><input type="checkbox" id="provider-consent" required><span id="provider-consent-text">These are low-risk study notes I can share with the selected AI provider.</span></label>
 <button type="submit" class="primary-btn" id="generate" disabled>Create a playful draft <span aria-hidden="true">✧</span></button>
-</form>
 <p class="service-status" id="service-status">Checking authoring availability…</p>
-<p class="muted small">The first engines support circle circumference, 1/n approaching zero, and finite permutations. Other concepts get a labelled memory scene. AI drafts need mathematical review.</p>
+<p class="muted small">The older hosted engines support circle circumference, 1/n approaching zero, and finite permutations. Other concepts get a labelled memory scene. AI drafts need mathematical review.</p>
+</details>
+</form>
 </section>
 <section class="panel shelf"><div class="section-heading"><h2>Your exhibits</h2><button type="button" class="ghost" id="refresh-shelf">Refresh</button></div><div id="exhibit-list"><p class="muted small">Loading your shelf…</p></div></section>
 </aside>

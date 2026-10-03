@@ -1,10 +1,12 @@
 FROM rust:1.98.1-bookworm AS build
 WORKDIR /app
 COPY Cargo.toml Cargo.lock ./
+COPY build.rs ./build.rs
 COPY src ./src
 COPY migrations ./migrations
 COPY static ./static
 COPY math-playground ./math-playground
+COPY docs/operations/prompts/MATH_PLAYGROUND_EXTERNAL_AUTHORING.md ./docs/operations/prompts/MATH_PLAYGROUND_EXTERNAL_AUTHORING.md
 RUN cargo build --release --locked
 
 FROM debian:bookworm-slim

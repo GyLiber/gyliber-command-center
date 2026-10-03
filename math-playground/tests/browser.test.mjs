@@ -14,7 +14,10 @@ const id = '0123456789abcdef0123456789abcdef';
 const legacyId = 'abcdef0123456789abcdef0123456789';
 const hash = (value) => createHash('sha256').update(value).digest('hex');
 const legacy = JSON.parse(await readFile(resolve(root,'math-playground/exhibits/giant-pi/0.1.0/manifest.json')));
-let drafts = [], writes = [], provider = 'openai', draftError = null;
+let drafts = [], writes = [], provider = 'openai', draftError = null, shelfUnavailable = false, archiveOnly = false;
+const approved=JSON.parse(await readFile(resolve(root,'math-playground/catalog.json')));
+const metricFolder=resolve(root,'math-playground/exhibits/metric-couriers/0.1.0');
+const metricManifest=JSON.parse(await readFile(resolve(metricFolder,'manifest.json')));
 const manifests = Object.fromEntries(await Promise.all(['giant-pi','snug-tails','creature-shuffle','memory-cloud'].map(async (id) =>
   [id, JSON.parse(await readFile(resolve(root, `math-playground/exhibits/${id}/0.2.0/manifest.json`)))])));
 const server = createServer(async (request, response) => {
@@ -24,6 +27,15 @@ const server = createServer(async (request, response) => {
       response.writeHead(status, {'Content-Type':type, 'Content-Security-Policy':"default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'"});
       response.end(typeof content === 'string' || Buffer.isBuffer(content) ? content : JSON.stringify(content));
     };
+    if(path === prefix && shelfUnavailable)return send(503,{error:'playground_storage_unavailable'});
+    if(path===`${prefix}/curated`)return send(200,{...approved,releases:approved.releases.map(r=>({...r,in_gallery:!archiveOnly}))});
+    if(path===`${prefix}/authoring-template`)return send(200,await readFile(resolve(root,'docs/operations/prompts/MATH_PLAYGROUND_EXTERNAL_AUTHORING.md')),'text/plain');
+    if(path.startsWith(`${prefix}/curated/metric-couriers/0.1.0/`)) {
+      const name=path.split('/').at(-1);
+      if(name==='package'){const files={};for(const file of [...Object.keys(metricManifest.files),'manifest.json'])files[file]=await readFile(resolve(metricFolder,file),'utf8');return send(200,{manifest:metricManifest,files});}
+      if(name==='manifest.json'||Object.hasOwn(metricManifest.files,name))return send(200,await readFile(resolve(metricFolder,name)),name.endsWith('.mjs')?'text/javascript':name.endsWith('.css')?'text/css':name.endsWith('.html')?'text/html':'application/json');
+      return send(404,{});
+    }
     if (path === prefix) return send(200, {csrf:'test-csrf', ai_ready:true, ai_provider:provider, publishing_ready:true, storage_ready:true, exhibits:drafts});
     if (path.startsWith(prefix) && request.method === 'POST') {
       assert.equal(request.headers['x-math-csrf'], 'test-csrf');
@@ -106,6 +118,8 @@ try {
     await page.goto(`${base}/command/math-playground`);
     await page.locator('canvas').waitFor();
     assert.equal(await page.locator('#formal-drawer').getAttribute('open'),null);
+    await page.getByRole('button',{name:'Pi’s ribbon',exact:true}).click();
+    await page.getByRole('slider',{name:'Unroll the ribbon'}).waitFor();
     await assertDarkScene(page);
     // Exercise every supported scene/palette with the actual renderer, without AI.
     const paletteChecks=await page.evaluate(async()=>{
@@ -165,6 +179,7 @@ try {
     await assertDarkScene(page);
     assert.equal(await page.locator('#scene-kind').textContent(),'MNEMONIC METAPHOR');
     await page.locator('#tex-files').setInputFiles({name:'concept.tex',mimeType:'text/plain',buffer:Buffer.from('C = 2\\pi r')});
+    await page.locator('#embedded-authoring > summary').click();
     await page.locator('#provider-consent').check();
     await page.waitForFunction(()=>!document.getElementById('generate').disabled);
     await page.locator('#generate').click();
@@ -242,6 +257,52 @@ try {
 
     if (process.env.PLAYGROUND_SCREENSHOT) await page.screenshot({path:process.env.PLAYGROUND_SCREENSHOT,fullPage:true});
     await page.close();
+  });
+  test('reviewed metric archive and local prompt work with private shelf unavailable and no provider calls',async()=>{
+    shelfUnavailable=true;archiveOnly=true;
+    const page=await browser.newPage({viewport:{width:1440,height:1100}}),errors=[],requests=[];
+    page.on('pageerror',error=>errors.push(error.message));page.on('request',request=>requests.push({url:request.url(),method:request.method()}));
+    try {
+      await page.goto(`${base}/command/math-playground?exhibit=metric-couriers&version=0.1.0`);
+      await page.getByRole('combobox',{name:'Via y',exact:true}).waitFor();
+      assert.equal(await page.locator('[data-curated]').count(),0); // Archived, still addressable.
+      await assertDarkScene(page);
+      assert.match(await page.locator('.scene-description').textContent(),/Direct distance 3; detour 2 \+ 1 = 3/);
+      await page.getByRole('combobox',{name:'Via y',exact:true}).selectOption('4');
+      await page.getByRole('combobox',{name:'Finish z',exact:true}).selectOption('3');
+      assert.match(await page.locator('.scene-description').textContent(),/longer by 2/);
+      await page.getByRole('combobox',{name:'Start x',exact:true}).focus();await page.keyboard.press('ArrowDown');await page.keyboard.press('Enter');
+      assert.match(await page.locator('.scene-description').textContent(),/Start 3/);
+      await page.getByRole('button',{name:'Reset',exact:true}).click();
+      const still=await page.locator('canvas').evaluate(c=>c.toDataURL());await page.waitForTimeout(120);assert.equal(await page.locator('canvas').evaluate(c=>c.toDataURL()),still);
+      await page.getByRole('button',{name:'Animate',exact:true}).click();await page.waitForTimeout(200);
+      assert.notEqual(await page.locator('canvas').evaluate(c=>c.toDataURL()),still);
+      await page.getByRole('button',{name:'Pause motion',exact:true}).click();
+      await page.locator('#formal-drawer > summary').click();
+      assert.match(await page.locator('#formal-statement').textContent(),/For every x, y, z ∈ X/);
+      assert.match(await page.locator('#formal-statement').textContent(),/if and only if/);
+      assert.match(await page.locator('#formal-limitations').textContent(),/does not replace/);
+      await assertTextContrast(page);
+      const download=page.waitForEvent('download');await page.locator('#download-curated').click();
+      const packet=JSON.parse(await readFile(await (await download).path()));
+      for(const [name,digest] of Object.entries(packet.manifest.files))assert.equal(hash(packet.files[name]),digest);
+      const source='\\newcommand{\\d}{d}\nLet X be nonempty. d(x,y)=|x-y|. SOURCE MUST STAY LOCAL';
+      await page.locator('#tex-files').setInputFiles({name:'concept.tex',mimeType:'text/plain',buffer:Buffer.from(source)});
+      const promptDownload=page.waitForEvent('download');await page.locator('#prepare-prompt').click();
+      const prompt=await readFile(await (await promptDownload).path(),'utf8');
+      assert.ok(prompt.includes(JSON.stringify([{name:'concept.tex',content:source}],null,2)));
+      assert.ok(prompt.includes('NEEDS_CONTEXT'));assert.ok(prompt.includes('NEEDS_SELECTION'));
+      assert.equal(requests.filter(r=>r.method!=='GET').length,0);
+      assert.ok(requests.every(r=>r.url.startsWith(base)));
+      if(process.env.PLAYGROUND_SCREENSHOT_DIR)await page.screenshot({path:resolve(process.env.PLAYGROUND_SCREENSHOT_DIR,'metric-desktop.png'),fullPage:true});
+      await page.setViewportSize({width:390,height:844});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),true);
+      await assertTextContrast(page);
+      if(process.env.PLAYGROUND_SCREENSHOT_DIR)await page.screenshot({path:resolve(process.env.PLAYGROUND_SCREENSHOT_DIR,'metric-mobile.png'),fullPage:true});
+      // Changing scenes disposes the metric renderer; returning starts paused.
+      await page.getByRole('button',{name:'Pi’s ribbon',exact:true}).click();await page.getByRole('slider',{name:'Unroll the ribbon'}).waitFor();
+      await page.locator('#archive-select').selectOption('metric-couriers/0.1.0');await page.getByRole('combobox',{name:'Via y',exact:true}).waitFor();await assertDarkScene(page);
+      assert.deepEqual(errors,[]);
+    } finally {shelfUnavailable=false;archiveOnly=false;await page.close();}
   });
 } finally {
   // node:test awaits pending tests before process exit; cleanup belongs in an after hook.

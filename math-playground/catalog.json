@@ -1,0 +1,13 @@
+{
+  "format": 1,
+  "releases": [
+    {
+      "id": "metric-couriers",
+      "version": "0.1.0",
+      "title": "Metric couriers",
+      "visibility": "member",
+      "in_gallery": true,
+      "review": "sol_reviewed_public_synthetic"
+    }
+  ]
+}

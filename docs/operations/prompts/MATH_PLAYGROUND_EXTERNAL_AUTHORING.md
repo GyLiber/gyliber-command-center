@@ -1,7 +1,7 @@
 # External mathematics exhibit authoring template
 
 **Template version:** 1.0.0, 2026-10-03.
-**Status:** A proposal-authoring template. Generated files require review; the live site does not currently import arbitrary packages.
+**Status:** Used by the member page's browser-local prompt preparation. Generated files require developer review; the site does not import arbitrary executable packages. See [the handoff runbook](../MATH_PLAYGROUND_MANUAL_AUTHORING.md).
 **Design:** [ADR-0011](../../architecture/ADR-0011-manual-math-authoring.md).
 
 Use an AI platform already accessible to you; no site API key is needed for this handoff. Attach one complete `.tex` concept with its required `.tex` companions, or paste their exact text into the marked section. Supply only material you have permission to share under that platform's terms. Retain the original LaTeX in its existing primary home.

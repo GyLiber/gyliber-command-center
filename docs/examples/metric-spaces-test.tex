@@ -1,0 +1,40 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb}
+\title{Abstract Mathematics: Introduction to Metric Spaces}
+\author{Synthetic playground test prepared by Sol}
+\date{}
+\begin{document}
+\maketitle
+
+\section*{One concept: a metric space}
+Let $X$ be a nonempty set. A metric on $X$ is a function
+\[
+ d:X\times X\longrightarrow [0,\infty)
+\]
+such that, for every $x,y,z\in X$:
+\begin{enumerate}
+ \item $d(x,y)=0$ if and only if $x=y$;
+ \item $d(x,y)=d(y,x)$;
+ \item $d(x,z)\leq d(x,y)+d(y,z)$.
+\end{enumerate}
+Nonnegativity is included in the codomain: $d(x,y)\geq 0$.
+The pair $(X,d)$ is called a metric space. Its points need not be
+points in the Euclidean plane; the set and its metric specify the space.
+
+\section*{A small illustration of the same concept}
+For $X=\mathbb{R}$, the usual metric is $d(x,y)=|x-y|$.
+For $x=1$, $y=3$ and $z=4$,
+\[
+ d(1,3)=2,\qquad d(3,4)=1,\qquad d(1,4)=3\leq 2+1.
+\]
+This calculation illustrates the triangle inequality for one triple;
+it does not prove the metric axioms for all real numbers.
+The general definition above, including its universal quantifiers,
+is the concept; this example does not replace it.
+
+\section*{Scope and provenance}
+This is original synthetic test material, not an extract from Gyile's
+course notes. A drawing of creatures or connections may serve as a
+mnemonic for the definition. Their positions, edges or colours do not
+by themselves specify a metric, verify its axioms or prove a theorem.
+\end{document}
