@@ -8,7 +8,7 @@ fn component(value: &str) -> bool {
         && value != ".."
         && value
             .bytes()
-            .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-' || b == b'.')
+            .all(|b| b.is_ascii_alphabetic() || b.is_ascii_digit() || b == b'-' || b == b'.')
 }
 
 fn main() {
