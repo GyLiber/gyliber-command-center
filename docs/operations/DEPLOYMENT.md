@@ -1,4 +1,4 @@
-# v0.3.0 Development Deployment Runbook
+# Command Center Deployment Runbook
 
 ## 1. Deployment model
 
@@ -25,7 +25,7 @@ The OAuth callback URL must exactly match the GitHub application configuration.
 
 ## 3. Security boundary
 
-The current v0.3 development line is not authorized to store banking records, unrestricted financial data, high-value trade secrets, personnel records, production credentials, real client contracts or irreplaceable company archives in the temporary development database.
+The current engineering/demo environment is not authorized to store banking records, unrestricted financial data, high-value trade secrets, personnel records, production credentials, real client contracts or irreplaceable company archives in the temporary development database.
 
 ## 4. Current release acceptance
 
@@ -105,7 +105,7 @@ PR #22 records the corrective change:
 - the image uses Rust 1.98.1 and the committed lockfile with `cargo build --release --locked`;
 - CI builds the production image and verifies startup against disposable PostgreSQL 18 through `scripts/verify-container.sh`.
 
-Until PR #22 is verified, merged and successfully deployed, the previous v0.2 live deployment remains the active production-like release.
+PR #22 was subsequently verified, merged and deployed. This paragraph records the historical failure; the current prepared release and remaining hosted identity checks are in [the v0.3.0 release record](RELEASE_0_3_0.md).
 
 ## 7. Render/managed-host free-tier constraints
 
@@ -125,7 +125,7 @@ The current free Render PostgreSQL instance `gyliber-command-center-db` expires 
 
 ## 8. Manual changes
 
-Infrastructure credentials and external DNS changes are the only deployment actions that should require Gyile/GyLiber intervention.
+Infrastructure credentials and external DNS changes require Gyile/GyLiber intervention. Deployment and signed-in acceptance may also require manual action when Sol has no permitted hosting/authenticated-browser capability. The current v0.3.0 completion steps are in [the release record](RELEASE_0_3_0.md).
 
 Never put the production Client Secret, session key or private database connection string into a committed file.
 

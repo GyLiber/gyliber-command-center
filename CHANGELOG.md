@@ -1,6 +1,15 @@
 # Changelog
 
-## [Unreleased] — Reviewed external mathematics authoring
+## [Unreleased]
+
+- Future operational hardening, actual course-source review, bounded recipe import and exhibit proof support remain separate planned work. None is implied by the v0.3.0 application release.
+
+## [0.3.0] — Reviewed mathematical playground
+
+Release preparation: 2026-10-03. Gyile reports all four hosted pilot checks passed; deployment of this version label and exact revision remains the final release gate. See [release evidence and completion](docs/operations/RELEASE_0_3_0.md).
+
+- Promoted the existing tested playground work into the next application minor version; health, Live State Monitor and public/member page labels share the Cargo package version.
+
 
 - Sol implemented browser-local LaTeX prompt preparation, with explicit source/size validation and no upload/provider call.
 - Added the reviewed metric-couriers finite example, full metric definition, opt-in dark animation and tests of all nine pairs and 27 triples.
@@ -9,34 +18,7 @@
 - Documented developer review/publication, explicit developer review and publication rights, deployment acceptance and deferred data-only/general executable import.
 
 
-## [0.2.0] — Live product foundation
-
-- Centralized authenticated-member access policy for protected browser and API surfaces.
-- Added explicit tests for page redirect and API authentication failure semantics.
-- Added ADR-0008 documenting the authentication-policy boundary.
-
-- Committed Cargo.lock for reproducible Rust dependency resolution.
-- Updated CI to enforce locked dependency resolution for check, Clippy and tests.
-- Added the reproducible dependency architecture decision record.
-
-- Added a typed Digital Assets resource registry.
-- Added a protected resource registry API and browser surface.
-- Registered the resource registry as a first-class Command Center module.
-
-- Added the first typed Command Center module registry.
-- Added the protected Live State Monitor with server observation timestamps.
-- Added live Repository Monitor integration for the public GyLiber Command Center GitHub repository.
-- Added bounded upstream timeouts and explicit unavailable-state handling.
-- Hardened production transport configuration, HSTS behavior and request-body limits.
-- Added architecture and deployment documentation for the new modules and hosting constraints.
-
-- Added runtime release and managed-host deployment commit provenance to the authenticated live-state surface.
-- Added safe public-only deployment bootstrap while keeping protected routes denied until GitHub OAuth is configured.
-- Added a public live-health indicator, dashboard build identity and the client demonstration baseline.
-- Corrected the Docker runtime image to include system CA certificates required by rustls outbound TLS.
-- Documented the canonical-domain strategy so the public GyLiber identity remains independent of the hosting provider.
-
-## Unreleased — v0.3.0 development
+### Included development history
 
 - Recorded Gyile's failed synthetic metric-space generation and prioritized external authoring, reviewed repository packages and provider-independent playback in ADR-0011. Added a reusable external authoring template and updated Next Steps/runbook/handoff; no runtime or automatic code-import change is made by this plan.
 
@@ -77,9 +59,35 @@
 - Added a production-container CI gate covering fail-closed configuration, PostgreSQL migration, HTTP health, static assets, anonymous access boundaries and restart with persisted session metadata.
 - Deferred the canonical domain purchase without changing the long-term GyLiber-owned domain strategy.
 
-The v0.3 development line is being implemented incrementally. See:
+The remaining operational roadmap is not completed by this release. See [Next Steps](docs/operations/NEXT_DEVELOPMENT_STEPS.md).
 
-`docs/operations/NEXT_DEVELOPMENT_STEPS.md`
+
+## [0.2.0] — Live product foundation
+
+- Centralized authenticated-member access policy for protected browser and API surfaces.
+- Added explicit tests for page redirect and API authentication failure semantics.
+- Added ADR-0008 documenting the authentication-policy boundary.
+
+- Committed Cargo.lock for reproducible Rust dependency resolution.
+- Updated CI to enforce locked dependency resolution for check, Clippy and tests.
+- Added the reproducible dependency architecture decision record.
+
+- Added a typed Digital Assets resource registry.
+- Added a protected resource registry API and browser surface.
+- Registered the resource registry as a first-class Command Center module.
+
+- Added the first typed Command Center module registry.
+- Added the protected Live State Monitor with server observation timestamps.
+- Added live Repository Monitor integration for the public GyLiber Command Center GitHub repository.
+- Added bounded upstream timeouts and explicit unavailable-state handling.
+- Hardened production transport configuration, HSTS behavior and request-body limits.
+- Added architecture and deployment documentation for the new modules and hosting constraints.
+
+- Added runtime release and managed-host deployment commit provenance to the authenticated live-state surface.
+- Added safe public-only deployment bootstrap while keeping protected routes denied until GitHub OAuth is configured.
+- Added a public live-health indicator, dashboard build identity and the client demonstration baseline.
+- Corrected the Docker runtime image to include system CA certificates required by rustls outbound TLS.
+- Documented the canonical-domain strategy so the public GyLiber identity remains independent of the hosting provider.
 
 ## [0.1.0] — Foundation
 

@@ -170,8 +170,12 @@ fn build_app(
         .with_state(state)
 }
 
-async fn public_home() -> Html<&'static str> {
-    Html(include_str!("../static/home.html"))
+fn render_release_page(template: &str) -> String {
+    template.replace("<!-- RELEASE -->", RELEASE)
+}
+
+async fn public_home() -> Html<String> {
+    Html(render_release_page(include_str!("../static/home.html")))
 }
 
 async fn public_about() -> Html<&'static str> {
@@ -238,7 +242,10 @@ async fn command_resources(session: Session) -> Response {
         Err(failure) => return failure.into_response(),
     };
 
-    Html(include_str!("../static/resources.html")).into_response()
+    Html(render_release_page(include_str!(
+        "../static/resources.html"
+    )))
+    .into_response()
 }
 
 async fn command_repository(session: Session) -> Response {
@@ -247,7 +254,10 @@ async fn command_repository(session: Session) -> Response {
         Err(failure) => return failure.into_response(),
     };
 
-    Html(include_str!("../static/repository.html")).into_response()
+    Html(render_release_page(include_str!(
+        "../static/repository.html"
+    )))
+    .into_response()
 }
 
 async fn command_state(session: Session) -> Response {
@@ -468,6 +478,30 @@ mod tests {
             .expect("response is produced");
 
         assert_eq!(response.status(), StatusCode::OK);
+
+        let body = axum::body::to_bytes(response.into_body(), 16 * 1024)
+            .await
+            .expect("home body reads");
+        let body = String::from_utf8(body.to_vec()).expect("home is UTF-8");
+        assert!(body.contains(&format!("v{} MATHEMATICAL PLAYGROUND", super::RELEASE)));
+        assert!(!body.contains("<!-- RELEASE -->"));
+
+        let response = test_app()
+            .oneshot(
+                Request::builder()
+                    .uri("/api/health")
+                    .body(Body::empty())
+                    .expect("health request builds"),
+            )
+            .await
+            .expect("health response is produced");
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = axum::body::to_bytes(response.into_body(), 16 * 1024)
+            .await
+            .expect("health body reads");
+        let health: serde_json::Value = serde_json::from_slice(&body).expect("health is JSON");
+        assert_eq!(health["version"], super::RELEASE);
+        assert_eq!(health["status"], "ok");
     }
 
     #[tokio::test]

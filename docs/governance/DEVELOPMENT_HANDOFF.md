@@ -7,7 +7,7 @@
 
 ## Current temporary pause checkpoint — 2026-10-03
 
-At Gyile's latest instruction, **Sol** reviewed the repository and updated the handoff before a temporary stop. This checkpoint takes precedence over the historical next-work instructions below.
+At Gyile's latest instruction, **Sol** reviewed the repository and updated the handoff before a temporary stop. This checkpoint governed the temporary pause; the explicit release resumption below now supersedes it.
 
 - Audited `main`: `70a2177e952138f174a90dc6aee7c9253f6e22b4`. Implementation [PR #30](https://github.com/GyLiber/gyliber-command-center/pull/30) and evidence [PR #31](https://github.com/GyLiber/gyliber-command-center/pull/31) are merged; there were no open pull requests at the audit.
 - Post-merge [CI 37107340539](https://github.com/GyLiber/gyliber-command-center/actions/runs/37107340539) and [Security 37107340552](https://github.com/GyLiber/gyliber-command-center/actions/runs/37107340552) both succeeded for that exact main revision. The implementation test evidence remains recorded below and in the runbook.
@@ -102,3 +102,9 @@ At Gyile's request to finish the documented redesign, Sol implemented local prom
 ### Final tested source checkpoint
 
 Implementation PR #30 merged as `1d790442ea8dcddfa036d666d85879fbf2c147ed`, checked head `8058d6a1f920c7e908cef3340e5c2d8219a16805`. CI `37106568446` and Security `37106568444` succeeded: 42 Rust, ten Node and two browser tests, production-container checks, audit and security scans. Fresh-checkout Node verification passed. The cloud browser URL policy blocked production inspection after Render's cold-start surface; hosted activation and signed-in acceptance are **pending**, not certified. Gyile's exact final deployment/check steps are recorded in the manual-authoring runbook. This is the day's final implementation scope; do not resume provider troubleshooting, arbitrary imports or broader features implicitly.
+
+## Sol — v0.3.0 application release resumption, 2026-10-03
+
+Gyile explicitly resumed development and asked whether this work could form the site's next minor release. Gyile reported **all four hosted pilot checks passed** when asked about metric couriers, formal reveal, prompt download and archive download. This is maintainer-reported acceptance; the deployed commit was not supplied and Sol does not claim independent live verification.
+
+Sol prepares application **0.3.0 — Reviewed Mathematical Playground**, continuing Luna's foundation. Health and authenticated state already derive their version from Cargo; public/resource/repository labels now use the same compiled version instead of hardcoded 0.2.0. Release scope, verification and novice-friendly final deployment steps are in [the release record](../operations/RELEASE_0_3_0.md). This scoped minor release does not complete the wider audit/contract roadmap, optional provider publishing or deferred exhibit proof capability. Exact-head CI/Security and merged source are required before deployment; live version/commit confirmation remains the final release gate.

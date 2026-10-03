@@ -57,7 +57,7 @@ Before processing many course files, Gyile should judge whether this one example
 - [Security 37106568444](https://github.com/GyLiber/gyliber-command-center/actions/runs/37106568444): successful secret scan and CodeQL Rust/JavaScript/Actions.
 - A separate fresh checkout of the checked head passed all ten Node tests. The browser tests also exercised the standalone viewer without private shelf/provider use. Desktop/mobile screenshots were reviewed; personal eye comfort is still for Gyile to assess.
 
-**Hosted acceptance remains pending.** The cloud browser reached Render's cold-start surface, then its URL policy blocked live inspection. Sol did not attempt a workaround, inspect credentials or infer deployment from the merge. No signed-in production metric/prompt/package check is claimed.
+**Historical independent-verification limit.** The cloud browser reached Render's cold-start surface, then its URL policy blocked live inspection. Sol did not attempt a workaround, inspect credentials or infer deployment from the merge. No signed-in production metric/prompt/package check is claimed.
 
 On resumption, Gyile's first manual step is to open the existing Render web service whose public address is `https://gyliber-command-center-1bym.onrender.com`, open **Deploys → Manual Deploy → Deploy latest commit**, and wait for **Live**. If the service already shows the current merged `main` commit as Live, no duplicate deployment is needed. No new environment settings are required. Record the deployed commit (the implementation merge above or a later main commit retaining it), then sign in and verify:
 
@@ -67,3 +67,7 @@ On resumption, Gyile's first manual step is to open the existing Render web serv
 4. The archive package download succeeds; the version remains addressable by the stable replay link.
 
 If deployment or any check fails, report the failing step and visible error without sharing keys or database URLs. At Gyile's latest instruction, development may stop temporarily now, with these hosted checks explicitly pending until resumption. Sol's [repository pause checkpoint](../governance/DEVELOPMENT_HANDOFF.md#current-temporary-pause-checkpoint--2026-10-03) records the audited main revision and successful post-merge checks. Broader work remains deferred until Gyile resumes it.
+
+## Release resumption and reported pilot acceptance — 2026-10-03
+
+Gyile subsequently reported **all four hosted pilot checks passed** and authorized continued development. This supersedes the temporary pause above and establishes maintainer-reported functional acceptance of the pilot; it does not supply an exact deployed revision or independently prove hosting conditions. The same workflow forms the prepared **application v0.3.0** release. After its checked commit is merged and deployed, confirm health version 0.3.0 and the Live State deployment commit, then recheck the four actions. See [the release record and exact final steps](RELEASE_0_3_0.md). Exhibit packages/capability versions are independent; no accepted package bytes or deferred proof status change.
