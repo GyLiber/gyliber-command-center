@@ -4,7 +4,7 @@
 >
 > **Ever Toward Liberation.**
 
-![Status](https://img.shields.io/badge/release-v0.2.0--live-product-foundation-slate)
+![Status](https://img.shields.io/badge/release-v0.3.0--prepared-slate)
 ![Backend](https://img.shields.io/badge/backend-Rust-orange)
 
 ## 1. Product
@@ -19,9 +19,10 @@ The interface is deliberately calm, dark and information-forward. Its design tar
 
 ## 2. Current release
 
-### v0.2.0 Live product foundation
+### v0.3.0 Reviewed mathematical playground
 
-The current live-product foundation includes:
+The tested playground workflow is the next application minor release. Source identifies as **0.3.0**; Gyile reports the four hosted pilot checks passed on 2026-10-03. Deployment of this release revision and live version confirmation remain pending. See [release scope, evidence and final steps](docs/operations/RELEASE_0_3_0.md). This release retains the existing foundation:
+
 
 - public GyLiber landing page
 - About / Work / Links public pages
@@ -48,17 +49,17 @@ The current live-product foundation includes:
 - safe public-only deployment mode while member authentication is unconfigured
 - requirements, architecture, security, governance and operational runbooks
 
-### Mathematical playground development
+### Mathematical playground
 
-The member Command Center now registers `/command/math-playground`: four playable, repository-backed demonstrations, source upload, configured AI concept drafting, formal reveal, private exhibit persistence and source-free Git publishing. The playground is deployed on Render; Gemini settings and the publishing token have been reported configured. Successful live AI drafting and Git publication remain acceptance gates after the provider compatibility correction; unavailable settings and distinct provider failures are reflected in the page. General-purpose arbitrary AI code execution is not enabled.
+The default member workflow at `/command/math-playground` prepares a prompt from local `.tex` files without uploading them or calling a provider. Use that prompt with an accessible AI (including Sol), then return the proposal for mathematical/code/rights review and normal PR publication. The approved catalog runs reviewed code; it does not execute arbitrary uploaded programs.
 
-See [playground activation, failure recovery and current evidence](docs/operations/MATH_PLAYGROUND.md), [ADR-0010](docs/architecture/ADR-0010-bounded-mathematical-playground.md) and the [next-minor dark visual plan](docs/architecture/MATH_PLAYGROUND_DESIGN.md#next-minor-release-calmer-dark-visuals). The dark executable exhibit bundle is 0.2.0, with engine mathematics unchanged from 0.1.0; formal reveal stays 0.2.0 and proofs remain deferred to 0.3.0. These capability versions are independent of application releases. New scenes start paused; old saved bytes remain exact and offer an explicit dim viewing option. Live dark deployment and Gyile’s comfort assessment remain acceptance checks.
+Metric couriers is the first reviewed pilot: a deterministic finite metric example, dark paused-by-default drawing, complete general metric definition, immutable hashed package, archive/stable replay links and full package download. A standalone viewer reproduces it without AI, a private exhibit database, CDN or npm dependencies. Four earlier demonstrations and optional hosted AI authoring remain available. Successful hosted AI drafting/runtime Git publishing are still unverified and are not prerequisites for this release's default path.
 
-AI authoring can explicitly select OpenAI or Google Gemini. For the current zero-spend pilot, Gemini requires an eligible free-tier account and provider-specific consent; its unpaid service may use submitted content for product improvement. The server never falls back to another provider. The four demonstrations need no AI account or billing.
+See [the two-action workflow and replay instructions](docs/operations/MATH_PLAYGROUND_MANUAL_AUTHORING.md), [ADR-0011](docs/architecture/ADR-0011-manual-math-authoring.md) and [optional provider activation/recovery](docs/operations/MATH_PLAYGROUND.md). Application **0.3.0**, metric package **0.1.0**, dark legacy bundle **0.2.0** and formal reveal capability **0.2.0** are separate versions. Exhibit proof capability **0.3.0** remains deferred; an application release is not a proof-support claim. Personal eye comfort and recall benefit still need Gyile's feedback.
 
-### Deliberately absent from v0.2.0
+### Information boundary
 
-The first release does **not** authorize storage of:
+This release does **not** authorize storage of:
 
 - banking credentials
 - unrestricted banking/financial records

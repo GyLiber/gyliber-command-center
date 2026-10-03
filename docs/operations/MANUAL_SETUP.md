@@ -1,4 +1,4 @@
-# Manual Setup Runbook — v0.3.0 development
+# Manual Setup Runbook
 
 This document covers actions that require Gyile/GyLiber because they involve an external account, secret, domain or approval boundary.
 
@@ -94,7 +94,7 @@ The long-term cutover procedure remains documented in `docs/operations/DEPLOYMEN
 
 ## 4. PostgreSQL session persistence
 
-The v0.3 development line replaces production in-memory sessions with PostgreSQL-backed sessions.
+The PostgreSQL session implementation replaces production in-memory sessions.
 
 ### Required production value
 

@@ -3,8 +3,8 @@
 **Document status:** Active roadmap  
 **Planning date:** 2026-09-30  
 **Last development update:** 2026-10-03
-**Current release:** v0.2.0 Live Product Foundation  
-**Next development line:** v0.3.x operational hardening  
+**Prepared release:** v0.3.0 Reviewed Mathematical Playground; live release identity pending
+**Next development line:** remaining operational hardening and evidence-led playground iteration
 **Product principle:** maximize useful state and action per unit of human attention.
 
 ## 1. Current position
@@ -30,7 +30,7 @@ The Command Center has a verified live vertical slice:
 - deployment and demonstration runbooks
 - documented provider-independent public-domain strategy
 
-The current live service remains on the v0.2 product foundation with the durable-session/container correction merged and subsequent hosted activation observed. The current environment remains an engineering/demo environment. It is **not** an authorization to load critical company information.
+The prepared v0.3.0 application release includes the durable-session/container correction and reviewed mathematical playground. Gyile reports all four hosted pilot checks passed; the exact deployed revision and new release label still need confirmation. The current environment remains an engineering/demo environment. It is **not** an authorization to load critical company information.
 
 ## 2. Deferred external dependency
 
@@ -335,3 +335,11 @@ Gyile requested a repository review and documentation update before stopping tem
 3. Review one actual course-source proposal, including source rights, complete-concept selection and mathematical fidelity, before converting many concepts or extending storage/automation. Consider bounded data-only recipes after that evidence.
 
 The existing catalog, archived replay, prompt preparation, formal definition and fresh-checkout tests are completed work; do not repeat their initial implementation. Arbitrary executable import, proof checking, provider retesting and the wider audit roadmap remain deferred. The temporary database expiry on 2026-10-30 still applies; this pause does not establish durable hosting or backup readiness.
+
+### Resumed release completion — 2026-10-03
+
+Gyile explicitly resumed development and asked whether the completed playground could constitute the next minor site release. Sol adopts **application v0.3.0 — Reviewed Mathematical Playground** as the bounded release, retaining all existing security gates. This supersedes the temporary pause above. It does not claim all operational-hardening roadmap items or exhibit proof capability are complete.
+
+Gyile answered **“All four passed”** for signed-in metric/definition/prompt/archive checks. Record this as maintainer-reported pilot acceptance, without inventing a deployed commit. Sol prepares the shared Cargo-driven release identity, current README/changelog and [v0.3.0 release record](RELEASE_0_3_0.md), then runs CI/Security and merges after success.
+
+Next actions are: deploy the tested release revision if necessary; record health version 0.3.0 and Live State deployment commit; confirm the four pilot checks still pass; update the release record with that evidence. Then seek personal comfort/recall feedback and one permitted course-source proposal. Further feature work follows that evidence, rather than reopening the initial implementation. The wider audit/session-continuity/backup/contract gates and 2026-10-30 database expiry remain open.
