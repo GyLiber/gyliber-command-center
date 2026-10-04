@@ -21,7 +21,7 @@ The interface is deliberately calm, dark and information-forward. Its design tar
 
 ### v0.3.0 Reviewed mathematical playground
 
-The tested playground workflow is the next application minor release. Gyile confirmed the final deployment, four hosted playground checks, health `status=ok`, health/Live State version **0.3.0** and deployed commit `ae80a6d04b0753dd4f6bd6a90f75dc003ec37d3d` on 2026-10-03. This is maintainer-reported live acceptance; Sol did not independently inspect the signed-in production site. See [release scope, evidence and final steps](docs/operations/RELEASE_0_3_0.md). This release retains the existing foundation:
+The tested playground workflow is the next application minor release. Gyile confirmed the final deployment, four hosted playground checks, health `status=ok`, health/Live State version **0.3.0** and deployed commit `ae80a6d04b0753dd4f6bd6a90f75dc003ec37d3d` on 2026-10-03. This is maintainer-reported live acceptance; Sol did not independently inspect the signed-in production site. The application v0.1.0, v0.2.0 and v0.3.0 tags and GitHub Release listings were published on 2026-10-04; see [verified release tag history](docs/operations/RELEASE_TAGS.md) and [release scope and acceptance](docs/operations/RELEASE_0_3_0.md). This release retains the existing foundation:
 
 
 - public GyLiber landing page
