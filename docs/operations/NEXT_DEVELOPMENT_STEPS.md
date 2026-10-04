@@ -135,7 +135,7 @@ Make deployment health a first-class release gate.
 
 Target loop:
 
-`commit → CI → security → merge → deploy → health verification → release evidence`
+`commit → CI → security → merge → deploy → health verification → release evidence → tag publication/verification`
 
 Acceptance evidence:
 
@@ -348,4 +348,4 @@ Next actions are: deploy the tested release revision if necessary; record health
 
 Gyile reported the final commit deployed Live and playground tests passed, then explicitly confirmed health `status=ok`, health/Live State version **0.3.0**, and deployment commit `ae80a6d04b0753dd4f6bd6a90f75dc003ec37d3d`. Sol recorded this as maintainer-reported end-to-end acceptance in [the release record](RELEASE_0_3_0.md); no independent signed-in production observation is claimed. This supersedes the pending release gates above. The documentation-only acceptance record needs no deployment/retest.
 
-The scoped application minor release is complete. Next development waits for Gyile's direction and evidence of eye comfort/recall benefit, then one permitted actual course-source proposal. GitHub tag/listing publication remains optional and unclaimed; wider operational hardening and deferred exhibit proofs are not completed by this acceptance.
+The scoped application minor release is complete. Next development waits for Gyile's direction and evidence of eye comfort/recall benefit, then one permitted actual course-source proposal. Sol published and verified the application v0.1.0, v0.2.0 and v0.3.0 tags/release listings on 2026-10-04; see [tag provenance and future release rules](RELEASE_TAGS.md). Wider operational hardening and deferred exhibit proofs remain open. Future release closure includes publication and verification of its exact source tag.

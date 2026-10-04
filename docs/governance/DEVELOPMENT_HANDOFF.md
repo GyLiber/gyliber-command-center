@@ -117,4 +117,11 @@ Sol prepares application **0.3.0 — Reviewed Mathematical Playground**, continu
 
 Gyile reported **“Final commit deployed live and the playground tests pass.”** Asked specifically whether health/Live State version 0.3.0, health `status=ok` and deployment commit `ae80a6d04b0753dd4f6bd6a90f75dc003ec37d3d` matched, Gyile confirmed **“Yes, all match.”** Sol closes the scoped application v0.3.0 release gate as maintainer-reported end-to-end acceptance, superseding the pending status above. Independent browser verification is not claimed. The [release record](../operations/RELEASE_0_3_0.md), README, changelog and Next Steps now reflect this evidence.
 
-This record changes documentation only, introduces no runtime/package bytes and requires no new deployment or retest from Gyile. Optional GitHub tag/release listing, personal comfort/recall feedback, actual course-source review and the wider operational/proof roadmap remain separate. Further feature development requires Gyile's direction; do not reopen completed release checks merely because documentation has advanced main.
+This record changes documentation only, introduces no runtime/package bytes and requires no new deployment or retest from Gyile. GitHub tag/release listing was subsequently completed on 2026-10-04 as recorded below. Personal comfort/recall feedback, actual course-source review and the wider operational/proof roadmap remain separate. Further feature development requires Gyile's direction; do not reopen completed release checks merely because documentation has advanced main.
+
+
+## Sol — application release tags published, 2026-10-04
+
+At Gyile’s explicit request, Sol traced and published the missing application v0.1.0, v0.2.0 and v0.3.0 tags with GitHub Release notes at their reviewed historical commits. All remote targets were read back and verified. GitHub’s release interface created lightweight tags; no annotated tag, tag signature, backdated creation or new hosted acceptance is claimed. v0.3.0 is Latest and retains the accepted `ae80a6d04b0753dd4f6bd6a90f75dc003ec37d3d` deployment target. See [exact mappings, historical CI and publication evidence](../operations/RELEASE_TAGS.md).
+
+This closes tag publication and adds no runtime/package changes. No Render deployment or repeated playground testing is required. Retain and verify a release’s exact tag when closing future releases; never force-move an existing published tag. Next development remains governed by the usefulness feedback and open work in Next Steps.
