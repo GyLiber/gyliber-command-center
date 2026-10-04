@@ -2,10 +2,12 @@
 
 **Document status:** Active roadmap  
 **Planning date:** 2026-09-30  
-**Last development update:** 2026-10-03
+**Last development update:** 2026-10-04
 **Current release:** v0.3.0 Reviewed Mathematical Playground; maintainer-reported live acceptance
-**Next development line:** remaining operational hardening and evidence-led playground iteration
+**Next development line:** Mathematical Experiment Bench design 1.0.0; implementation awaits explicit resumption
 **Product principle:** maximize useful state and action per unit of human attention.
+
+**Current stopping point:** Gyile selected the [Mathematical Experiment Bench design 1.0.0](../architecture/MATHEMATICAL_EXPERIMENT_BENCH_DESIGN.md) as the next candidate. Today is documentation only; stop after document verification/merge. No implementation or deployment is authorized by this planning work unit. Examination rehearsal and public demonstration/service candidates are not queued. Existing operational responsibilities, including temporary database expiry on 2026-10-30, remain open.
 
 ## 1. Current position
 
@@ -349,3 +351,20 @@ Next actions are: deploy the tested release revision if necessary; record health
 Gyile reported the final commit deployed Live and playground tests passed, then explicitly confirmed health `status=ok`, health/Live State version **0.3.0**, and deployment commit `ae80a6d04b0753dd4f6bd6a90f75dc003ec37d3d`. Sol recorded this as maintainer-reported end-to-end acceptance in [the release record](RELEASE_0_3_0.md); no independent signed-in production observation is claimed. This supersedes the pending release gates above. The documentation-only acceptance record needs no deployment/retest.
 
 The scoped application minor release is complete. Next development waits for Gyile's direction and evidence of eye comfort/recall benefit, then one permitted actual course-source proposal. Sol published and verified the application v0.1.0, v0.2.0 and v0.3.0 tags/release listings on 2026-10-04; see [tag provenance and future release rules](RELEASE_TAGS.md). Wider operational hardening and deferred exhibit proofs remain open. Future release closure includes publication and verification of its exact source tag.
+
+
+### Mathematical Experiment Bench selected; documentation stop — 2026-10-04
+
+Gyile prioritizes a useful tool for current mathematics work and immediate livelihood over more features competing for his attention. Sol records [design document version 1.0.0](../architecture/MATHEMATICAL_EXPERIMENT_BENCH_DESIGN.md). This is a design version, not application v1.0.0, an implemented feature or a new release. Application v0.3.0 and its published tags remain the accepted baseline.
+
+The first proposed member bench compares ordinary and squared distance on X={0,1,2}. It shows exact finite axiom checks and the triangle counterexample 4 > 2, with a calm dark drawing, complete definition and one-click readable result/replay export. LaTeX remains the authoring source; already reviewed benches need no repeat upload or live AI request. Use existing catalog/archive and normal reviewed Git publication, preserving prior immutable packages. Personal results are ephemeral until deliberately downloaded; public publication is a separate reviewed action.
+
+After Gyile explicitly resumes implementation:
+
+1. Confirm one actual current-work question and eye comfort; adjust the bounded example if it does not help that work.
+2. Review mathematical/source/rights specifications, using original synthetic material until course-source review is complete.
+3. Implement a new metric package provisionally at `metric-experiment-bench/0.1.0`, deterministic engine, dark accessible controls, export and standalone bounded-data replay. No arbitrary formulas, code uploads, new account or provider dependency.
+4. Verify mathematics, witness scope, malformed inputs/replay, exact hashes, unchanged old archives, keyboard/mobile/motion behavior and required CI/Security before merge.
+5. Deploy and verify the actual running revision and bench/export workflow, assess usefulness, update evidence and publish/verify the chosen application minor tag. Stop expansion if the bench adds friction without answering the intended question.
+
+Examination rehearsal, public demonstration/service features, proof automation and general imports are not dependencies or approved additions to this queue. No learning, income or wider security-roadmap completion is inferred from the design. Finish today's documentation and stop; no signup, Render deployment or fresh release tag is required.

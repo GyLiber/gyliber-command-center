@@ -293,6 +293,7 @@ The following documents are intentionally living documents:
 - `docs/requirements/REQUIREMENTS.md`
 - `docs/architecture/DESIGN.md`
 - `docs/architecture/MATH_PLAYGROUND_DESIGN.md` — source-driven creative mathematics design, with bounded implementation in ADR-0010
+- [Mathematical Experiment Bench design 1.0.0](docs/architecture/MATHEMATICAL_EXPERIMENT_BENCH_DESIGN.md) — selected next-work design; implementation awaits resumption
 - `docs/architecture/ADR-0009-canonical-public-domain.md`
 - `docs/architecture/ADR-0010-bounded-mathematical-playground.md`
 - `docs/operations/MATH_PLAYGROUND.md`
