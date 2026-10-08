@@ -4,10 +4,10 @@
 **Planning date:** 2026-09-30  
 **Last development update:** 2026-10-08
 **Current release:** v0.3.0 Reviewed Mathematical Playground; maintainer-reported live acceptance
-**Next development line:** Resolution Control, proposed application v0.4.0; persistence/API packet followed by member workflow
+**Next development line:** Resolution Control, proposed application v0.4.0; member preview in smaller packets, followed by hosted acceptance
 **Product principle:** maximize useful state and action per unit of human attention.
 
-**Current stopping point:** Sol resumes from verified PR #42/main `9785e74c7b79b3c118d7177b7c7ebb570c31a4b1` on `feat/resolution-control-api` and implements the persistence/API packet. Stop after exact-head CI/Security and merge. Next on `continue`: the member workflow packet, not a release/deployment. The API defaults disabled; v0.3.0 remains the accepted release. Mathematical Experiment Bench design 1.0.0 remains queued. PostgreSQL expiry on 2026-10-30 and private activation/recovery gates remain open.
+**Current stopping point:** Sol resumes from verified PR #43/main `b4567c14c615296a94c3e2f8a6a6cc6f9ff0e57a` on `feat/resolution-control-workflow`. This smaller packet implements protected capture/edit controls, obligation ledger, Current Action and explicit failure/retry/conflict behavior with tests. Stop after exact-head CI/Security, screenshot review and merge. Next on `continue`: evidence/threat/history/report and deliberate recovery controls, not deployment. The feature stays disabled; v0.3.0 remains accepted. Storage expiry on 2026-10-30 and private activation/recovery gates remain open.
 
 ## 1. Current position
 
@@ -409,3 +409,14 @@ This packet adds bounded command replay, migration 0003, stable GitHub-ID owners
 Next on `continue`: the **member workflow packet** — register/protect the page; dark, keyboard/mobile capture and ledger/current action; complete scope/material/evidence/threat controls; same-snapshot private reports and deliberate export/recovery/delete; browser checks for the whole synthetic workflow and failures. Keep loading and uncertain saves explicit; refetch after acknowledgement; conflicts require review. Expose imported provenance and actual capacity limits. No automatic client messaging, scheduling, provider AI or executable import.
 
 Keep feature activation disabled during backend preparation. No manual action is required from Gyile for this packet. Hosted acceptance follows the UI packet and must request concrete manual deployment/configuration actions only then. Resolve the 2026-10-30 storage expiry and prove a private independent backup plus latest deletion ledger can be restored before real onboarding. Application v0.4.0 and its tag await that end-to-end evidence. The existing locked `yoke-derive` 0.8.3 yank warning remains a separate dependency-maintenance item; this packet changes no dependency versions or audit policy.
+
+
+### Smaller member-workflow packets — 2026-10-08
+
+The API packet merged through [PR #43](https://github.com/GyLiber/gyliber-command-center/pull/43) at `b4567c14c615296a94c3e2f8a6a6cc6f9ff0e57a`, exact tested head `3ee25b248c3f3987f00410c9e99be8ecb1b91e22`. [CI 37829975848](https://github.com/GyLiber/gyliber-command-center/actions/runs/37829975848) and [Security 37829975775](https://github.com/GyLiber/gyliber-command-center/actions/runs/37829975775) passed, including 75 Rust tests with PostgreSQL 18, playground/browser and production-container checks.
+
+At Gyile's renewed instruction about interface interruptions, split the larger member workflow into two reviewable packets. The current packet is a protected synthetic preview: resolution/commitment/action capture and guarded edit, exact/date-only/unknown controls, ledger and one manually selected Current Action, output references, visible server buffer observations, keyboard/mobile rendering and retained drafts. Uncertain saves offer only an explicit identical retry; stale editing drafts retain their original revision even after refresh. No optimistic saves, automatic action selection or embedded AI. The reserved Confidential registry entry becomes a preview link only when the feature/pool and current identity are available. Default activation remains disabled.
+
+Next packet on `continue`: complete scope/dimension mapping/deployment, stress-test/verification/confirmation/reopening, threats, private history/daily report, export plus newest deletion ledger, bounded restore/purge controls and their synthetic browser scenarios. The protected preview is not yet the complete v0.4.0 workflow. Then a separate hosted acceptance/release packet verifies deployed identity, sessions, independent clean-database restoration, database expiry/disposable-pilot policy and Gyile's practical usefulness/comfort. Request manual actions only when those tested prerequisites are ready. No manual Render action is required now.
+
+Browser tests exercise the real static files with a controlled synthetic API fixture. PostgreSQL/Rust tests independently verify the actual API and privacy boundary; do not describe the mock as hosted acceptance. Local Chromium download availability is an execution-environment constraint; exact-head CI provides browser execution and desktop/mobile review artifacts. Preserve GitHub commits/checkpoints after each packet; a chat rendering error is not evidence that repository changes were lost.

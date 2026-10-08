@@ -30,6 +30,9 @@ pub(crate) struct Service {
     pool: Option<PgPool>,
 }
 impl Service {
+    pub(crate) fn available(&self) -> bool {
+        self.enabled && self.pool.is_some()
+    }
     pub(crate) fn from_environment() -> anyhow::Result<Self> {
         let enabled = match std::env::var("RESOLUTION_CONTROL_ENABLED") {
             Ok(value) => crate::config::parse_bool("RESOLUTION_CONTROL_ENABLED", &value)?,
@@ -54,6 +57,7 @@ impl Service {
 
 pub(crate) fn routes() -> Router<AppState> {
     Router::new()
+        .route("/command/resolution-control", get(page))
         .route("/api/resolution-control", get(bootstrap))
         .route("/api/resolution-control/commands", post(mutate))
         .route("/api/resolution-control/history", get(history))
@@ -72,6 +76,13 @@ pub(crate) fn routes() -> Router<AppState> {
                 .layer(DefaultBodyLimit::max(4 * 1024 * 1024))
                 .layer(RequestBodyLimitLayer::new(4 * 1024 * 1024)),
         )
+}
+
+async fn page(session: Session) -> Response {
+    if let Err(error) = auth::require_page_member(&session).await {
+        return error.into_response();
+    }
+    axum::response::Html(include_str!("../../static/resolution-control.html")).into_response()
 }
 
 fn failure(status: StatusCode, code: &'static str) -> Response {
@@ -219,7 +230,7 @@ async fn bootstrap(
         }
         Err(_) => return error(store::Error::Unavailable),
     };
-    Json(json!({"csrf": token, "view": view, "limits": {"events": 2048, "resolutions": 16, "commitments": 64, "actions": 128, "threats": 128}, "import_notice": "Imported history is a user-supplied account, not independently authenticated evidence."})).into_response()
+    Json(json!({"viewer": owner, "csrf": token, "view": view, "limits": {"events": 2048, "resolutions": 16, "commitments": 64, "actions": 128, "threats": 128}, "import_notice": "Imported history is a user-supplied account, not independently authenticated evidence."})).into_response()
 }
 async fn execute(state: &AppState, owner: &str, operation: model::Operation) -> Response {
     let pool = state.resolution.pool.as_ref().expect("access checked");

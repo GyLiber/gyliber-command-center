@@ -1,0 +1,115 @@
+import test, {after} from 'node:test';
+import assert from 'node:assert/strict';
+import {createServer} from 'node:http';
+import {readFile,mkdir} from 'node:fs/promises';
+import {resolve} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {chromium} from 'playwright';
+const root=fileURLToPath(new URL('../../',import.meta.url));
+let view,writes,operations,interrupt,disabled;
+function reset() {
+  view={generation:null,revision:0,observed_at:'2026-10-08T18:00:07Z',workspace:{resolutions:[],commitments:[],actions:[],threats:[],current_action:null},buffers:[],imported_history:false};
+  writes=[];operations=new Map();interrupt=false;disabled=false;
+}
+reset();
+const server=createServer(async(req,res)=>{
+  try {
+    const path=new URL(req.url,'http://localhost').pathname;
+    const send=(status,content,type='application/json')=>{res.writeHead(status,{'Content-Type':type,'Cache-Control':'no-store','Content-Security-Policy':"default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'"});res.end(typeof content==='string'||Buffer.isBuffer(content)?content:JSON.stringify(content));};
+    const files={'/command/resolution-control':'static/resolution-control.html','/static/app.css':'static/app.css','/static/resolution-control/style.css':'static/resolution-control/style.css','/static/resolution-control/app.mjs':'static/resolution-control/app.mjs','/static/resolution-control/model.mjs':'static/resolution-control/model.mjs'};
+    if(files[path])return send(200,await readFile(resolve(root,files[path])),path.endsWith('.mjs')?'text/javascript':path.endsWith('.css')?'text/css':'text/html');
+    if(path==='/api/resolution-control')return disabled?send(503,{error:'feature_disabled'}):send(200,{viewer:'github-1',csrf:'test-csrf',view,limits:{events:2048},import_notice:'Imported history is a user-supplied claim.'});
+    if(path==='/api/resolution-control/commands' && req.method==='POST') {
+      assert.equal(req.headers['x-resolution-csrf'],'test-csrf');
+      let body='';for await(const chunk of req)body+=chunk;
+      const packet=JSON.parse(body);writes.push(packet);
+      const old=operations.get(packet.meta.operation_id);
+      if(old){assert.equal(body,old.body);return send(200,{...old.ack,replayed:true});}
+      if(packet.meta.generation!==view.generation || packet.meta.expected_revision!==view.revision)return send(409,{error:'refresh_required'});
+      const c=packet.command,w=view.workspace;
+      if(c.type==='create_resolution')w.resolutions.push({id:c.id,spec:c.spec});
+      else if(c.type==='update_resolution')w.resolutions.find(r=>r.id===c.id).spec=c.spec;
+      else if(c.type==='create_commitment'){w.commitments.push({id:c.id,resolution:c.resolution,spec:c.spec,schedule:c.schedule});view.buffers.push({commitment:c.id,unfinished:{state:'target_unknown',deadline_reached:false},finished:null});}
+      else if(c.type==='update_commitment')Object.assign(w.commitments.find(r=>r.id===c.id),{spec:c.spec,schedule:c.schedule});
+      else if(c.type==='create_action')w.actions.push({id:c.id,commitment:c.commitment,action:{plan:c.plan,status:'new',artifact:null}});
+      else if(c.type==='update_action')Object.assign(w.actions.find(a=>a.id===c.id).action,{plan:c.plan,status:'new'});
+      else if(c.type==='select_action')w.current_action=c.id;
+      else {
+        const action=w.actions.find(a=>a.id===c.id).action;
+        const statuses={ready_action:'ready',start_action:'in_progress',block_action:'blocked',cancel_action:'cancelled',complete_action:'completed',reopen_action:'new'};
+        assert.ok(statuses[c.type]);action.status=statuses[c.type];
+        if(c.type==='complete_action')action.artifact=c.artifact;
+        if(['complete_action','cancel_action'].includes(c.type))w.current_action=null;
+      }
+      view.generation='generation-1';view.revision++;
+      const ack={generation:view.generation,revision:view.revision,replayed:false};operations.set(packet.meta.operation_id,{body,ack});
+      if(interrupt){interrupt=false;res.destroy();return;}
+      return send(200,ack);
+    }
+    send(404,{});
+  }catch{res.writeHead(500);res.end('{}');}
+});
+await new Promise(done=>server.listen(0,'127.0.0.1',done));
+const base=`http://127.0.0.1:${server.address().port}`;
+const browser=await chromium.launch({headless:true});
+after(async()=>{await browser.close();await new Promise(done=>server.close(done));});
+const pageErrors=[];
+async function page() {const p=await browser.newPage({viewport:{width:1280,height:1000}});p.on('pageerror',e=>pageErrors.push(e.message));await p.goto(`${base}/command/resolution-control`);await p.getByText('State refreshed. No changes were made.',{exact:true}).waitFor();return p;}
+async function saved(p) {await p.getByText('Saved and refreshed.',{exact:true}).waitFor();}
+async function outcome(p,title='Synthetic outcome') {await p.getByLabel('Resolution title',{exact:true}).fill(title);await p.getByRole('button',{name:'Capture resolution',exact:true}).click();await saved(p);}
+async function commitment(p) {await p.getByLabel('Commitment title',{exact:true}).fill('Metric preparation');await p.getByLabel('Deadline precision',{exact:true}).selectOption('date_only');await p.getByLabel('Hard deadline',{exact:true}).fill('2026-10-12');await p.getByRole('button',{name:'Capture commitment',exact:true}).click();await saved(p);}
+test('Resolution Control keyboard/mobile capture, refine, select, start and externalize',async()=>{
+  reset();pageErrors.length=0;const p=await page();
+  try {
+    await p.getByLabel('Resolution title',{exact:true}).focus();await p.keyboard.press('Tab');assert.equal(await p.getByLabel('Objective (optional)',{exact:true}).evaluate(n=>n===document.activeElement),true);
+    await outcome(p,'Metric <img src=x onerror=alert(1)>');await commitment(p);
+    assert.equal(view.workspace.commitments[0].schedule.deadline.precision,'date_only');assert.equal(view.workspace.commitments[0].schedule.buffer_minutes,null);
+    assert.equal(await p.locator('#ledger img').count(),0);assert.match(await p.locator('#ledger').textContent(),/date only/);
+    await p.getByLabel('Action instruction',{exact:true}).fill('Construct one original proof');
+    await p.getByRole('button',{name:'Capture action',exact:true}).click();await saved(p);
+    assert.equal(view.workspace.current_action,null);
+    await p.locator('.obligation summary').click();await p.getByRole('button',{name:'Select action',exact:true}).click();await saved(p);
+    assert.equal(await p.getByRole('button',{name:'Mark ready',exact:true}).isDisabled(),true);
+    await p.getByRole('button',{name:'Edit plan',exact:true}).click();
+    await p.getByLabel('Expected output (needed before ready)',{exact:true}).fill('proof.tex');await p.getByLabel('Verification method (needed before ready)',{exact:true}).fill('Check each implication');
+    await p.getByLabel('Start reference (optional; existing work location)',{exact:true}).fill('javascript:alert(1)');
+    await p.getByRole('button',{name:'Save action',exact:true}).click();await saved(p);
+    assert.equal(await p.locator('#current-content a').count(),0);
+    await p.getByRole('button',{name:'Mark ready',exact:true}).click();await saved(p);
+    await p.getByRole('button',{name:'Start action',exact:true}).click();await saved(p);
+    await p.getByLabel('Completed output reference',{exact:true}).fill('https://example.invalid/proof');
+    await p.getByRole('button',{name:'Refresh state',exact:true}).click();await p.getByText('State refreshed. No changes were made.',{exact:true}).waitFor();
+    assert.equal(await p.getByLabel('Completed output reference',{exact:true}).inputValue(),'https://example.invalid/proof');
+    await p.getByRole('button',{name:'Record completed output',exact:true}).click();await saved(p);
+    assert.equal(view.workspace.actions[0].action.status,'completed');assert.equal(view.workspace.current_action,null);
+    assert.match(await p.locator('#current-content').textContent(),/No action is selected/);
+    assert.equal(writes.length,8);assert.equal(new Set(writes.map(w=>w.meta.operation_id)).size,8);
+    assert.ok(writes.every(w=>!('owner' in w) && !('actor' in w.command)));
+    assert.equal(await p.locator('body').evaluate(n=>getComputedStyle(n).colorScheme),'dark');
+    if(process.env.PLAYGROUND_SCREENSHOT_DIR){await mkdir(process.env.PLAYGROUND_SCREENSHOT_DIR,{recursive:true});await p.screenshot({path:resolve(process.env.PLAYGROUND_SCREENSHOT_DIR,'resolution-desktop.png'),fullPage:true});}
+    await p.setViewportSize({width:390,height:844});assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+    await p.getByRole('button',{name:'Refresh state',exact:true}).focus();await p.keyboard.press('Tab');assert.equal(await p.evaluate(()=>getComputedStyle(document.activeElement).outlineStyle),'solid');
+    if(process.env.PLAYGROUND_SCREENSHOT_DIR)await p.screenshot({path:resolve(process.env.PLAYGROUND_SCREENSHOT_DIR,'resolution-mobile.png'),fullPage:true});
+    assert.deepEqual(pageErrors,[]);
+  }finally{await p.close();}
+});
+test('Resolution Control uncertain saves retry identically and stale drafts are not rebased',async()=>{
+  reset();pageErrors.length=0;const p=await page();
+  try {
+    interrupt=true;await p.getByLabel('Resolution title',{exact:true}).fill('Retained draft');await p.getByRole('button',{name:'Capture resolution',exact:true}).click();
+    await p.getByText(/Save outcome is uncertain/).waitFor();assert.equal(writes.length,1);assert.equal(await p.getByLabel('Resolution title',{exact:true}).inputValue(),'Retained draft');
+    assert.equal(await p.getByRole('button',{name:'Capture resolution',exact:true}).isDisabled(),true);
+    await p.getByRole('button',{name:'Refresh state',exact:true}).click();await p.getByText(/An earlier save is still uncertain/).waitFor();assert.equal(writes.length,1);
+    await p.getByRole('button',{name:'Retry the same request',exact:true}).click();await p.getByText(/earlier save was confirmed/).waitFor();
+    assert.deepEqual(writes[0],writes[1]);assert.equal(view.revision,1);assert.equal(view.workspace.resolutions.length,1);
+    await commitment(p);await p.getByRole('button',{name:'Edit controls',exact:true}).click();await p.getByLabel('Commitment title',{exact:true}).fill('Local draft');
+    const original=view.revision;view.workspace.commitments[0].spec.title='Other tab';view.revision++;
+    await p.getByRole('button',{name:'Refresh state',exact:true}).click();await p.getByText('State refreshed. No changes were made.',{exact:true}).waitFor();
+    await p.getByRole('button',{name:'Save commitment',exact:true}).click();await p.getByText(/Another edit or recovery/).waitFor();
+    assert.equal(writes.at(-1).meta.expected_revision,original);assert.equal(view.workspace.commitments[0].spec.title,'Other tab');assert.equal(await p.getByLabel('Commitment title',{exact:true}).inputValue(),'Local draft');
+    p.once('dialog',dialog=>dialog.accept());await p.getByRole('button',{name:'Edit controls',exact:true}).click();assert.equal(await p.getByLabel('Commitment title',{exact:true}).inputValue(),'Other tab');
+    await p.getByLabel('Commitment title',{exact:true}).fill('Reviewed draft');await p.getByRole('button',{name:'Save commitment',exact:true}).click();await saved(p);assert.equal(view.workspace.commitments[0].spec.title,'Reviewed draft');
+    disabled=true;await p.getByRole('button',{name:'Refresh state',exact:true}).click();await p.getByText(/disabled on this deployment/).waitFor();assert.equal(await p.getByRole('button',{name:'Capture action',exact:true}).isDisabled(),true);
+    assert.deepEqual(pageErrors,[]);
+  }finally{await p.close();}
+});

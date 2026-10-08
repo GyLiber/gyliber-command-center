@@ -5,7 +5,15 @@
 **Continuing AI engineering collaborator:** Sol
 **Inherited checkpoint:** PR #22, `fix/include-migrations-in-docker`
 
-## Current implementation checkpoint — Resolution Control persistence/API, 2026-10-08
+## Current checkpoint — smaller member preview packet, 2026-10-08
+
+Gyile explicitly continues and reiterates bounded batches to reduce exposure to chat interface interruptions. Sol resumes from [PR #43](https://github.com/GyLiber/gyliber-command-center/pull/43), main `b4567c14c615296a94c3e2f8a6a6cc6f9ff0e57a`. Its tested head `3ee25b248c3f3987f00410c9e99be8ecb1b91e22` passed [CI 37829975848](https://github.com/GyLiber/gyliber-command-center/actions/runs/37829975848) and [Security 37829975775](https://github.com/GyLiber/gyliber-command-center/actions/runs/37829975775), including 75 Rust tests with actual PostgreSQL 18 execution.
+
+On `feat/resolution-control-workflow`, implement one smaller outcome: protected synthetic capture/edit, obligation ledger and Current Action lifecycle/output, fixed UTC+02:00 controls, explicit uncertainty/retry/conflict and keyboard/mobile tests. Update [the runbook](../operations/RESOLUTION_CONTROL.md#member-preview-packet--2026-10-08) and design/roadmap. Record exact-head CI/Security and screenshot evidence in the implementation PR before merge, then stop.
+
+Next on `continue`: the remaining evidence/threat/history/report/recovery interface, in its own verified packet. Hosted deployment, real pilot activation and application v0.4.0 release follow later scoped acceptance. Keep the feature disabled; no manual action is needed now. Storage expiry on 2026-10-30 and independent recovery/deletion-ledger verification remain gates. The UI fixture is synthetic and is not a live signed-in production test. An interface interruption can be recovered from the authoritative GitHub checkpoint; do not restart already committed work.
+
+## Previous implementation checkpoint — Resolution Control persistence/API, 2026-10-08
 
 Gyile's explicit `continue` resumes Sol from [PR #42](https://github.com/GyLiber/gyliber-command-center/pull/42), main `9785e74c7b79b3c118d7177b7c7ebb570c31a4b1`. The typed-core head `b89f185d80d770018bf37dea04ee4c75cac7565c` passed [CI 37819305794](https://github.com/GyLiber/gyliber-command-center/actions/runs/37819305794) and [Security 37819305401](https://github.com/GyLiber/gyliber-command-center/actions/runs/37819305401). Sol continues on `feat/resolution-control-api` with private owner-filtered PostgreSQL history, typed command replay, server identity/time, protected endpoints, conflict/retry handling, reports and export/restore/purge recovery barriers. [Operations](../operations/RESOLUTION_CONTROL.md) and [design section 19](../architecture/RESOLUTION_CONTROL_DESIGN.md#19-persistenceapi-implementation-packet--2026-10-08) record the implemented bounds and remaining trust assumptions.
 
