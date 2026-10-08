@@ -451,7 +451,9 @@ pub fn replay(
         {
             return Err(DomainError::InvalidTime.into());
         }
-        state.apply(&event.command, actor.clone(), event.at)?;
+        // A failed reconstruction returns no state. Avoid cloning the whole
+        // aggregate for each archived event; live edits still use atomic apply.
+        state.apply_inner(event.command.clone(), actor.clone(), event.at)?;
         previous = Some(event.at);
     }
     Ok(state)

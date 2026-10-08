@@ -675,6 +675,70 @@ async fn postgres_http_valid_owner_workflow_body_limits_and_closed_pool() {
     .await;
     assert_eq!(response.status(), StatusCode::OK);
     assert_eq!(response_json(response).await["revision"], 1);
+    for _ in 0..2 {
+        assert_eq!(
+            request(
+                app.clone(),
+                "/api/resolution-control/commands",
+                "POST",
+                cookie.as_deref(),
+                Some("wrong"),
+                None,
+                &body
+            )
+            .await
+            .status(),
+            StatusCode::FORBIDDEN
+        );
+    }
+    let denials: i64 = sqlx::query_scalar("SELECT COALESCE(sum(occurrences),0)::bigint FROM gyliber_resolution_audit WHERE actor=$1 AND event_code='csrf_required'").bind(&owner).fetch_one(&pool).await.unwrap();
+    assert!(denials >= 2);
+    let acknowledgement: String = sqlx::query_scalar(
+        "SELECT result FROM gyliber_resolution_operations WHERE owner=$1 AND operation_id='one'",
+    )
+    .bind(&owner)
+    .fetch_one(&pool)
+    .await
+    .unwrap();
+    assert!(!acknowledgement.contains("Synthetic outcome"));
+    let observed = store::view(&pool, &owner).await.unwrap().observed_at;
+    let date = time::OffsetDateTime::from_unix_timestamp(observed.unix_seconds())
+        .unwrap()
+        .to_offset(time::UtcOffset::from_hms(2, 0, 0).unwrap())
+        .date()
+        .to_string();
+    let report = request(
+        app.clone(),
+        &format!("/api/resolution-control/report?date={date}&offset_minutes=120&cutoff_revision=1"),
+        "GET",
+        cookie.as_deref(),
+        None,
+        None,
+        "",
+    )
+    .await;
+    assert_eq!(report.status(), StatusCode::OK);
+    assert_eq!(
+        response_json(report).await["changes"]
+            .as_array()
+            .unwrap()
+            .len(),
+        1
+    );
+    assert_eq!(
+        request(
+            app.clone(),
+            "/api/resolution-control/restore",
+            "POST",
+            cookie.as_deref(),
+            Some("test-csrf"),
+            None,
+            &"x".repeat(65537)
+        )
+        .await
+        .status(),
+        StatusCode::BAD_REQUEST
+    );
     let foreign = request(
         app.clone(),
         "/api/resolution-control/history?owner=forged",
