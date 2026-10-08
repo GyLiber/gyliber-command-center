@@ -38,4 +38,42 @@
 <p class="muted small">Editing a ready or blocked plan returns it to new. Block ongoing work before changing its plan.</p>
 <button type="submit">Capture action</button><button type="button" class="cancel-edit" hidden>Cancel edit</button></fieldset></form></details>
 </div></section><p class="muted small">Keep this tab open until an uncertain save is resolved. Saved control metadata is private; original artifacts stay in their existing tool.</p>
+<section id="readiness" class="rc-readiness" aria-labelledby="readiness-heading">
+<div class="section-heading"><h2 id="readiness-heading">Evidence, readiness and threats</h2><span class="muted">Human-attested evidence, not machine-certified correctness</span></div>
+<p class="muted">Work outputs and preparation are separate. Identify every applicable scope/dimension pair, map and deploy the source material, then record explicit stress tests and verification. An unknown item is never counted as ready.</p>
+<label for="rc-commitment">Obligation to review</label><select id="rc-commitment"><option value="">Choose an obligation</option></select>
+<div id="rc-readiness-status" role="status" aria-live="polite"></div>
+<div class="rc-evidence-grid">
+<details open><summary>1. Identify applicable scope</summary><form id="rc-scope-form"><fieldset disabled>
+<label for="rc-scope-input">One pair per line: item_id | dimension</label>
+<textarea id="rc-scope-input" name="scope" rows="5" placeholder="metric_axioms | written&#10;metric_axioms | oral" spellcheck="false"></textarea>
+<p class="muted small">Dimensions: written, oral, board, justification, research, practical, test_case. Identifying again invalidates prior verification even if the pairs are unchanged.</p>
+<button type="submit">Replace identified scope</button><button type="button" id="rc-reload-scope">Reload observed scope</button>
+<button type="button" id="rc-scope-unknown" data-write="true">Mark scope unknown</button>
+</fieldset></form></details>
+<details open><summary>2. Map and deploy material</summary><form id="rc-material-form"><fieldset disabled>
+<label for="rc-material-key">Scope pair</label><select id="rc-material-key" name="key"><option value="">Identify scope first</option></select>
+<label for="rc-material-phase">Material stage</label><select id="rc-material-phase" name="phase"><option value="map">Map existing source</option><option value="deploy">Deploy reviewed material</option></select>
+<label for="rc-material-artifact">Existing material reference</label><input id="rc-material-artifact" name="artifact" maxlength="2048" required>
+<button type="submit">Record material</button>
+</fieldset></form></details>
+<details open><summary>3. Stress test and verification</summary><form id="rc-evidence-form"><fieldset disabled>
+<label for="rc-evidence-key">Scope pair</label><select id="rc-evidence-key" name="key"><option value="">Identify scope first</option></select>
+<label for="rc-evidence-stage">Evidence stage</label><select id="rc-evidence-stage" name="stage"><option value="stress_test">Stress test</option><option value="verification">Verification</option></select>
+<label for="rc-evidence-outcome">Result</label><select id="rc-evidence-outcome" name="outcome"><option value="pass">Pass (recorded by actor)</option><option value="fail">Fail</option></select>
+<label for="rc-evidence-method">Test / verification method</label><textarea id="rc-evidence-method" name="method" maxlength="2048" required></textarea>
+<label for="rc-evidence-artifact">Existing evidence reference</label><input id="rc-evidence-artifact" name="artifact" maxlength="2048" required>
+<button type="submit">Record evidence</button>
+</fieldset></form></details>
+<details open><summary>4. Capture a threat</summary><form id="rc-threat-form"><fieldset disabled>
+<label for="rc-threat-description">Observed threat / obstacle</label><textarea id="rc-threat-description" name="description" maxlength="2048" required></textarea>
+<label class="rc-checkbox"><input id="rc-threat-blocking" type="checkbox" name="blocking">Blocks verified readiness</label>
+<label for="rc-threat-path">Resolution path (optional)</label><textarea id="rc-threat-path" name="resolution_path" maxlength="2048"></textarea>
+<button type="submit">Capture threat</button>
+</fieldset></form></details>
+</div>
+<h3>Scope coverage</h3><div id="rc-coverage" aria-live="polite"></div>
+<h3>Recorded threats</h3><div id="rc-threats" aria-live="polite"></div>
+<p class="muted small">Only the server can establish identity, timestamp and revision. After any acknowledged write, the current view is reloaded. A failed or stale test invalidates readiness; no numerical percentage hides unknown scope.</p>
+</section>
 </main></body></html>
