@@ -16,7 +16,7 @@ const server=createServer(async(req,res)=>{
   try {
     const path=new URL(req.url,'http://localhost').pathname;
     const send=(status,content,type='application/json')=>{res.writeHead(status,{'Content-Type':type,'Cache-Control':'no-store','Content-Security-Policy':"default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'"});res.end(typeof content==='string'||Buffer.isBuffer(content)?content:JSON.stringify(content));};
-    const files={'/command/resolution-control':'static/resolution-control.html','/static/app.css':'static/app.css','/static/resolution-control/style.css':'static/resolution-control/style.css','/static/resolution-control/app.mjs':'static/resolution-control/app.mjs','/static/resolution-control/model.mjs':'static/resolution-control/model.mjs'};
+    const files={'/command/resolution-control':'static/resolution-control.html','/static/app.css':'static/app.css','/static/resolution-control/style.css':'static/resolution-control/style.css','/static/resolution-control/app.mjs':'static/resolution-control/app.mjs','/static/resolution-control/model.mjs':'static/resolution-control/model.mjs','/static/resolution-control/readiness.mjs':'static/resolution-control/readiness.mjs'};
     if(files[path])return send(200,await readFile(resolve(root,files[path])),path.endsWith('.mjs')?'text/javascript':path.endsWith('.css')?'text/css':'text/html');
     if(path==='/api/resolution-control')return unauthorized?send(401,{error:'authentication_required'}):disabled?send(503,{error:'feature_disabled'}):send(200,{viewer:'github-1',csrf:'test-csrf',view,limits:{events:2048},import_notice:'Imported history is a user-supplied claim.'});
     if(path==='/api/resolution-control/commands' && req.method==='POST') {
@@ -29,11 +29,42 @@ const server=createServer(async(req,res)=>{
       const c=packet.command,w=view.workspace;
       if(c.type==='create_resolution')w.resolutions.push({id:c.id,spec:c.spec});
       else if(c.type==='update_resolution')w.resolutions.find(r=>r.id===c.id).spec=c.spec;
-      else if(c.type==='create_commitment'){w.commitments.push({id:c.id,resolution:c.resolution,spec:c.spec,schedule:c.schedule});view.buffers.push({commitment:c.id,unfinished:{state:'target_unknown',deadline_reached:false},finished:null});}
+      else if(c.type==='create_commitment'){w.commitments.push({id:c.id,resolution:c.resolution,spec:c.spec,schedule:c.schedule,readiness:{scope_revision:0,scope_identified:false,items:[],blocking_threats:0,verified_finish:null}});view.buffers.push({commitment:c.id,unfinished:{state:'target_unknown',deadline_reached:false},finished:null});}
       else if(c.type==='update_commitment')Object.assign(w.commitments.find(r=>r.id===c.id),{spec:c.spec,schedule:c.schedule});
       else if(c.type==='create_action')w.actions.push({id:c.id,commitment:c.commitment,action:{plan:c.plan,status:'new',artifact:null}});
       else if(c.type==='update_action')Object.assign(w.actions.find(a=>a.id===c.id).action,{plan:c.plan,status:'new'});
       else if(c.type==='select_action')w.current_action=c.id;
+      else if(['identify_scope','mark_scope_unknown','map_material','deploy_material','record_evidence','confirm_readiness','reopen_readiness','add_threat','resolve_threat'].includes(c.type)) {
+        const commitment=c.commitment ?? w.threats.find(t=>t.id===c.id)?.commitment;
+        const r=w.commitments.find(item=>item.id===commitment).readiness;
+        const matching=key=>r.items.find(item=>item.key.item===key.item&&item.key.dimension===key.dimension);
+        if(c.type==='identify_scope') {
+          r.scope_identified=true;r.scope_revision++;r.verified_finish=null;
+          r.items=c.items.map(key=>matching(key)??{key,mapped:null,deployed:null,stress_test:null,verification:null});
+        }
+        if(c.type==='mark_scope_unknown'){r.scope_identified=false;r.scope_revision++;r.verified_finish=null;}
+        if(c.type==='map_material'){const item=matching(c.key);item.mapped=c.artifact;item.deployed=null;r.scope_revision++;r.verified_finish=null;}
+        if(c.type==='deploy_material'){const item=matching(c.key);assert.ok(item.mapped);item.deployed=c.artifact;r.scope_revision++;r.verified_finish=null;}
+        if(c.type==='record_evidence') {
+          const item=matching(c.input.key);
+          assert.ok(item.deployed);
+          const evidence={...c.input,scope_revision:r.scope_revision,actor:'github-1',recorded_at:view.observed_at};
+          if(c.input.stage==='stress_test'){item.stress_test=evidence;item.verification=null;} else item.verification=evidence;
+          r.verified_finish=null;
+        }
+        if(c.type==='confirm_readiness'){
+          assert.ok(r.scope_identified&&r.blocking_threats===0&&r.items.length>0&&r.items.every(x=>x.verification?.outcome==='pass'&&x.verification?.scope_revision===r.scope_revision&&x.stress_test?.outcome==='pass'&&x.stress_test?.scope_revision===r.scope_revision));
+          r.verified_finish=view.observed_at;
+        }
+        if(c.type==='reopen_readiness'){assert.ok(r.verified_finish);r.verified_finish=null;r.scope_revision++;}
+        if(c.type==='add_threat'){w.threats.push({id:c.id,commitment:c.commitment,spec:c.spec,resolved:false});}
+        if(c.type==='resolve_threat'){w.threats.find(t=>t.id===c.id).resolved=true;}
+        if(['add_threat','resolve_threat'].includes(c.type)){
+          r.blocking_threats=w.threats.filter(t=>t.commitment===commitment&&!t.resolved&&t.spec.blocking).length;
+          if(r.blocking_threats>0){r.scope_revision++;r.verified_finish=null;}
+          assert.ok(r.blocking_threats<=128);
+        }
+      }
       else {
         const action=w.actions.find(a=>a.id===c.id).action;
         const statuses={ready_action:'ready',start_action:'in_progress',block_action:'blocked',cancel_action:'cancelled',complete_action:'completed',reopen_action:'new'};
