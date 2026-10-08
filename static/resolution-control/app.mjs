@@ -1,12 +1,15 @@
 import {text, reference, schedule, plan, displayTime, exactLocal, errorMessage} from './model.mjs';
+import {createReadinessUi} from './readiness.mjs';
 const $ = (id) => document.getElementById(id);
 let snapshot = null, csrf = null, viewer = null, ready = false, busy = false, pending = null;
 const forms = ['resolution','commitment','action'];
 const completionDrafts=new Map();
+let readinessUi=null;
 function node(tag, value, className) { const n = document.createElement(tag); if(value != null)n.textContent=value; if(className)n.className=className; return n; }
 function notice(value) { $('notice').textContent=value; }
 function buttons() {
   for(const kind of forms)$(`${kind}-form`).querySelector('fieldset').disabled=!ready || busy || !!pending;
+  for(const fieldset of document.querySelectorAll('.rc-readiness fieldset'))fieldset.disabled=!ready || busy || !!pending;
   for(const b of document.querySelectorAll('[data-write]'))b.disabled=!ready || busy || !!pending || b.dataset.eligible==='false';
   document.querySelector('.rc').setAttribute('aria-busy',String(busy));
   $('refresh').disabled=busy; $('retry').hidden=!pending; $('retry').disabled=busy || !csrf;
@@ -23,7 +26,7 @@ function referenceNode(ref) {
   return node('span',ref?.value ?? 'Not provided','reference');
 }
 function clearPrivate() {
-  snapshot=null;csrf=null;pending=null;ready=false;completionDrafts.clear();
+  snapshot=null;csrf=null;pending=null;ready=false;completionDrafts.clear();readinessUi?.clear();
   $('current-content').replaceChildren(node('p','Private state is not available.'));
   $('ledger').replaceChildren();$('capacity').textContent='';$('observed').textContent='Not loaded';$('import-notice').hidden=true;
   for(const kind of forms)resetForm(kind);
@@ -152,6 +155,7 @@ function render() {
     }
     ledger.append(group);
   }
+  readinessUi?.render(workspace);
 }
 function setPrecision(name, fact) {
   const select=$(`${name}-precision`),input=$(`${name}-value`);select.value=fact?.precision ?? 'unknown';input.type=select.value==='instant'?'datetime-local':'date';input.step='1';input.disabled=select.value==='unknown';input.value=!fact?'':fact.precision==='instant'?exactLocal(fact.value):fact.value;
@@ -178,6 +182,7 @@ function editForm(kind, record) {
   form.querySelector('input:not(:disabled),textarea').focus();notice('Editing the displayed item. Refresh does not rebase this draft; reload the item after a conflict.');
 }
 function setup() {
+  readinessUi=createReadinessUi({getSnapshot:()=>snapshot,save,notice,referenceNode});
   for(const kind of forms) {
     const form=$(`${kind}-form`);form.querySelector('.cancel-edit').onclick=()=>resetForm(kind);
     form.addEventListener('input',()=>{form.dataset.dirty='true';});
