@@ -1,5 +1,5 @@
 // Resolution Control member evidence and readiness. No private payload is HTML.
-import {text, reference} from './model.mjs';
+import {text, reference, displayTime} from './model.mjs';
 
 export const dimensions = ['written','oral','board','justification','research','practical','test_case'];
 const idPattern = /^[A-Za-z0-9_-]{1,64}$/u;
@@ -59,7 +59,7 @@ function baseNow(snapshot) {return {generation:snapshot.generation,revision:snap
 // controller owns idempotency, CSRF, pending/uncertain writes and acknowledgements.
 export function createReadinessUi({getSnapshot,save,notice,referenceNode}) {
   const forms=['scope','material','evidence','threat'];
-  let selected=null, scopeDraft=false;
+  let selected=null;
   const markDraft=form=>{if(!form.dataset.base)form.dataset.base=JSON.stringify(baseNow(getSnapshot()));};
   for(const name of forms) {
     const form=$(`rc-${name}-form`);
@@ -68,13 +68,13 @@ export function createReadinessUi({getSnapshot,save,notice,referenceNode}) {
   }
   function resetForm(name,scope=false) {
     const form=$(`rc-${name}-form`);delete form.dataset.base;
-    if(name==='scope') {scopeDraft=false;if(scope)form.elements.scope.value=scopeText(recordFor(getSnapshot()?.workspace||{commitments:[]},selected)?.readiness);}
+    if(name==='scope') {if(scope)form.elements.scope.value=scopeText(recordFor(getSnapshot()?.workspace||{commitments:[]},selected)?.readiness);}
     else if(name==='material')form.elements.artifact.value='';
     else if(name==='evidence'){form.elements.method.value='';form.elements.artifact.value='';}
     else if(name==='threat'){form.elements.description.value='';form.elements.resolution_path.value='';form.elements.blocking.checked=false;}
   }
   function clear() {
-    selected=null;scopeDraft=false;
+    selected=null;
     for(const name of forms){const form=$(`rc-${name}-form`);form.reset();delete form.dataset.base;}
     $('rc-commitment').replaceChildren(new Option('No private state',''));
     for(const id of ['rc-coverage','rc-threats','rc-readiness-status'])$(id).replaceChildren();
@@ -93,7 +93,7 @@ export function createReadinessUi({getSnapshot,save,notice,referenceNode}) {
     const commitment=recordFor(ws,id),r=commitment?.readiness,area=$('rc-coverage'),threats=$('rc-threats'),status=$('rc-readiness-status');
     area.replaceChildren();threats.replaceChildren();status.replaceChildren();
     if(!r){status.append(elt('p','Choose an obligation to review its applicable scope and evidence.'));return;}
-    if(!scopeDraft && !$('rc-scope-form').dataset.base)$('rc-scope-form').elements.scope.value=scopeText(r);
+    if(!$('rc-scope-form').dataset.base)$('rc-scope-form').elements.scope.value=scopeText(r);
     status.append(elt('p',r.verified_finish
       ? 'Human-confirmed verified finish is recorded. Later changes require renewed verification.'
       : r.scope_identified ? `Scope revision ${r.scope_revision} · ${r.items.length} pairs · ${r.blocking_threats} blocking threats. No verified finish yet.`
@@ -116,7 +116,7 @@ export function createReadinessUi({getSnapshot,save,notice,referenceNode}) {
       }
       for(const [label,evidence] of [['Stress test',item.stress_test],['Verification',item.verification]]) {
         dl.append(elt('dt',label));const dd=elt('dd');
-        dd.textContent=evidence?`${evidence.outcome} · scope revision ${evidence.scope_revision} · ${evidence.method} · actor-attested (not certified)`:'Not recorded';
+        dd.textContent=evidence?`${evidence.outcome} · scope revision ${evidence.scope_revision} · ${evidence.method} · recorded by ${evidence.actor} at ${displayTime({precision:'instant',value:evidence.recorded_at})} · human-attested, not machine-certified`:'Not recorded';
         if(evidence){dd.append(elt('br'));dd.append(referenceNode(evidence.artifact));}
         dl.append(dd);
       }
