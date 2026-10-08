@@ -5,7 +5,17 @@
 **Continuing AI engineering collaborator:** Sol
 **Inherited checkpoint:** PR #22, `fix/include-migrations-in-docker`
 
-## Current checkpoint — smaller member preview packet, 2026-10-08
+## Current temporary stop — 2026-10-08
+
+Gyile requested a documentation-only close for today after the recovered member-preview batch. Sol completed [PR #44](https://github.com/GyLiber/gyliber-command-center/pull/44) on `feat/resolution-control-workflow`; implementation head `e93d3370b1aed6632d08ea7b62d7f7a83b6fbaf1` merged into main as `2f3e5caecf15da55129ab7882902c5dd8a13409f`. The merged tree `0b24894040c1e646b5385d50cbd7361302e6473a` exactly matches the tested implementation tree.
+
+[CI 37835663960](https://github.com/GyLiber/gyliber-command-center/actions/runs/37835663960) and [Security 37835663898](https://github.com/GyLiber/gyliber-command-center/actions/runs/37835663898) passed for that implementation head: 77 Rust tests with PostgreSQL 18.6, 12 Node/model/curated tests, 4 browser tests, production-container verification, secret scanning and all three CodeQL analyses. Sol reviewed the synthetic desktop/mobile screenshots for the dark layout, readable controls and mobile stacking. This does not establish Gyile's eye comfort or hosted signed-in acceptance. The unchanged locked `yoke-derive` 0.8.3 yank warning remains a separate maintenance item.
+
+The protected capture/edit, obligation ledger and Current Action lifecycle/output preview are complete for this packet. Feature activation remains disabled; application v0.3.0 remains the accepted live release and v0.4.0 remains proposed. No deployment, private onboarding or release-tag publication is requested now. The chat stream error did not erase the committed work; its cause is unconfirmed.
+
+**Stop here.** On Gyile's next `continue`, inspect current main and this handoff rather than restarting PR #44. Follow [the remaining bounded packets](../operations/NEXT_DEVELOPMENT_STEPS.md#return-plan-after-temporary-stop--2026-10-08), beginning with evidence/readiness and threats. Commit, verify, document and stop after each coherent packet. Reporting/recovery and hosted acceptance follow separately. Ask Gyile explicitly at the instant an actual manual action becomes necessary; none is needed for this pause.
+
+## Previous checkpoint — smaller member preview packet, 2026-10-08
 
 Gyile explicitly continues and reiterates bounded batches to reduce exposure to chat interface interruptions. Sol resumes from [PR #43](https://github.com/GyLiber/gyliber-command-center/pull/43), main `b4567c14c615296a94c3e2f8a6a6cc6f9ff0e57a`. Its tested head `3ee25b248c3f3987f00410c9e99be8ecb1b91e22` passed [CI 37829975848](https://github.com/GyLiber/gyliber-command-center/actions/runs/37829975848) and [Security 37829975775](https://github.com/GyLiber/gyliber-command-center/actions/runs/37829975775), including 75 Rust tests with actual PostgreSQL 18 execution.
 
