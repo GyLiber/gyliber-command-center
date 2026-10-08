@@ -5,7 +5,15 @@
 **Continuing AI engineering collaborator:** Sol
 **Inherited checkpoint:** PR #22, `fix/include-migrations-in-docker`
 
-## Current checkpoint — Resolution Control recovery, 2026-10-08
+## Current implementation checkpoint — typed Resolution Control core, 2026-10-08
+
+Gyile explicitly resumed implementation under the checkpointed batch protocol. Sol starts `feat/resolution-control-state` from main `4173ffcb43032019447d89952b427a080cad725c`, the merged [PR #41](https://github.com/GyLiber/gyliber-command-center/pull/41) design checkpoint. The recovery packet passed CI/Security and preserved Luna's isolated design commit; no rollback was needed.
+
+This packet implements reusable domain types, action/readiness guards and controlled-clock deadline/buffer rules with synthetic tests. [Design section 18](../architecture/RESOLUTION_CONTROL_DESIGN.md#18-typed-core-implementation-packet--2026-10-08) records exact limits and the trust boundary. Repository verification and the exact tested head are recorded in its PR/checkpoint report. No private pilot data, member routes, migrations or release bump are introduced. Application v0.3.0 remains accepted; Resolution Control is proposed for v0.4.0 after later implementation and hosted acceptance.
+
+Stop after this packet is verified and merged. Next on `continue`: PostgreSQL persistence and owner-authorized API, transactional history, conflict/idempotency behavior and private report/export/restore tests. No manual action is required yet. The temporary database expiry on 2026-10-30 must be resolved before private activation; broader contract/security gates remain open. Historical checkpoints below retain their original context.
+
+## Previous checkpoint — Resolution Control recovery, 2026-10-08
 
 Gyile asked Sol to recover cleanly from Luna's separate design proposal and continue it toward live use. Main was `9e2eabf352c0f0c723eea46826129c5dbfc3fe92`; Luna's branch `design/resolution-control-2026-10-08` was `a434801235ce4a9f2addb178e95f86b7e3033ea8`, directly descended from that main revision and adding only `docs/architecture/RESOLUTION_CONTROL_DESIGN.md`. The SHA pasted in chat contained an extra character; the branch supplies the authoritative value. No rollback or release change is needed.
 

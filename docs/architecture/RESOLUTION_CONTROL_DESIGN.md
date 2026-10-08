@@ -2,10 +2,10 @@
 
 **Repository:** `GyLiber/gyliber-command-center`
 **Target release:** application **v0.4.0** (proposed)
-**Feature status:** reviewed design; implementation pending
+**Feature status:** typed domain core implemented; persistence/API, member UI and hosted acceptance pending
 **Design date:** 2026-10-08
 
-**Continuity:** Luna proposed this design in commit `a434801235ce4a9f2addb178e95f86b7e3033ea8` on `design/resolution-control-2026-10-08`, directly from main `9e2eabf352c0f0c723eea46826129c5dbfc3fe92`. Sol continues integration at Gyile's request, preserving that commit and adding the implementation contract below. GitHub authorship remains the authenticated contributor identity. No runtime change or v0.4.0 release is implied.
+**Continuity:** Luna proposed this design in commit `a434801235ce4a9f2addb178e95f86b7e3033ea8` on `design/resolution-control-2026-10-08`, directly from main `9e2eabf352c0f0c723eea46826129c5dbfc3fe92`. Sol continues integration at Gyile's request, preserving that commit and adding the implementation contract below. GitHub authorship remains the authenticated contributor identity. The design integration did not change runtime behavior. The first implementation packet below adds a pure domain core, not a live module or v0.4.0 release.
 
 ## 1. Problem
 
@@ -373,4 +373,23 @@ These controls implement the relevant durable audit foundation for this bounded 
 4. **Member workflow packet:** registry/page, calm dark keyboard/mobile controls, capture/current action/ledger/coverage/threats/report/export; browser tests for the complete synthetic workflow, loading/failure/conflict states and privacy. Stop at a verified commit.
 5. **Hosted acceptance/release packet:** deploy the tested revision, verify migrations/session continuity and running identity; demonstrate end-to-end use and recovery, obtain Gyile's usefulness/eye-comfort feedback, document limitations and private activation status. Release application v0.4.0 only after its scoped gates pass; publish and verify the exact accepted tag. No tag is promised by this design.
 
-The next implementation packet is number 2. Mathematical Experiment Bench design 1.0.0 remains valid but is queued after this newly selected priority; it is not silently implemented alongside Resolution Control. Keep each packet reviewable and stop for Gyile's `continue` before starting another.
+After the typed-core packet passes its checks and merges, the next implementation packet is number 3. Mathematical Experiment Bench design 1.0.0 remains valid but is queued after this newly selected priority; it is not silently implemented alongside Resolution Control. Keep each packet reviewable and stop for Gyile's `continue` before starting another.
+
+
+## 18. Typed-core implementation packet — 2026-10-08
+
+Sol continues from main `4173ffcb43032019447d89952b427a080cad725c` on `feat/resolution-control-state`. The reusable library module `src/resolution_control/` owns bounded specification types, guarded action transitions, revision-aware scope/readiness, explicit time facts and deterministic buffer calculations. The binary's routes and registry are not changed in this packet. The application release remains v0.3.0; proposed v0.4.0 requires the later packets and live acceptance.
+
+Implementation choices now explicit:
+
+- Titles are limited to 160 UTF-8 bytes; notes and references to 2,048 bytes; identifiers to 64 ASCII letters/digits/hyphens/underscores. Blank and inappropriate control-character input is rejected. Scalar JSON deserialization applies those bounds; specification objects reject unknown fields. The API packet must also bound total request bodies and collections before domain construction.
+- Web references permit HTTP(S), without embedded credentials, whitespace, query parameters or fragments. Non-clickable text references can identify existing work in other tools. Do not include secrets in either kind; there is no automatic fetching or execution. The initial stricter link policy avoids saving token-bearing links; a future extension needs explicit review.
+- Time facts distinguish date-only source facts from exact, explicitly offset RFC3339 instants. Exact instants normalize to UTC and use whole-second precision with years 0001–9999. Subsecond instants with a nonzero fractional value are rejected, not silently rounded. A missing/date-only control is not an exact timestamp. Buffer duration is nullable, in whole minutes, capped at 525,600 (one 365-day year); zero is a deliberately selected zero margin. Arithmetic outside supported time bounds fails validation.
+- Scope is capped at 128 unique item/dimension pairs. An identified scope must be nonempty; unknown scope is a separate valid state. No percentage is produced. Re-identification, mapping changes, re-deployment, newly added blocking threats and explicit readiness reopening conservatively invalidate earlier attestations by incrementing the scope revision. This initial conservative policy requires fresh tests for the whole current scope; narrower invalidation is deferred until its dependency rules are demonstrated.
+- Stress-test and verification results are distinct. A new stress test, even a pass, supersedes the prior verification for that item. Passing verification requires a passing stress test on the current revision. All applicable items must pass, scope must be identified and blockers absent before a deliberate final confirmation mints a verified-finish value. An action completion cannot mint that value. A later failure clears current verified finish. Recorded evidence remains a human attestation, not a mathematical proof certificate.
+- Domain aggregates serialize their latest state but do not deserialize browser-supplied status, actor, owner or verified-finish fields. The API packet must supply identity/time/revision from the server, enforce owner authorization and operation conflict/idempotency checks, and validate any trusted persisted/recovery state before reconstruction. It must transactionally archive superseded state/evidence: this pure core is not itself an audit store.
+- Action capture may omit expected artifact/method, but becoming ready/startable requires both. Editing a not-yet-started plan returns it to new; ongoing work must be blocked before changing its plan. Completion requires an artifact reference. Reopening returns the action to new and clears current completion metadata; prior values must remain in private event history. Backwards clock updates and invalid transitions fail before changing state.
+
+Focused tests cover specification/JSON bounds, safe references, explicit offsets/date-only preservation, incomplete and inconsistent controls, boundary equality/zero margins, a generated finite buffer-case sweep, action guards/atomic failures, scope and dimension coverage, stale evidence, blockers/failures/reopening and frozen finish outcomes. Required CI/Security evidence and exact head are recorded in the implementation PR before merge. No real pilot data or new service account is needed for this packet.
+
+After this checkpoint, implement the dedicated PostgreSQL/API boundary, including transactional private history, authorization, revision conflicts/idempotency, exports, report cutoffs and validated restoration. Do not expose an apparently usable module that only keeps state in process memory. The 2026-10-30 database expiry remains an activation/release dependency.
