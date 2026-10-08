@@ -596,3 +596,306 @@ fn rejected_evidence_and_backwards_readiness_edits_preserve_state() {
     );
     assert_eq!(readiness, original);
 }
+
+fn identifier(value: &str) -> Identifier {
+    value.to_owned().try_into().unwrap()
+}
+fn initial_workspace() -> Workspace {
+    let mut state = Workspace::default();
+    state
+        .apply(
+            &Command::CreateResolution {
+                id: identifier("r"),
+                spec: ResolutionSpec {
+                    title: "Synthetic".to_owned().try_into().unwrap(),
+                    objective: None,
+                    client_reference: None,
+                },
+            },
+            identifier("actor"),
+            at(0),
+        )
+        .unwrap();
+    state
+        .apply(
+            &Command::CreateCommitment {
+                id: identifier("c"),
+                resolution: identifier("r"),
+                spec: CommitmentSpec {
+                    title: "Synthetic".to_owned().try_into().unwrap(),
+                    area: None,
+                    kind: CommitmentKind::Assessment,
+                    source: None,
+                },
+                schedule: ScheduleInput {
+                    deadline: None,
+                    earliest_finish: None,
+                    buffer_minutes: None,
+                }
+                .try_into()
+                .unwrap(),
+            },
+            identifier("actor"),
+            at(0),
+        )
+        .unwrap();
+    state
+}
+fn apply(state: &mut Workspace, command: Command) -> Result<(), WorkspaceError> {
+    state.apply(&command, identifier("actor"), at(0))
+}
+#[test]
+fn workspace_single_running_action_and_manual_focus() {
+    let mut state = initial_workspace();
+    for name in ["a", "b"] {
+        apply(
+            &mut state,
+            Command::CreateAction {
+                id: identifier(name),
+                commitment: identifier("c"),
+                plan: plan(),
+            },
+        )
+        .unwrap();
+        apply(
+            &mut state,
+            Command::ReadyAction {
+                id: identifier(name),
+            },
+        )
+        .unwrap();
+    }
+    assert_eq!(
+        apply(
+            &mut state,
+            Command::StartAction {
+                id: identifier("a")
+            }
+        ),
+        Err(WorkspaceError::CurrentActionRequired)
+    );
+    apply(
+        &mut state,
+        Command::SelectAction {
+            id: Some(identifier("a")),
+        },
+    )
+    .unwrap();
+    apply(
+        &mut state,
+        Command::StartAction {
+            id: identifier("a"),
+        },
+    )
+    .unwrap();
+    apply(
+        &mut state,
+        Command::SelectAction {
+            id: Some(identifier("b")),
+        },
+    )
+    .unwrap();
+    let before = state.clone();
+    assert!(
+        apply(
+            &mut state,
+            Command::StartAction {
+                id: identifier("b")
+            }
+        )
+        .is_err()
+    );
+    assert_eq!(state, before);
+    apply(
+        &mut state,
+        Command::CompleteAction {
+            id: identifier("a"),
+            artifact: reference(),
+        },
+    )
+    .unwrap();
+    apply(
+        &mut state,
+        Command::StartAction {
+            id: identifier("b"),
+        },
+    )
+    .unwrap();
+    apply(
+        &mut state,
+        Command::CompleteAction {
+            id: identifier("b"),
+            artifact: reference(),
+        },
+    )
+    .unwrap();
+    assert!(state.current_action.is_none());
+    assert!(
+        apply(
+            &mut state,
+            Command::SelectAction {
+                id: Some(identifier("a"))
+            }
+        )
+        .is_err()
+    );
+}
+#[test]
+fn workspace_capacity_duplicate_foreign_reference_and_replay_guards() {
+    let mut state = initial_workspace();
+    let before = state.clone();
+    assert_eq!(
+        apply(
+            &mut state,
+            Command::CreateAction {
+                id: identifier("r"),
+                commitment: identifier("c"),
+                plan: plan()
+            }
+        ),
+        Err(WorkspaceError::DuplicateIdentifier)
+    );
+    assert_eq!(
+        apply(
+            &mut state,
+            Command::CreateAction {
+                id: identifier("a"),
+                commitment: identifier("foreign"),
+                plan: plan()
+            }
+        ),
+        Err(WorkspaceError::NotFound)
+    );
+    assert_eq!(state, before);
+    for n in 0..MAX_ACTIONS {
+        apply(
+            &mut state,
+            Command::CreateAction {
+                id: identifier(&format!("a{n}")),
+                commitment: identifier("c"),
+                plan: plan(),
+            },
+        )
+        .unwrap();
+    }
+    assert_eq!(
+        apply(
+            &mut state,
+            Command::CreateAction {
+                id: identifier("overflow"),
+                commitment: identifier("c"),
+                plan: plan()
+            }
+        ),
+        Err(WorkspaceError::CapacityReached)
+    );
+    let event = WorkspaceEvent {
+        revision: 1,
+        at: at(0),
+        origin: EventOrigin::Live,
+        command: Command::CreateResolution {
+            id: identifier("r"),
+            spec: before.resolutions[0].spec.clone(),
+        },
+    };
+    assert_eq!(
+        replay(std::slice::from_ref(&event), identifier("actor"), at(0))
+            .unwrap()
+            .resolutions
+            .len(),
+        1
+    );
+    let mut bad = event.clone();
+    bad.revision = 2;
+    assert!(replay(&[bad], identifier("actor"), at(0)).is_err());
+    let mut bad = event.clone();
+    bad.at = at(1);
+    assert!(replay(&[bad], identifier("actor"), at(0)).is_err());
+    assert!(replay(&vec![event; MAX_EVENTS + 1], identifier("actor"), at(0)).is_err());
+}
+#[test]
+fn workspace_threats_invalidate_readiness_and_actor_is_supplied_by_adapter() {
+    let mut state = initial_workspace();
+    let key = key("proof", Dimension::Written);
+    apply(
+        &mut state,
+        Command::IdentifyScope {
+            commitment: identifier("c"),
+            items: vec![key.clone()],
+        },
+    )
+    .unwrap();
+    apply(
+        &mut state,
+        Command::MapMaterial {
+            commitment: identifier("c"),
+            key: key.clone(),
+            artifact: reference(),
+        },
+    )
+    .unwrap();
+    apply(
+        &mut state,
+        Command::DeployMaterial {
+            commitment: identifier("c"),
+            key: key.clone(),
+            artifact: reference(),
+        },
+    )
+    .unwrap();
+    for stage in [EvidenceStage::StressTest, EvidenceStage::Verification] {
+        apply(
+            &mut state,
+            Command::RecordEvidence {
+                commitment: identifier("c"),
+                input: EvidenceInput {
+                    key: key.clone(),
+                    stage,
+                    method: notes("Independent check"),
+                    artifact: reference(),
+                    outcome: Outcome::Pass,
+                },
+            },
+        )
+        .unwrap();
+    }
+    apply(
+        &mut state,
+        Command::ConfirmReadiness {
+            commitment: identifier("c"),
+        },
+    )
+    .unwrap();
+    assert!(state.commitments[0].readiness.verified_finish().is_some());
+    apply(
+        &mut state,
+        Command::AddThreat {
+            id: identifier("t"),
+            commitment: identifier("c"),
+            spec: ThreatSpec {
+                description: notes("Missing scope"),
+                blocking: true,
+                resolution_path: None,
+            },
+        },
+    )
+    .unwrap();
+    assert!(state.commitments[0].readiness.verified_finish().is_none());
+    apply(
+        &mut state,
+        Command::ResolveThreat {
+            id: identifier("t"),
+        },
+    )
+    .unwrap();
+    assert!(
+        apply(
+            &mut state,
+            Command::ConfirmReadiness {
+                commitment: identifier("c")
+            }
+        )
+        .is_err()
+    );
+    assert!(serde_json::to_string(&state).unwrap().contains("actor"));
+}

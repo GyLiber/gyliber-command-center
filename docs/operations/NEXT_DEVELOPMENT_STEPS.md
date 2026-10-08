@@ -4,10 +4,10 @@
 **Planning date:** 2026-09-30  
 **Last development update:** 2026-10-08
 **Current release:** v0.3.0 Reviewed Mathematical Playground; maintainer-reported live acceptance
-**Next development line:** Resolution Control, proposed application v0.4.0; typed core packet followed by persistence/API
+**Next development line:** Resolution Control, proposed application v0.4.0; persistence/API packet followed by member workflow
 **Product principle:** maximize useful state and action per unit of human attention.
 
-**Current stopping point:** At Gyile's explicit resumption, Sol implements the typed state/calculation packet on `feat/resolution-control-state`. Stop after its focused tests, exact-head CI/Security and merge. Next on `continue`: the dedicated persistence/API packet in section 11. This core alone adds no member page or live end-to-end capability; v0.3.0 remains the accepted release. Mathematical Experiment Bench design 1.0.0 remains queued. Temporary PostgreSQL expiry on 2026-10-30 and wider operational gates remain open.
+**Current stopping point:** Sol resumes from verified PR #42/main `9785e74c7b79b3c118d7177b7c7ebb570c31a4b1` on `feat/resolution-control-api` and implements the persistence/API packet. Stop after exact-head CI/Security and merge. Next on `continue`: the member workflow packet, not a release/deployment. The API defaults disabled; v0.3.0 remains the accepted release. Mathematical Experiment Bench design 1.0.0 remains queued. PostgreSQL expiry on 2026-10-30 and private activation/recovery gates remain open.
 
 ## 1. Current position
 
@@ -381,9 +381,9 @@ This takes priority over the previous bench queue at Gyile's latest instruction.
 | Packet | Reviewable outcome | Verification / stop boundary |
 |---|---|---|
 | Recovery/design integration | Luna provenance, reviewed contract, roadmap and handoff | Documentation consistency, CI/Security, merge; stop |
-| Typed state/calculations (next) | Bounded model, lifecycle, scope/evidence rules, precise buffers | Targeted unit tests including boundaries/missing times; CI/Security, commit/merge; stop |
-| Persistence and private API | Dedicated migrations, owner isolation, atomic/idempotent history, conflicts, report/export/restore | Synthetic PostgreSQL integration and authorization/failure tests, CI/Security; stop |
-| Member workflow | Dark focused action/ledger/unknowns/coverage and private report/recovery controls | Full synthetic browser workflow, keyboard/mobile/errors/privacy, CI/Security; stop |
+| Typed state/calculations (merged PR #42) | Bounded model, lifecycle, scope/evidence rules, precise buffers | Targeted unit tests including boundaries/missing times; CI/Security, commit/merge; stop |
+| Persistence and private API (this packet) | Dedicated migrations, owner isolation, atomic/idempotent history, conflicts, report/export/restore | Synthetic PostgreSQL integration and authorization/failure tests, CI/Security; stop |
+| Member workflow (next) | Dark focused action/ledger/unknowns/coverage and private report/recovery controls | Full synthetic browser workflow, keyboard/mobile/errors/privacy, CI/Security; stop |
 | Hosted acceptance/release | Verified running revision and useful workflow; documented private activation status | Deployment/migration/session and restore evidence, Gyile feedback, scoped release/tag verification; stop |
 
 Before private pilot onboarding, resolve the 2026-10-30 database expiry, demonstrate independent export restoration, durable owner/action audit and retention/deletion. These are concrete delivery gates, not a request to upload private data to this public repository. No new provider signup or paid AI is required by the design. If infrastructure needs a manual action, provide a specific runbook after the tested prerequisite work is complete.
@@ -398,3 +398,14 @@ The recovery/design packet merged through [PR #41](https://github.com/GyLiber/gy
 The current typed-core packet adds `src/lib.rs` and `src/resolution_control/` with bounded specs, guarded actions, scope/dimension/evidence transitions and precise controlled-clock schedules. See [design section 18](../architecture/RESOLUTION_CONTROL_DESIGN.md#18-typed-core-implementation-packet--2026-10-08) for concrete limits and conservative revision invalidation. Existing library dependencies are reused; time parsing/formatting features are enabled without changing the dependency versions. No routes, schema, registry entry or application version change yet.
 
 The next packet is **persistence/API**, not another design or repeated core implementation: owner-filtered PostgreSQL schema, transactional private history, server identity/time, revision conflicts/idempotency, bounded report/export/restore and synthetic integration/authorization/failure tests. Before real pilot use, resolve database expiry and demonstrate recovery and retention/deletion. Ask Gyile for an explicit manual infrastructure action only when the tested prerequisite work exposes one; no manual action is required for the typed-core packet. Return an exact verified checkpoint and stop before advancing.
+
+
+### Persistence/API implementation checkpoint — 2026-10-08
+
+The typed-core packet merged through [PR #42](https://github.com/GyLiber/gyliber-command-center/pull/42) at `9785e74c7b79b3c118d7177b7c7ebb570c31a4b1`. Its exact tested head was `b89f185d80d770018bf37dea04ee4c75cac7565c`: [CI 37819305794](https://github.com/GyLiber/gyliber-command-center/actions/runs/37819305794) and [Security 37819305401](https://github.com/GyLiber/gyliber-command-center/actions/runs/37819305401) passed. Gyile's `continue` authorizes this distinct next packet.
+
+This packet adds bounded command replay, migration 0003, stable GitHub-ID ownership, authenticated same-origin/CSRF endpoints, transactionally appended private history, revision/idempotency controls, private fixed-offset daily snapshots, checksummed data-only export/restore and deletion-generation barriers. See [design section 19](../architecture/RESOLUTION_CONTROL_DESIGN.md#19-persistenceapi-implementation-packet--2026-10-08) and [the operational contract](RESOLUTION_CONTROL.md). Synthetic PostgreSQL/HTTP tests exercise isolation, concurrency, failure, recovery and bounds. The implementation PR records exact-head repository gate evidence; a local run without a database is not persistence evidence.
+
+Next on `continue`: the **member workflow packet** — register/protect the page; dark, keyboard/mobile capture and ledger/current action; complete scope/material/evidence/threat controls; same-snapshot private reports and deliberate export/recovery/delete; browser checks for the whole synthetic workflow and failures. Keep loading and uncertain saves explicit; refetch after acknowledgement; conflicts require review. Expose imported provenance and actual capacity limits. No automatic client messaging, scheduling, provider AI or executable import.
+
+Keep feature activation disabled during backend preparation. No manual action is required from Gyile for this packet. Hosted acceptance follows the UI packet and must request concrete manual deployment/configuration actions only then. Resolve the 2026-10-30 storage expiry and prove a private independent backup plus latest deletion ledger can be restored before real onboarding. Application v0.4.0 and its tag await that end-to-end evidence. The existing locked `yoke-derive` 0.8.3 yank warning remains a separate dependency-maintenance item; this packet changes no dependency versions or audit policy.

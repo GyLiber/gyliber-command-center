@@ -21,7 +21,7 @@ The interface is deliberately calm, dark and information-forward. Its design tar
 
 ### v0.3.0 Reviewed mathematical playground
 
-The tested playground workflow is the next application minor release. Gyile confirmed the final deployment, four hosted playground checks, health `status=ok`, health/Live State version **0.3.0** and deployed commit `ae80a6d04b0753dd4f6bd6a90f75dc003ec37d3d` on 2026-10-03. This is maintainer-reported live acceptance; Sol did not independently inspect the signed-in production site. The application v0.1.0, v0.2.0 and v0.3.0 tags and GitHub Release listings were published on 2026-10-04; see [verified release tag history](docs/operations/RELEASE_TAGS.md) and [release scope and acceptance](docs/operations/RELEASE_0_3_0.md). This release retains the existing foundation:
+The tested playground workflow is the accepted application minor release. Gyile confirmed the final deployment, four hosted playground checks, health `status=ok`, health/Live State version **0.3.0** and deployed commit `ae80a6d04b0753dd4f6bd6a90f75dc003ec37d3d` on 2026-10-03. This is maintainer-reported live acceptance; Sol did not independently inspect the signed-in production site. The application v0.1.0, v0.2.0 and v0.3.0 tags and GitHub Release listings were published on 2026-10-04; see [verified release tag history](docs/operations/RELEASE_TAGS.md) and [release scope and acceptance](docs/operations/RELEASE_0_3_0.md). This release retains the existing foundation:
 
 
 - public GyLiber landing page
@@ -56,6 +56,10 @@ The default member workflow at `/command/math-playground` prepares a prompt from
 Metric couriers is the first reviewed pilot: a deterministic finite metric example, dark paused-by-default drawing, complete general metric definition, immutable hashed package, archive/stable replay links and full package download. A standalone viewer reproduces it without AI, a private exhibit database, CDN or npm dependencies. Four earlier demonstrations and optional hosted AI authoring remain available. Successful hosted AI drafting/runtime Git publishing are still unverified and are not prerequisites for this release's default path.
 
 See [the two-action workflow and replay instructions](docs/operations/MATH_PLAYGROUND_MANUAL_AUTHORING.md), [ADR-0011](docs/architecture/ADR-0011-manual-math-authoring.md) and [optional provider activation/recovery](docs/operations/MATH_PLAYGROUND.md). Application **0.3.0**, metric package **0.1.0**, dark legacy bundle **0.2.0** and formal reveal capability **0.2.0** are separate versions. Exhibit proof capability **0.3.0** remains deferred; an application release is not a proof-support claim. Personal eye comfort and recall benefit still need Gyile's feedback.
+
+### Resolution Control development
+
+The proposed application v0.4.0 is being delivered in verified batches. The typed core and private PostgreSQL/API foundation cover guarded actions/readiness, deadline buffers, transactional history, owner isolation, conflicts/retries and report/export/restore. The feature defaults to disabled; the member interface and hosted acceptance remain next. Application v0.3.0 stays the accepted live release. See [the design](docs/architecture/RESOLUTION_CONTROL_DESIGN.md), [operations and recovery contract](docs/operations/RESOLUTION_CONTROL.md) and [current next steps](docs/operations/NEXT_DEVELOPMENT_STEPS.md).
 
 ### Information boundary
 

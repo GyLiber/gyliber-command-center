@@ -5,7 +5,13 @@
 **Continuing AI engineering collaborator:** Sol
 **Inherited checkpoint:** PR #22, `fix/include-migrations-in-docker`
 
-## Current implementation checkpoint — typed Resolution Control core, 2026-10-08
+## Current implementation checkpoint — Resolution Control persistence/API, 2026-10-08
+
+Gyile's explicit `continue` resumes Sol from [PR #42](https://github.com/GyLiber/gyliber-command-center/pull/42), main `9785e74c7b79b3c118d7177b7c7ebb570c31a4b1`. The typed-core head `b89f185d80d770018bf37dea04ee4c75cac7565c` passed [CI 37819305794](https://github.com/GyLiber/gyliber-command-center/actions/runs/37819305794) and [Security 37819305401](https://github.com/GyLiber/gyliber-command-center/actions/runs/37819305401). Sol continues on `feat/resolution-control-api` with private owner-filtered PostgreSQL history, typed command replay, server identity/time, protected endpoints, conflict/retry handling, reports and export/restore/purge recovery barriers. [Operations](../operations/RESOLUTION_CONTROL.md) and [design section 19](../architecture/RESOLUTION_CONTROL_DESIGN.md#19-persistenceapi-implementation-packet--2026-10-08) record the implemented bounds and remaining trust assumptions.
+
+The exact tested head and CI/Security outcomes are recorded in this packet's PR and checkpoint report before merge. Stop after this coherent backend packet. Next on `continue`: member page/registry and complete synthetic browser workflow. The feature defaults disabled; application v0.3.0 remains accepted and v0.4.0 awaits the UI and hosted acceptance packets. No manual action is needed now. Private pilot data remains absent from public source; the temporary database expires 2026-10-30 and independent recovery/deletion-ledger evidence remains an activation dependency. Do not silently activate contracts, change historical tags or merge unrelated dependency work.
+
+## Previous implementation checkpoint — typed Resolution Control core, 2026-10-08
 
 Gyile explicitly resumed implementation under the checkpointed batch protocol. Sol starts `feat/resolution-control-state` from main `4173ffcb43032019447d89952b427a080cad725c`, the merged [PR #41](https://github.com/GyLiber/gyliber-command-center/pull/41) design checkpoint. The recovery packet passed CI/Security and preserved Luna's isolated design commit; no rollback was needed.
 
