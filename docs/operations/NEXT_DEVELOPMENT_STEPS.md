@@ -2,12 +2,12 @@
 
 **Document status:** Active roadmap  
 **Planning date:** 2026-09-30  
-**Last development update:** 2026-10-04
+**Last development update:** 2026-10-08
 **Current release:** v0.3.0 Reviewed Mathematical Playground; maintainer-reported live acceptance
-**Next development line:** Mathematical Experiment Bench design 1.0.0; implementation awaits explicit resumption
+**Next development line:** Resolution Control, proposed application v0.4.0; next packet is typed state/calculation implementation
 **Product principle:** maximize useful state and action per unit of human attention.
 
-**Current stopping point:** Gyile selected the [Mathematical Experiment Bench design 1.0.0](../architecture/MATHEMATICAL_EXPERIMENT_BENCH_DESIGN.md) as the next candidate. Today is documentation only; stop after document verification/merge. No implementation or deployment is authorized by this planning work unit. Examination rehearsal and public demonstration/service candidates are not queued. Existing operational responsibilities, including temporary database expiry on 2026-10-30, remain open.
+**Current stopping point:** Sol is integrating Luna's isolated [Resolution Control design](../architecture/RESOLUTION_CONTROL_DESIGN.md) at Gyile's request. This packet preserves Luna's commit, closes the implementation-contract gaps and updates documentation; stop after exact-head CI/Security and merge. No runtime change or deployment is included. On `continue`, begin only the typed state/calculation packet in section 11. Mathematical Experiment Bench design 1.0.0 remains queued after this newly selected priority. Temporary PostgreSQL expiry on 2026-10-30 and wider operational gates remain open.
 
 ## 1. Current position
 
@@ -368,3 +368,24 @@ After Gyile explicitly resumes implementation:
 5. Deploy and verify the actual running revision and bench/export workflow, assess usefulness, update evidence and publish/verify the chosen application minor tag. Stop expansion if the bench adds friction without answering the intended question.
 
 Examination rehearsal, public demonstration/service features, proof automation and general imports are not dependencies or approved additions to this queue. No learning, income or wider security-roadmap completion is inferred from the design. Finish today's documentation and stop; no signup, Render deployment or fresh release tag is required.
+
+
+## 11. Resolution Control recovery and next packets — 2026-10-08
+
+Luna's branch `design/resolution-control-2026-10-08` added one design file in commit `a434801235ce4a9f2addb178e95f86b7e3033ea8`, directly from main `9e2eabf352c0f0c723eea46826129c5dbfc3fe92`. No application code, release tag or main-branch change occurred. No rollback is needed. Preserve the original branch/commit and integrate the reviewed design through `sol/resolution-control-integration` using the ordinary PR/check/merge process.
+
+The [reviewed design, sections 16–17](../architecture/RESOLUTION_CONTROL_DESIGN.md#16-implementation-contract--sol-review-2026-10-08), defines owner authorization, completed-versus-verified evidence, exact buffer boundaries, transactional history/conflicts/idempotency, private report generation and activation/recovery gates. It supersedes any assumption that a member login alone or a temporary database makes the private pilot ready.
+
+This takes priority over the previous bench queue at Gyile's latest instruction. Existing accepted v0.3.0 playground behavior and immutable packages remain the baseline. The bench is still a design, not discarded work. Resolution Control is proposed for **application v0.4.0**; this documentation integration is not that release.
+
+| Packet | Reviewable outcome | Verification / stop boundary |
+|---|---|---|
+| Recovery/design integration | Luna provenance, reviewed contract, roadmap and handoff | Documentation consistency, CI/Security, merge; stop |
+| Typed state/calculations (next) | Bounded model, lifecycle, scope/evidence rules, precise buffers | Targeted unit tests including boundaries/missing times; CI/Security, commit/merge; stop |
+| Persistence and private API | Dedicated migrations, owner isolation, atomic/idempotent history, conflicts, report/export/restore | Synthetic PostgreSQL integration and authorization/failure tests, CI/Security; stop |
+| Member workflow | Dark focused action/ledger/unknowns/coverage and private report/recovery controls | Full synthetic browser workflow, keyboard/mobile/errors/privacy, CI/Security; stop |
+| Hosted acceptance/release | Verified running revision and useful workflow; documented private activation status | Deployment/migration/session and restore evidence, Gyile feedback, scoped release/tag verification; stop |
+
+Before private pilot onboarding, resolve the 2026-10-30 database expiry, demonstrate independent export restoration, durable owner/action audit and retention/deletion. These are concrete delivery gates, not a request to upload private data to this public repository. No new provider signup or paid AI is required by the design. If infrastructure needs a manual action, provide a specific runbook after the tested prerequisite work is complete.
+
+Follow the checkpointed batch protocol: one coherent unit, ordinarily 1–4 commits, verify relevant gates, record branch/exact head/results/next unit, then stop. Gyile's `continue` starts the next packet. This replaces the older one-session progression for new development; historical checkpoints above retain their original meaning.
