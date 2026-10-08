@@ -5,6 +5,16 @@
 **Continuing AI engineering collaborator:** Sol
 **Inherited checkpoint:** PR #22, `fix/include-migrations-in-docker`
 
+## Current checkpoint — Resolution Control recovery, 2026-10-08
+
+Gyile asked Sol to recover cleanly from Luna's separate design proposal and continue it toward live use. Main was `9e2eabf352c0f0c723eea46826129c5dbfc3fe92`; Luna's branch `design/resolution-control-2026-10-08` was `a434801235ce4a9f2addb178e95f86b7e3033ea8`, directly descended from that main revision and adding only `docs/architecture/RESOLUTION_CONTROL_DESIGN.md`. The SHA pasted in chat contained an extra character; the branch supplies the authoritative value. No rollback or release change is needed.
+
+Sol preserves Luna's commit as the parent of the reviewed integration on `sol/resolution-control-integration`. The [reviewed design](../architecture/RESOLUTION_CONTROL_DESIGN.md) fills owner authorization, scope/evidence, time/buffer, private transactional history and recovery gaps. The real pilot document is separate and was not supplied or reviewed. No private instance data is introduced.
+
+This is a documentation packet, not a deployed feature. Required CI/Security results and exact head are recorded in its GitHub PR/checkpoint report before merge. Next on `continue`: the bounded typed-state/calculation packet in [Next Steps section 11](../operations/NEXT_DEVELOPMENT_STEPS.md#11-resolution-control-recovery-and-next-packets--2026-10-08). Stop after each coherent verified packet and return branch/head/results/next unit to Gyile; do not start the following packet silently. Proposed v0.4.0 awaits implementation and hosted acceptance. Mathematical Experiment Bench design 1.0.0 remains queued; v0.3.0 stays the accepted application baseline.
+
+The temporary PostgreSQL expiry on 2026-10-30, private activation and wider audit/contract gates remain open. Documentation-only integration needs no Render deployment or release tag.
+
 ## Current temporary pause checkpoint — 2026-10-03
 
 At Gyile's latest instruction, **Sol** reviewed the repository and updated the handoff before a temporary stop. This checkpoint governed the temporary pause; the explicit release resumption below now supersedes it.
