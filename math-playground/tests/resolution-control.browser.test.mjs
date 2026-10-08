@@ -16,7 +16,7 @@ const server=createServer(async(req,res)=>{
   try {
     const path=new URL(req.url,'http://localhost').pathname;
     const send=(status,content,type='application/json')=>{res.writeHead(status,{'Content-Type':type,'Cache-Control':'no-store','Content-Security-Policy':"default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'"});res.end(typeof content==='string'||Buffer.isBuffer(content)?content:JSON.stringify(content));};
-    const files={'/command/resolution-control':'static/resolution-control.html','/static/app.css':'static/app.css','/static/resolution-control/style.css':'static/resolution-control/style.css','/static/resolution-control/app.mjs':'static/resolution-control/app.mjs','/static/resolution-control/model.mjs':'static/resolution-control/model.mjs'};
+    const files={'/command/resolution-control':'static/resolution-control.html','/static/app.css':'static/app.css','/static/resolution-control/style.css':'static/resolution-control/style.css','/static/resolution-control/app.mjs':'static/resolution-control/app.mjs','/static/resolution-control/model.mjs':'static/resolution-control/model.mjs','/static/resolution-control/readiness.mjs':'static/resolution-control/readiness.mjs'};
     if(files[path])return send(200,await readFile(resolve(root,files[path])),path.endsWith('.mjs')?'text/javascript':path.endsWith('.css')?'text/css':'text/html');
     if(path==='/api/resolution-control')return unauthorized?send(401,{error:'authentication_required'}):disabled?send(503,{error:'feature_disabled'}):send(200,{viewer:'github-1',csrf:'test-csrf',view,limits:{events:2048},import_notice:'Imported history is a user-supplied claim.'});
     if(path==='/api/resolution-control/commands' && req.method==='POST') {
@@ -29,11 +29,42 @@ const server=createServer(async(req,res)=>{
       const c=packet.command,w=view.workspace;
       if(c.type==='create_resolution')w.resolutions.push({id:c.id,spec:c.spec});
       else if(c.type==='update_resolution')w.resolutions.find(r=>r.id===c.id).spec=c.spec;
-      else if(c.type==='create_commitment'){w.commitments.push({id:c.id,resolution:c.resolution,spec:c.spec,schedule:c.schedule});view.buffers.push({commitment:c.id,unfinished:{state:'target_unknown',deadline_reached:false},finished:null});}
+      else if(c.type==='create_commitment'){w.commitments.push({id:c.id,resolution:c.resolution,spec:c.spec,schedule:c.schedule,readiness:{scope_revision:0,scope_identified:false,items:[],blocking_threats:0,verified_finish:null}});view.buffers.push({commitment:c.id,unfinished:{state:'target_unknown',deadline_reached:false},finished:null});}
       else if(c.type==='update_commitment')Object.assign(w.commitments.find(r=>r.id===c.id),{spec:c.spec,schedule:c.schedule});
       else if(c.type==='create_action')w.actions.push({id:c.id,commitment:c.commitment,action:{plan:c.plan,status:'new',artifact:null}});
       else if(c.type==='update_action')Object.assign(w.actions.find(a=>a.id===c.id).action,{plan:c.plan,status:'new'});
       else if(c.type==='select_action')w.current_action=c.id;
+      else if(['identify_scope','mark_scope_unknown','map_material','deploy_material','record_evidence','confirm_readiness','reopen_readiness','add_threat','resolve_threat'].includes(c.type)) {
+        const commitment=c.commitment ?? w.threats.find(t=>t.id===c.id)?.commitment;
+        const r=w.commitments.find(item=>item.id===commitment).readiness;
+        const matching=key=>r.items.find(item=>item.key.item===key.item&&item.key.dimension===key.dimension);
+        if(c.type==='identify_scope') {
+          r.scope_identified=true;r.scope_revision++;r.verified_finish=null;
+          r.items=c.items.map(key=>matching(key)??{key,mapped:null,deployed:null,stress_test:null,verification:null});
+        }
+        if(c.type==='mark_scope_unknown'){r.scope_identified=false;r.scope_revision++;r.verified_finish=null;}
+        if(c.type==='map_material'){const item=matching(c.key);item.mapped=c.artifact;item.deployed=null;r.scope_revision++;r.verified_finish=null;}
+        if(c.type==='deploy_material'){const item=matching(c.key);assert.ok(item.mapped);item.deployed=c.artifact;r.scope_revision++;r.verified_finish=null;}
+        if(c.type==='record_evidence') {
+          const item=matching(c.input.key);
+          assert.ok(item.deployed);
+          const evidence={...c.input,scope_revision:r.scope_revision,actor:'github-1',recorded_at:view.observed_at};
+          if(c.input.stage==='stress_test'){item.stress_test=evidence;item.verification=null;} else item.verification=evidence;
+          r.verified_finish=null;
+        }
+        if(c.type==='confirm_readiness'){
+          assert.ok(r.scope_identified&&r.blocking_threats===0&&r.items.length>0&&r.items.every(x=>x.verification?.outcome==='pass'&&x.verification?.scope_revision===r.scope_revision&&x.stress_test?.outcome==='pass'&&x.stress_test?.scope_revision===r.scope_revision));
+          r.verified_finish=view.observed_at;
+        }
+        if(c.type==='reopen_readiness'){assert.ok(r.verified_finish);r.verified_finish=null;r.scope_revision++;}
+        if(c.type==='add_threat'){w.threats.push({id:c.id,commitment:c.commitment,spec:c.spec,resolved:false});}
+        if(c.type==='resolve_threat'){w.threats.find(t=>t.id===c.id).resolved=true;}
+        if(['add_threat','resolve_threat'].includes(c.type)){
+          r.blocking_threats=w.threats.filter(t=>t.commitment===commitment&&!t.resolved&&t.spec.blocking).length;
+          if(r.blocking_threats>0){r.scope_revision++;r.verified_finish=null;}
+          assert.ok(r.blocking_threats<=128);
+        }
+      }
       else {
         const action=w.actions.find(a=>a.id===c.id).action;
         const statuses={ready_action:'ready',start_action:'in_progress',block_action:'blocked',cancel_action:'cancelled',complete_action:'completed',reopen_action:'new'};
@@ -116,6 +147,83 @@ test('Resolution Control uncertain saves retry identically and stale drafts are 
     assert.ok(!(await p.locator('#action-commitment').textContent()).includes('Reviewed draft'));
     assert.equal(await p.getByLabel('Resolution title',{exact:true}).inputValue(),'');
     assert.equal(await p.getByRole('link',{name:'Sign in again',exact:true}).isVisible(),true);
+    assert.deepEqual(pageErrors,[]);
+  }finally{await p.close();}
+});
+
+test('Resolution Control evidence is revision-bound, threats block finish and reopening invalidates attestations',async()=>{
+  reset();pageErrors.length=0;const p=await page();
+  try {
+    await outcome(p);await commitment(p);
+    await p.getByLabel('One pair per line: item_id | dimension').fill('metric_axioms | written');
+    p.once('dialog',dialog=>dialog.accept());
+    await p.getByRole('button',{name:'Replace identified scope'}).click();await saved(p);
+    assert.equal(view.workspace.commitments[0].readiness.items.length,1);
+    assert.equal(await p.getByRole('button',{name:/Confirm verified readiness/}).isDisabled(),true);
+
+    await p.getByLabel('Existing material reference').fill('https://example.invalid/source');
+    await p.getByRole('button',{name:'Record material'}).click();await saved(p);
+    assert.match(await p.locator('#rc-coverage').textContent(),/mapped/);
+    await p.getByLabel('Material stage').selectOption('deploy');
+    await p.getByLabel('Existing material reference').fill('reviewed-notes.tex');
+    await p.getByRole('button',{name:'Record material'}).click();await saved(p);
+    await p.getByLabel('Test / verification method').fill('Try an edge case');
+    await p.getByLabel('Existing evidence reference').fill('test-case-1');
+    await p.getByRole('button',{name:'Record evidence'}).click();await saved(p);
+    await p.getByLabel('Evidence stage').selectOption('verification');
+    await p.getByLabel('Test / verification method').fill('Inspect each logical implication');
+    await p.getByLabel('Existing evidence reference').fill('verification.tex');
+    await p.getByRole('button',{name:'Record evidence'}).click();await saved(p);
+    assert.equal(await p.getByRole('button',{name:/Confirm verified readiness/}).isDisabled(),false);
+
+    await p.getByLabel('Observed threat / obstacle').fill('<img src=x onerror=alert(1)>');
+    await p.getByLabel('Blocks verified readiness').check();
+    await p.getByRole('button',{name:'Capture threat'}).click();await saved(p);
+    assert.equal(await p.locator('#rc-threats img').count(),0);
+    assert.equal(await p.getByRole('button',{name:/Confirm verified readiness/}).isDisabled(),true);
+    p.once('dialog',dialog=>dialog.accept());
+    await p.getByRole('button',{name:'Resolve threat'}).click();await saved(p);
+    assert.equal(view.workspace.commitments[0].readiness.blocking_threats,0);
+    assert.match(await p.locator('#rc-coverage').textContent(),/stale/);
+
+    await p.getByLabel('Evidence stage').selectOption('stress_test');
+    await p.getByLabel('Test / verification method').fill('New revision stress test');
+    await p.getByLabel('Existing evidence reference').fill('stress-after-threat');
+    await p.getByRole('button',{name:'Record evidence'}).click();await saved(p);
+    await p.getByLabel('Evidence stage').selectOption('verification');
+    await p.getByLabel('Test / verification method').fill('Review current revision');
+    await p.getByLabel('Existing evidence reference').fill('current-review.tex');
+    await p.getByRole('button',{name:'Record evidence'}).click();await saved(p);
+    p.once('dialog',dialog=>dialog.accept());
+    await p.getByRole('button',{name:/Confirm verified readiness/}).click();await saved(p);
+    assert.ok(view.workspace.commitments[0].readiness.verified_finish);
+    assert.match(await p.locator('#rc-readiness-status').textContent(),/Human-confirmed/);
+
+    p.once('dialog',dialog=>dialog.accept());
+    await p.getByRole('button',{name:'Reopen verified readiness'}).click();await saved(p);
+    assert.equal(view.workspace.commitments[0].readiness.verified_finish,null);
+    assert.equal(await p.getByRole('button',{name:/Confirm verified readiness/}).isDisabled(),true);
+    assert.ok(writes.every(packet=>!('owner' in packet)&&!('actor' in packet.command)));
+    if(process.env.PLAYGROUND_SCREENSHOT_DIR)await p.screenshot({path:resolve(process.env.PLAYGROUND_SCREENSHOT_DIR,'resolution-evidence-desktop.png'),fullPage:true});
+    await p.setViewportSize({width:390,height:844});
+    assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+    if(process.env.PLAYGROUND_SCREENSHOT_DIR)await p.screenshot({path:resolve(process.env.PLAYGROUND_SCREENSHOT_DIR,'resolution-evidence-mobile.png'),fullPage:true});
+    assert.deepEqual(pageErrors,[]);
+  }finally{await p.close();}
+});
+
+test('Resolution Control never rebases a draft from an empty generation across an external reset',async()=>{
+  reset();pageErrors.length=0;const p=await page();
+  try {
+    await p.getByLabel('Resolution title',{exact:true}).fill('Preserve original generation');
+    view.generation='replacement-generation';view.revision=0;
+    await p.getByRole('button',{name:'Capture resolution',exact:true}).click();
+    await p.getByText(/Another edit or recovery/).waitFor();
+    assert.equal(writes.length,1);
+    assert.equal(writes[0].meta.generation,null);
+    assert.equal(writes[0].meta.expected_revision,0);
+    assert.equal(view.workspace.resolutions.length,0);
+    assert.equal(await p.getByLabel('Resolution title',{exact:true}).inputValue(),'Preserve original generation');
     assert.deepEqual(pageErrors,[]);
   }finally{await p.close();}
 });

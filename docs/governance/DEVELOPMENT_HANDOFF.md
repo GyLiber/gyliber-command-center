@@ -5,6 +5,10 @@
 **Continuing AI engineering collaborator:** Sol
 **Inherited checkpoint:** PR #22, `fix/include-migrations-in-docker`
 
+## Current development packet — member readiness, 2026-10-08
+
+Gyile's resumed development begins the bounded evidence/readiness/threat member interface packet on `feat/resolution-control-readiness-ui`, following merged docs PR #45. Existing Rust commands are reused. The page records explicitly identified scope/dimensions, source material, human stress-test/verification evidence, staleness, blockers, and deliberate readiness confirmation/reopening. New Node and browser tests accompany the implementation. Exact-head GitHub CI/Security verification and the merged revision are required before completion. No Render activation, private data onboarding, version bump or tag is authorized. Stop after this verified packet; Packet B is the private reporting/recovery interface.
+
 ## Current temporary stop — 2026-10-08
 
 Gyile requested a documentation-only close for today after the recovered member-preview batch. Sol completed [PR #44](https://github.com/GyLiber/gyliber-command-center/pull/44) on `feat/resolution-control-workflow`; implementation head `e93d3370b1aed6632d08ea7b62d7f7a83b6fbaf1` merged into main as `2f3e5caecf15da55129ab7882902c5dd8a13409f`. The merged tree `0b24894040c1e646b5385d50cbd7361302e6473a` exactly matches the tested implementation tree.

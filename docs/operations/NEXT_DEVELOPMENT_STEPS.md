@@ -436,3 +436,12 @@ To keep the remaining interface work bounded, the previously planned evidence/re
 On each `continue`, first inspect current main, open PRs, this handoff and the relevant source/design; choose one packet on a short-lived branch. Do not replay completed work or silently begin the following packet. If a packet grows beyond a coherent reviewable outcome, establish a tested sub-checkpoint and document its remainder. Record branch, exact tested head, merged main if applicable, checks and next unit in GitHub and return control to Gyile.
 
 No manual action is required at this temporary stop. Keep `RESOLUTION_CONTROL_ENABLED` disabled and actual private records out of public fixtures. Application v0.3.0 and historical tags remain unchanged. Mathematical Experiment Bench remains queued after Resolution Control; unrelated dependency work is outside these packets. Documentation-only closeout requires no Render deployment or hosted retest.
+
+
+### Evidence/readiness/threat member packet — in review, 2026-10-08
+
+Work branch `feat/resolution-control-readiness-ui` continues from the merged documentation checkpoint PR #45. It connects existing guarded API/domain commands to member controls for explicit scope/dimension pairs; source mapping/deployment; revision-bound stress-test/verification evidence; human-attested readiness confirmation/reopening; and blocking/nonblocking threats. Completed actions alone do not imply verified finish. The dark layout renders private text safely and reuses the existing same-origin CSRF/idempotency/retry controls; editing drafts retain their original revision across refresh.
+
+Verification requires Node parsing/readiness tests, synthetic browser coverage through threats and reopening, mobile/keyboard/privacy checks, and exact-head CI/Security before merge. The browser uses a controlled API fixture; it does not replace real PostgreSQL integration evidence. No feature flag, application release or tag changes. Keep disabled until later hosted/recovery acceptance.
+
+**Next after verified merge/stop:** Packet B, private history/daily report, export/newest deletion-ledger, restore/purge and browser validation. After that Packet C hosted acceptance/release, including independent recovery, storage-expiry resolution and Gyile's actual usefulness/comfort feedback. Do not conflate these packets.
