@@ -87,6 +87,14 @@ pub fn catalog() -> &'static [ModuleDescriptor] {
             live: false,
         },
         ModuleDescriptor {
+            id: "resolution-control",
+            name: "Resolution Control (preview)",
+            ui_path: None,
+            status: ModuleStatus::Reserved,
+            classification: DataClassification::Confidential,
+            live: false,
+        },
+        ModuleDescriptor {
             id: "people",
             name: "People",
             ui_path: None,
@@ -97,6 +105,19 @@ pub fn catalog() -> &'static [ModuleDescriptor] {
     ]
 }
 
+pub fn catalog_with_resolution(available: bool) -> Vec<ModuleDescriptor> {
+    let mut modules = catalog().to_vec();
+    if available {
+        let module = modules
+            .iter_mut()
+            .find(|m| m.id == "resolution-control")
+            .expect("declared module");
+        module.status = ModuleStatus::Active;
+        module.ui_path = Some("/command/resolution-control");
+    }
+    modules
+}
+
 #[cfg(test)]
 mod tests {
     use super::{DataClassification, ModuleStatus, catalog};
@@ -104,11 +125,24 @@ mod tests {
     #[test]
     fn catalog_contains_only_declared_modules() {
         let modules = catalog();
-        assert_eq!(modules.len(), 8);
+        assert_eq!(modules.len(), 9);
         assert_eq!(modules[0].status, ModuleStatus::Active);
         assert_eq!(modules[1].classification, DataClassification::Internal);
         assert_eq!(modules[3].id, "contracts-engagements");
         assert_eq!(modules[3].status, ModuleStatus::Reserved);
         assert_eq!(modules[3].classification, DataClassification::Confidential);
+    }
+    #[test]
+    fn resolution_preview_is_confidential_and_reserved_until_available() {
+        for enabled in [false, true] {
+            let modules = super::catalog_with_resolution(enabled);
+            let module = modules
+                .iter()
+                .find(|m| m.id == "resolution-control")
+                .unwrap();
+            assert_eq!(module.classification, DataClassification::Confidential);
+            assert_eq!(module.status == ModuleStatus::Active, enabled);
+            assert_eq!(module.ui_path.is_some(), enabled);
+        }
     }
 }

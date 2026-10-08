@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Resolution Control · GyLiber</title>
+<link rel="stylesheet" href="/static/app.css"><link rel="stylesheet" href="/static/resolution-control/style.css"><script type="module" src="/static/resolution-control/app.mjs"></script></head>
+<body><a class="skip" href="#current">Skip to Current Action</a><main class="shell rc">
+<header class="topbar"><div><span class="eyebrow">GYLIBER / CONFIDENTIAL PREVIEW</span><h1>Resolution Control</h1></div><a class="secondary-btn" href="/command">Command Center</a></header>
+<p class="muted">Synthetic records only until pilot activation. Keep original work in its existing tool; record references here.</p>
+<div class="rc-toolbar"><button id="refresh" type="button">Refresh state</button><button id="retry" type="button" hidden>Retry the same request</button><a id="signin" href="/login" hidden>Sign in again</a><span id="observed" class="muted">Not loaded</span></div>
+<p id="notice" role="status" aria-live="polite">Loading private state…</p><p id="import-notice" class="warning" hidden></p>
+<noscript><p>JavaScript is required for these controls. No changes have been saved.</p></noscript>
+<section id="current" class="panel rc-current" tabindex="-1" aria-labelledby="current-heading"><span class="eyebrow">ONE CURRENT ACTION</span><h2 id="current-heading">Current Action</h2><div id="current-content"><p>State is not available yet.</p></div></section>
+<section aria-labelledby="ledger-heading"><div class="section-heading"><h2 id="ledger-heading">Obligation ledger</h2><span id="capacity" class="muted"></span></div><div id="ledger"><p class="muted">Loading…</p></div></section>
+<section aria-labelledby="capture-heading"><h2 id="capture-heading">Capture or refine</h2><p class="muted">Unknown values may stay blank. Completing an action records an output; it does not establish verified readiness. Evidence and report controls are not yet available in this preview.</p>
+<div class="rc-forms">
+<details id="resolution-details" open><summary>1. Resolution / intended outcome</summary><form id="resolution-form"><fieldset disabled>
+<label for="resolution-title">Resolution title</label><input id="resolution-title" name="title" required maxlength="160">
+<label for="resolution-objective">Objective (optional)</label><textarea id="resolution-objective" name="objective" maxlength="2048"></textarea>
+<button type="submit">Capture resolution</button><button type="button" class="cancel-edit" hidden>Cancel edit</button></fieldset></form></details>
+<details id="commitment-details" open><summary>2. Commitment / obligation</summary><form id="commitment-form"><fieldset disabled>
+<label for="commitment-resolution">Resolution</label><select id="commitment-resolution" name="resolution" required><option value="">Capture a resolution first</option></select>
+<label for="commitment-title">Commitment title</label><input id="commitment-title" name="title" required maxlength="160">
+<label for="commitment-area">Module / area (optional)</label><input id="commitment-area" name="area" maxlength="160">
+<label for="commitment-kind">Work kind</label><select id="commitment-kind" name="kind"><option value="unclassified">Unknown / new</option><option value="assessment">Assessment</option><option value="project">Project</option><option value="research">Research</option><option value="other">Other</option></select>
+<label for="commitment-source">Existing source reference (optional; no tokens or credentials)</label><input id="commitment-source" name="source" maxlength="2048">
+<label for="deadline-precision">Deadline precision</label><select id="deadline-precision" name="deadline_precision"><option value="unknown">Unknown</option><option value="date_only">Date only</option><option value="instant">Exact time · UTC+02:00</option></select>
+<label for="deadline-value">Hard deadline</label><input id="deadline-value" name="deadline" type="date" disabled>
+<label for="earliest-precision">Target precision</label><select id="earliest-precision" name="earliest_precision"><option value="unknown">Unknown</option><option value="date_only">Date only</option><option value="instant">Exact time · UTC+02:00</option></select>
+<label for="earliest-value">Preferred earliest finish</label><input id="earliest-value" name="earliest" type="date" disabled>
+<label for="commitment-buffer">Protected buffer (whole minutes; blank unknown, 0 deliberate)</label><input id="commitment-buffer" name="buffer" type="number" min="0" max="525600" step="1">
+<p class="muted small">Exact inputs use fixed UTC+02:00, not your device timezone. Target must be at or before deadline minus buffer. A date alone is never treated as midnight.</p>
+<button type="submit">Capture commitment</button><button type="button" class="cancel-edit" hidden>Cancel edit</button></fieldset></form></details>
+<details id="action-details" open><summary>3. One concrete action</summary><form id="action-form"><fieldset disabled>
+<label for="action-commitment">Commitment</label><select id="action-commitment" name="commitment" required><option value="">Capture a commitment first</option></select>
+<label for="action-instruction">Action instruction</label><textarea id="action-instruction" name="instruction" required maxlength="2048"></textarea>
+<label for="action-expected">Expected output (needed before ready)</label><textarea id="action-expected" name="expected_artifact" maxlength="2048"></textarea>
+<label for="action-method">Verification method (needed before ready)</label><textarea id="action-method" name="verification_method" maxlength="2048"></textarea>
+<label for="action-reference">Start reference (optional; existing work location)</label><input id="action-reference" name="start_reference" maxlength="2048">
+<p class="muted small">Editing a ready or blocked plan returns it to new. Block ongoing work before changing its plan.</p>
+<button type="submit">Capture action</button><button type="button" class="cancel-edit" hidden>Cancel edit</button></fieldset></form></details>
+</div></section><p class="muted small">Keep this tab open until an uncertain save is resolved. Saved control metadata is private; original artifacts stay in their existing tool.</p>
+</main></body></html>

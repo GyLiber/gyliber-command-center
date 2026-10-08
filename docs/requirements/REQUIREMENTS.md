@@ -3,7 +3,7 @@
 **Client:** Gyile / GyLiber  
 **Target architecture:** v1.0.0  
 **First executable release:** v0.1.0  
-**Current live baseline:** v0.2.0  
+**Current live baseline:** v0.3.0 Reviewed Mathematical Playground (maintainer-reported acceptance)
 **Status:** Living baseline
 
 ## 1. Mission

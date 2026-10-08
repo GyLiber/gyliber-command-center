@@ -59,7 +59,7 @@ See [the two-action workflow and replay instructions](docs/operations/MATH_PLAYG
 
 ### Resolution Control development
 
-The proposed application v0.4.0 is being delivered in verified batches. The typed core and private PostgreSQL/API foundation cover guarded actions/readiness, deadline buffers, transactional history, owner isolation, conflicts/retries and report/export/restore. The feature defaults to disabled; the member interface and hosted acceptance remain next. Application v0.3.0 stays the accepted live release. See [the design](docs/architecture/RESOLUTION_CONTROL_DESIGN.md), [operations and recovery contract](docs/operations/RESOLUTION_CONTROL.md) and [current next steps](docs/operations/NEXT_DEVELOPMENT_STEPS.md).
+The proposed application v0.4.0 is being delivered in verified batches. The typed core and private PostgreSQL/API foundation cover guarded actions/readiness, deadline buffers, transactional history, owner isolation, conflicts/retries and report/export/restore. The feature defaults to disabled; this packet adds a protected capture/ledger/Current Action preview, with the remaining evidence/recovery interface and hosted acceptance still pending. Application v0.3.0 stays the accepted live release. See [the design](docs/architecture/RESOLUTION_CONTROL_DESIGN.md), [operations and recovery contract](docs/operations/RESOLUTION_CONTROL.md) and [current next steps](docs/operations/NEXT_DEVELOPMENT_STEPS.md).
 
 ### Information boundary
 
@@ -298,7 +298,7 @@ The following documents are intentionally living documents:
 - `docs/architecture/DESIGN.md`
 - `docs/architecture/MATH_PLAYGROUND_DESIGN.md` — source-driven creative mathematics design, with bounded implementation in ADR-0010
 - [Mathematical Experiment Bench design 1.0.0](docs/architecture/MATHEMATICAL_EXPERIMENT_BENCH_DESIGN.md) — queued design; implementation pending
-- [Resolution Control design](docs/architecture/RESOLUTION_CONTROL_DESIGN.md) — proposed v0.4.0; typed domain core implemented, persistence/API and member UI pending; not yet live
+- [Resolution Control design](docs/architecture/RESOLUTION_CONTROL_DESIGN.md) — proposed v0.4.0; typed core and private API implemented, member preview in development; remaining evidence/recovery UI and hosted acceptance pending
 - `docs/architecture/ADR-0009-canonical-public-domain.md`
 - `docs/architecture/ADR-0010-bounded-mathematical-playground.md`
 - `docs/operations/MATH_PLAYGROUND.md`

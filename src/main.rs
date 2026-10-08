@@ -233,13 +233,16 @@ async fn protected_repository(State(state): State<config::AppState>, session: Se
     }
 }
 
-async fn protected_modules(session: Session) -> Response {
-    let _member = match auth::require_api_member(&session).await {
+async fn protected_modules(State(state): State<config::AppState>, session: Session) -> Response {
+    let member = match auth::require_api_member(&session).await {
         Ok(member) => member,
         Err(failure) => return failure.into_response(),
     };
 
-    Json(modules::catalog()).into_response()
+    Json(modules::catalog_with_resolution(
+        state.resolution.available() && member.id.is_some_and(|id| id > 0),
+    ))
+    .into_response()
 }
 
 async fn command_resources(session: Session) -> Response {

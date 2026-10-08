@@ -821,3 +821,37 @@ async fn postgres_http_valid_owner_workflow_body_limits_and_closed_pool() {
         StatusCode::SERVICE_UNAVAILABLE
     );
 }
+
+#[tokio::test]
+async fn member_preview_page_requires_authentication_and_initially_disables_controls() {
+    let (anonymous, _) = app(None, false, None).await;
+    let response = request(
+        anonymous,
+        "/command/resolution-control",
+        "GET",
+        None,
+        None,
+        None,
+        "",
+    )
+    .await;
+    assert_eq!(response.status(), StatusCode::SEE_OTHER);
+    let (member, cookie) = app(Some(Some(1)), false, None).await;
+    let response = request(
+        member,
+        "/command/resolution-control",
+        "GET",
+        cookie.as_deref(),
+        None,
+        None,
+        "",
+    )
+    .await;
+    assert_eq!(response.status(), StatusCode::OK);
+    assert_eq!(response.headers()[header::CACHE_CONTROL], "no-store");
+    let bytes = to_bytes(response.into_body(), 65536).await.unwrap();
+    let html = String::from_utf8(bytes.to_vec()).unwrap();
+    assert!(html.contains("<fieldset disabled>"));
+    assert!(html.contains("Synthetic records only"));
+    assert!(!html.contains("test-csrf"));
+}
