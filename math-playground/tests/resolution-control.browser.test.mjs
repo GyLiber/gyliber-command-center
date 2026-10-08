@@ -211,3 +211,19 @@ test('Resolution Control evidence is revision-bound, threats block finish and re
     assert.deepEqual(pageErrors,[]);
   }finally{await p.close();}
 });
+
+test('Resolution Control never rebases a draft from an empty generation across an external reset',async()=>{
+  reset();pageErrors.length=0;const p=await page();
+  try {
+    await p.getByLabel('Resolution title',{exact:true}).fill('Preserve original generation');
+    view.generation='replacement-generation';view.revision=0;
+    await p.getByRole('button',{name:'Capture resolution',exact:true}).click();
+    await p.getByText(/Another edit or recovery/).waitFor();
+    assert.equal(writes.length,1);
+    assert.equal(writes[0].meta.generation,null);
+    assert.equal(writes[0].meta.expected_revision,0);
+    assert.equal(view.workspace.resolutions.length,0);
+    assert.equal(await p.getByLabel('Resolution title',{exact:true}).inputValue(),'Preserve original generation');
+    assert.deepEqual(pageErrors,[]);
+  }finally{await p.close();}
+});
