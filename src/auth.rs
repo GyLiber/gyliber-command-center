@@ -29,6 +29,8 @@ pub(crate) struct OAuthCallback {
 
 #[derive(Deserialize, Serialize, Clone)]
 pub(crate) struct GitHubUser {
+    #[serde(default)]
+    pub(crate) id: Option<u64>,
     pub(crate) login: String,
     pub(crate) name: Option<String>,
     pub(crate) avatar_url: Option<String>,

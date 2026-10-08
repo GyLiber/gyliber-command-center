@@ -26,6 +26,7 @@ mod config;
 mod math_playground;
 mod modules;
 mod repository;
+mod resolution_api;
 mod resources;
 mod session_store;
 mod state;
@@ -56,6 +57,10 @@ async fn main() -> Result<()> {
 
     let session_store = session_store::SessionStoreBackend::from_environment().await?;
     std::sync::Arc::get_mut(&mut state.math)
+        .expect("application state has not been shared")
+        .initialize(session_store.pool())
+        .await?;
+    std::sync::Arc::get_mut(&mut state.resolution)
         .expect("application state has not been shared")
         .initialize(session_store.pool())
         .await?;
@@ -116,6 +121,7 @@ fn build_app(
         .fallback(not_found)
         .layer(RequestBodyLimitLayer::new(64 * 1024))
         .merge(math_playground::routes())
+        .merge(resolution_api::routes())
         .layer(SetRequestIdLayer::new(
             header::HeaderName::from_static("x-request-id"),
             MakeRequestUuid,
@@ -380,6 +386,7 @@ mod tests {
             github: Some(std::sync::Arc::new(github)),
             http: Client::new(),
             math: std::sync::Arc::new(crate::math_playground::Service::default()),
+            resolution: std::sync::Arc::new(crate::resolution_api::Service::default()),
         };
 
         build_app(
@@ -417,6 +424,7 @@ mod tests {
             github: None,
             http: Client::new(),
             math: std::sync::Arc::new(crate::math_playground::Service::default()),
+            resolution: std::sync::Arc::new(crate::resolution_api::Service::default()),
         };
 
         build_app(

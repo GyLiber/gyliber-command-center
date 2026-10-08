@@ -4,11 +4,13 @@ mod readiness;
 mod schedule;
 mod types;
 mod workflow;
+mod workspace;
 
 pub use readiness::*;
 pub use schedule::*;
 pub use types::*;
 pub use workflow::*;
+pub use workspace::*;
 
 #[cfg(test)]
 mod tests;

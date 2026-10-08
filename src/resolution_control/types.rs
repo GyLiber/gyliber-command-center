@@ -93,6 +93,12 @@ impl From<Identifier> for String {
     }
 }
 
+impl Identifier {
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(try_from = "String", into = "String")]
 pub struct WebReference(String);

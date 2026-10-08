@@ -42,3 +42,10 @@ Create and approve:
 - failure-domain strategy
 
 A backup that has never been restored is an assumption, not verified recovery capability.
+
+
+## Resolution Control development boundary
+
+The proposed v0.4.0 module adds a private data-only workflow export plus a separate newest deletion ledger; see [its exact recovery and retention procedure](RESOLUTION_CONTROL.md#recovery-deletion-and-retention). A workflow backup alone cannot preserve deletions made after that backup. Restore into an empty migrated workspace requires current authenticated ownership, validated command replay and an explicit review of the latest independently retained ledger. Imported records are labelled user-supplied claims. Sessions and secrets are not in these exports.
+
+The backend packet does not establish hosted backups, automatic encryption, RPO/RTO, private activation or permanent storage. Keep synthetic operation until the member workflow and hosted acceptance gates are complete. Resolve the temporary Render PostgreSQL expiry on 2026-10-30 before depending on it for a private pilot.

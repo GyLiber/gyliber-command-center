@@ -574,6 +574,7 @@ mod tests {
             .insert(
                 auth::MEMBER_KEY,
                 auth::GitHubUser {
+                    id: Some(1),
                     login: "test-member".into(),
                     name: None,
                     avatar_url: None,
@@ -595,6 +596,7 @@ mod tests {
             github: None,
             http: reqwest::Client::new(),
             math: Arc::new(Service::default()),
+            resolution: Arc::new(crate::resolution_api::Service::default()),
         };
         (
             crate::build_app(

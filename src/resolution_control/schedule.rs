@@ -61,6 +61,12 @@ impl Instant {
 #[serde(try_from = "String", into = "String")]
 pub struct DateOnly(Date);
 
+impl DateOnly {
+    pub fn as_date(self) -> Date {
+        self.0
+    }
+}
+
 impl TryFrom<String> for DateOnly {
     type Error = DomainError;
 

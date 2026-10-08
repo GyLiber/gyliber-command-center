@@ -13,6 +13,7 @@ pub(crate) struct AppState {
     pub(crate) github: Option<Arc<GitHubConfig>>,
     pub(crate) http: Client,
     pub(crate) math: Arc<crate::math_playground::Service>,
+    pub(crate) resolution: Arc<crate::resolution_api::Service>,
 }
 
 #[derive(Clone)]
@@ -79,6 +80,7 @@ pub(crate) fn load_state() -> Result<AppState> {
     Ok(AppState {
         github,
         math: Arc::new(crate::math_playground::Service::from_environment()?),
+        resolution: Arc::new(crate::resolution_api::Service::from_environment()?),
         http: Client::builder()
             .user_agent("GyLiber-Command-Center/0.1.0")
             .redirect(reqwest::redirect::Policy::none())
