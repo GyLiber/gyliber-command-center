@@ -88,7 +88,7 @@ async function sendPending() {
 }
 function save(command, saved, base) {
   if(!ready || busy || pending)return;
-  pending={body:JSON.stringify({meta:{operation_id:crypto.randomUUID(),generation:base?.generation ?? snapshot.generation,expected_revision:base?.revision ?? snapshot.revision},command}),saved};
+  pending={body:JSON.stringify({meta:{operation_id:crypto.randomUUID(),generation:base ? base.generation : snapshot.generation,expected_revision:base ? base.revision : snapshot.revision},command}),saved};
   sendPending();
 }
 function refillSelect(select, records, label, empty) {
