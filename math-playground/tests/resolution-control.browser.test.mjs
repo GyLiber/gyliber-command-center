@@ -6,10 +6,10 @@ import {resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {chromium} from 'playwright';
 const root=fileURLToPath(new URL('../../',import.meta.url));
-let view,writes,operations,interrupt,disabled;
+let view,writes,operations,interrupt,disabled,unauthorized;
 function reset() {
   view={generation:null,revision:0,observed_at:'2026-10-08T18:00:07Z',workspace:{resolutions:[],commitments:[],actions:[],threats:[],current_action:null},buffers:[],imported_history:false};
-  writes=[];operations=new Map();interrupt=false;disabled=false;
+  writes=[];operations=new Map();interrupt=false;disabled=false;unauthorized=false;
 }
 reset();
 const server=createServer(async(req,res)=>{
@@ -18,7 +18,7 @@ const server=createServer(async(req,res)=>{
     const send=(status,content,type='application/json')=>{res.writeHead(status,{'Content-Type':type,'Cache-Control':'no-store','Content-Security-Policy':"default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'"});res.end(typeof content==='string'||Buffer.isBuffer(content)?content:JSON.stringify(content));};
     const files={'/command/resolution-control':'static/resolution-control.html','/static/app.css':'static/app.css','/static/resolution-control/style.css':'static/resolution-control/style.css','/static/resolution-control/app.mjs':'static/resolution-control/app.mjs','/static/resolution-control/model.mjs':'static/resolution-control/model.mjs'};
     if(files[path])return send(200,await readFile(resolve(root,files[path])),path.endsWith('.mjs')?'text/javascript':path.endsWith('.css')?'text/css':'text/html');
-    if(path==='/api/resolution-control')return disabled?send(503,{error:'feature_disabled'}):send(200,{viewer:'github-1',csrf:'test-csrf',view,limits:{events:2048},import_notice:'Imported history is a user-supplied claim.'});
+    if(path==='/api/resolution-control')return unauthorized?send(401,{error:'authentication_required'}):disabled?send(503,{error:'feature_disabled'}):send(200,{viewer:'github-1',csrf:'test-csrf',view,limits:{events:2048},import_notice:'Imported history is a user-supplied claim.'});
     if(path==='/api/resolution-control/commands' && req.method==='POST') {
       assert.equal(req.headers['x-resolution-csrf'],'test-csrf');
       let body='';for await(const chunk of req)body+=chunk;
@@ -43,7 +43,7 @@ const server=createServer(async(req,res)=>{
       }
       view.generation='generation-1';view.revision++;
       const ack={generation:view.generation,revision:view.revision,replayed:false};operations.set(packet.meta.operation_id,{body,ack});
-      if(interrupt){interrupt=false;res.destroy();return;}
+      if(interrupt){interrupt=false;return send(200,'{"revision":');} // Accepted write, deliberately unusable acknowledgement.
       return send(200,ack);
     }
     send(404,{});
@@ -110,6 +110,12 @@ test('Resolution Control uncertain saves retry identically and stale drafts are 
     p.once('dialog',dialog=>dialog.accept());await p.getByRole('button',{name:'Edit controls',exact:true}).click();assert.equal(await p.getByLabel('Commitment title',{exact:true}).inputValue(),'Other tab');
     await p.getByLabel('Commitment title',{exact:true}).fill('Reviewed draft');await p.getByRole('button',{name:'Save commitment',exact:true}).click();await saved(p);assert.equal(view.workspace.commitments[0].spec.title,'Reviewed draft');
     disabled=true;await p.getByRole('button',{name:'Refresh state',exact:true}).click();await p.getByText(/disabled on this deployment/).waitFor();assert.equal(await p.getByRole('button',{name:'Capture action',exact:true}).isDisabled(),true);
+    disabled=false;unauthorized=true;await p.getByRole('button',{name:'Refresh state',exact:true}).click();await p.getByText(/Your session has ended/).waitFor();
+    assert.equal(await p.locator('#ledger').textContent(),'');
+    assert.ok(!(await p.locator('#commitment-resolution').textContent()).includes('Retained draft'));
+    assert.ok(!(await p.locator('#action-commitment').textContent()).includes('Reviewed draft'));
+    assert.equal(await p.getByLabel('Resolution title',{exact:true}).inputValue(),'');
+    assert.equal(await p.getByRole('link',{name:'Sign in again',exact:true}).isVisible(),true);
     assert.deepEqual(pageErrors,[]);
   }finally{await p.close();}
 });

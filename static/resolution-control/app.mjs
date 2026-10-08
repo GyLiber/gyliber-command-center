@@ -27,6 +27,8 @@ function clearPrivate() {
   $('current-content').replaceChildren(node('p','Private state is not available.'));
   $('ledger').replaceChildren();$('capacity').textContent='';$('observed').textContent='Not loaded';$('import-notice').hidden=true;
   for(const kind of forms)resetForm(kind);
+  $('commitment-resolution').replaceChildren(new Option('Choose resolution',''));
+  $('action-commitment').replaceChildren(new Option('Choose commitment',''));
 }
 async function fetchJson(path, options={}) {
   const controller=new AbortController(), timer=setTimeout(()=>controller.abort(),10000);
@@ -68,6 +70,7 @@ async function sendPending() {
       if(response.status>=500 && data.error!=='feature_disabled')throw new Error('uncertain');
       pending=null;
       if(response.status===401){clearPrivate();$('signin').hidden=false;}
+      if(response.status===403 || data.error==='feature_disabled')ready=false;
       if(response.status===409 || response.status===410) {try{await load();}catch{ready=false;}}
       notice(errorMessage(data.error));return;
     }
