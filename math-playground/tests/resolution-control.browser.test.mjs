@@ -150,3 +150,64 @@ test('Resolution Control uncertain saves retry identically and stale drafts are 
     assert.deepEqual(pageErrors,[]);
   }finally{await p.close();}
 });
+
+test('Resolution Control evidence is revision-bound, threats block finish and reopening invalidates attestations',async()=>{
+  reset();pageErrors.length=0;const p=await page();
+  try {
+    await outcome(p);await commitment(p);
+    await p.getByLabel('One pair per line: item_id | dimension').fill('metric_axioms | written');
+    p.once('dialog',dialog=>dialog.accept());
+    await p.getByRole('button',{name:'Replace identified scope'}).click();await saved(p);
+    assert.equal(view.workspace.commitments[0].readiness.items.length,1);
+    assert.equal(await p.getByRole('button',{name:/Confirm verified readiness/}).isDisabled(),true);
+
+    await p.getByLabel('Existing material reference').fill('https://example.invalid/source');
+    await p.getByRole('button',{name:'Record material'}).click();await saved(p);
+    assert.match(await p.locator('#rc-coverage').textContent(),/mapped/);
+    await p.getByLabel('Material stage').selectOption('deploy');
+    await p.getByLabel('Existing material reference').fill('reviewed-notes.tex');
+    await p.getByRole('button',{name:'Record material'}).click();await saved(p);
+    await p.getByLabel('Test / verification method').fill('Try an edge case');
+    await p.getByLabel('Existing evidence reference').fill('test-case-1');
+    await p.getByRole('button',{name:'Record evidence'}).click();await saved(p);
+    await p.getByLabel('Evidence stage').selectOption('verification');
+    await p.getByLabel('Test / verification method').fill('Inspect each logical implication');
+    await p.getByLabel('Existing evidence reference').fill('verification.tex');
+    await p.getByRole('button',{name:'Record evidence'}).click();await saved(p);
+    assert.equal(await p.getByRole('button',{name:/Confirm verified readiness/}).isDisabled(),false);
+
+    await p.getByLabel('Observed threat / obstacle').fill('<img src=x onerror=alert(1)>');
+    await p.getByLabel('Blocks verified readiness').check();
+    await p.getByRole('button',{name:'Capture threat'}).click();await saved(p);
+    assert.equal(await p.locator('#rc-threats img').count(),0);
+    assert.equal(await p.getByRole('button',{name:/Confirm verified readiness/}).isDisabled(),true);
+    p.once('dialog',dialog=>dialog.accept());
+    await p.getByRole('button',{name:'Resolve threat'}).click();await saved(p);
+    assert.equal(view.workspace.commitments[0].readiness.blocking_threats,0);
+    assert.match(await p.locator('#rc-coverage').textContent(),/stale/);
+
+    await p.getByLabel('Evidence stage').selectOption('stress_test');
+    await p.getByLabel('Test / verification method').fill('New revision stress test');
+    await p.getByLabel('Existing evidence reference').fill('stress-after-threat');
+    await p.getByRole('button',{name:'Record evidence'}).click();await saved(p);
+    await p.getByLabel('Evidence stage').selectOption('verification');
+    await p.getByLabel('Test / verification method').fill('Review current revision');
+    await p.getByLabel('Existing evidence reference').fill('current-review.tex');
+    await p.getByRole('button',{name:'Record evidence'}).click();await saved(p);
+    p.once('dialog',dialog=>dialog.accept());
+    await p.getByRole('button',{name:/Confirm verified readiness/}).click();await saved(p);
+    assert.ok(view.workspace.commitments[0].readiness.verified_finish);
+    assert.match(await p.locator('#rc-readiness-status').textContent(),/Human-confirmed/);
+
+    p.once('dialog',dialog=>dialog.accept());
+    await p.getByRole('button',{name:'Reopen verified readiness'}).click();await saved(p);
+    assert.equal(view.workspace.commitments[0].readiness.verified_finish,null);
+    assert.equal(await p.getByRole('button',{name:/Confirm verified readiness/}).isDisabled(),true);
+    assert.ok(writes.every(packet=>!('owner' in packet)&&!('actor' in packet.command)));
+    if(process.env.PLAYGROUND_SCREENSHOT_DIR)await p.screenshot({path:resolve(process.env.PLAYGROUND_SCREENSHOT_DIR,'resolution-evidence-desktop.png'),fullPage:true});
+    await p.setViewportSize({width:390,height:844});
+    assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+    if(process.env.PLAYGROUND_SCREENSHOT_DIR)await p.screenshot({path:resolve(process.env.PLAYGROUND_SCREENSHOT_DIR,'resolution-evidence-mobile.png'),fullPage:true});
+    assert.deepEqual(pageErrors,[]);
+  }finally{await p.close();}
+});
