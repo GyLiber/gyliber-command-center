@@ -4,10 +4,10 @@
 **Planning date:** 2026-09-30  
 **Last development update:** 2026-10-08
 **Current release:** v0.3.0 Reviewed Mathematical Playground; maintainer-reported live acceptance
-**Next development line:** Resolution Control, proposed application v0.4.0; next packet is typed state/calculation implementation
+**Next development line:** Resolution Control, proposed application v0.4.0; typed core packet followed by persistence/API
 **Product principle:** maximize useful state and action per unit of human attention.
 
-**Current stopping point:** Sol is integrating Luna's isolated [Resolution Control design](../architecture/RESOLUTION_CONTROL_DESIGN.md) at Gyile's request. This packet preserves Luna's commit, closes the implementation-contract gaps and updates documentation; stop after exact-head CI/Security and merge. No runtime change or deployment is included. On `continue`, begin only the typed state/calculation packet in section 11. Mathematical Experiment Bench design 1.0.0 remains queued after this newly selected priority. Temporary PostgreSQL expiry on 2026-10-30 and wider operational gates remain open.
+**Current stopping point:** At Gyile's explicit resumption, Sol implements the typed state/calculation packet on `feat/resolution-control-state`. Stop after its focused tests, exact-head CI/Security and merge. Next on `continue`: the dedicated persistence/API packet in section 11. This core alone adds no member page or live end-to-end capability; v0.3.0 remains the accepted release. Mathematical Experiment Bench design 1.0.0 remains queued. Temporary PostgreSQL expiry on 2026-10-30 and wider operational gates remain open.
 
 ## 1. Current position
 
@@ -389,3 +389,12 @@ This takes priority over the previous bench queue at Gyile's latest instruction.
 Before private pilot onboarding, resolve the 2026-10-30 database expiry, demonstrate independent export restoration, durable owner/action audit and retention/deletion. These are concrete delivery gates, not a request to upload private data to this public repository. No new provider signup or paid AI is required by the design. If infrastructure needs a manual action, provide a specific runbook after the tested prerequisite work is complete.
 
 Follow the checkpointed batch protocol: one coherent unit, ordinarily 1–4 commits, verify relevant gates, record branch/exact head/results/next unit, then stop. Gyile's `continue` starts the next packet. This replaces the older one-session progression for new development; historical checkpoints above retain their original meaning.
+
+
+### Typed-core implementation checkpoint — 2026-10-08
+
+The recovery/design packet merged through [PR #41](https://github.com/GyLiber/gyliber-command-center/pull/41) as `4173ffcb43032019447d89952b427a080cad725c`, preserving Luna's original commit after CI/Security success. Gyile then explicitly authorized end-to-end implementation under the batch protocol and designated Resolution Control as the next application minor release.
+
+The current typed-core packet adds `src/lib.rs` and `src/resolution_control/` with bounded specs, guarded actions, scope/dimension/evidence transitions and precise controlled-clock schedules. See [design section 18](../architecture/RESOLUTION_CONTROL_DESIGN.md#18-typed-core-implementation-packet--2026-10-08) for concrete limits and conservative revision invalidation. Existing library dependencies are reused; time parsing/formatting features are enabled without changing the dependency versions. No routes, schema, registry entry or application version change yet.
+
+The next packet is **persistence/API**, not another design or repeated core implementation: owner-filtered PostgreSQL schema, transactional private history, server identity/time, revision conflicts/idempotency, bounded report/export/restore and synthetic integration/authorization/failure tests. Before real pilot use, resolve database expiry and demonstrate recovery and retention/deletion. Ask Gyile for an explicit manual infrastructure action only when the tested prerequisite work exposes one; no manual action is required for the typed-core packet. Return an exact verified checkpoint and stop before advancing.

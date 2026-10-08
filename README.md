@@ -294,7 +294,7 @@ The following documents are intentionally living documents:
 - `docs/architecture/DESIGN.md`
 - `docs/architecture/MATH_PLAYGROUND_DESIGN.md` — source-driven creative mathematics design, with bounded implementation in ADR-0010
 - [Mathematical Experiment Bench design 1.0.0](docs/architecture/MATHEMATICAL_EXPERIMENT_BENCH_DESIGN.md) — queued design; implementation pending
-- [Resolution Control design](docs/architecture/RESOLUTION_CONTROL_DESIGN.md) — proposed v0.4.0; reviewed implementation contract and checkpointed delivery, not yet live
+- [Resolution Control design](docs/architecture/RESOLUTION_CONTROL_DESIGN.md) — proposed v0.4.0; typed domain core implemented, persistence/API and member UI pending; not yet live
 - `docs/architecture/ADR-0009-canonical-public-domain.md`
 - `docs/architecture/ADR-0010-bounded-mathematical-playground.md`
 - `docs/operations/MATH_PLAYGROUND.md`
