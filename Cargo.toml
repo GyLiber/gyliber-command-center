@@ -7,7 +7,7 @@ publish = false
 
 [dependencies]
 anyhow = "1"
-base64 = "0.22"
+base64 = "0.23"
 async-trait = "0.1"
 axum = { version = "0.8.9", features = ["form"] }
 oauth2 = { version = "5.0", default-features = false }
