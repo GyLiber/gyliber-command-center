@@ -142,6 +142,7 @@ test('backup and newest ledger download, deliberate purge receipt, identical unc
    assert.deepEqual(downloads.filter(x=>x.endsWith('.json')).length,2);
    assert.deepEqual(downloads,downloads.slice().sort((a,b)=>a.includes('backup')?-1:1));
    assert.ok(downloads.length===2);
+   await p.getByText('5. Deliberate full-workspace purge',{exact:true}).click();
    await p.getByLabel('Type DELETE MY RESOLUTION CONTROL DATA exactly').fill('DELETE MY RESOLUTION CONTROL DATA');
    broken=true;p.once('dialog',d=>d.accept());
    await p.getByRole('button',{name:'Purge private workspace'}).click();
