@@ -10,7 +10,7 @@
 <noscript><p>JavaScript is required for these controls. No changes have been saved.</p></noscript>
 <section id="current" class="panel rc-current" tabindex="-1" aria-labelledby="current-heading"><span class="eyebrow">ONE CURRENT ACTION</span><h2 id="current-heading">Current Action</h2><div id="current-content"><p>State is not available yet.</p></div></section>
 <section aria-labelledby="ledger-heading"><div class="section-heading"><h2 id="ledger-heading">Obligation ledger</h2><span id="capacity" class="muted"></span></div><div id="ledger"><p class="muted">Loading…</p></div></section>
-<section aria-labelledby="capture-heading"><h2 id="capture-heading">Capture or refine</h2><p class="muted">Unknown values may stay blank. Completing an action records an output; it does not establish verified readiness. Evidence and threat controls are available below. Private reports and recovery remain for the next packet.</p>
+<section aria-labelledby="capture-heading"><h2 id="capture-heading">Capture or refine</h2><p class="muted">Unknown values may stay blank. Completing an action records an output; it does not establish verified readiness. Evidence, private reports and guarded recovery controls are available below. All records remain synthetic until release acceptance.</p>
 <div class="rc-forms">
 <details id="resolution-details" open><summary>1. Resolution / intended outcome</summary><form id="resolution-form"><fieldset disabled>
 <label for="resolution-title">Resolution title</label><input id="resolution-title" name="title" required maxlength="160">
@@ -75,5 +75,46 @@
 <h3>Scope coverage</h3><div id="rc-coverage" aria-live="polite"></div>
 <h3>Recorded threats</h3><div id="rc-threats" aria-live="polite"></div>
 <p class="muted small">Only the server can establish identity, timestamp and revision. After any acknowledged write, the current view is reloaded. A failed or stale test invalidates readiness; no numerical percentage hides unknown scope.</p>
+</section>
+
+<section id="rc-private" class="rc-readiness" aria-labelledby="rc-private-heading">
+<h2 id="rc-private-heading">Private history, daily reporting and recovery</h2>
+<p id="rc-workspace-revision" class="muted">State not loaded.</p>
+<p class="warning">Sensitive export files are unencrypted JSON. Keep all backups, reports and separate deletion ledgers in appropriate private storage. Never upload real records to a public repository. History is actor-reported, not machine-certified proof.</p>
+<div class="rc-evidence-grid">
+<details open><summary>1. Recorded change history</summary>
+<div class="rc-toolbar"><button id="rc-history-refresh" type="button" disabled>Load private history</button><button id="rc-history-more" type="button" disabled>Load next page</button></div>
+<p id="rc-history-note" class="muted">History not loaded.</p><div id="rc-history-list"></div>
+</details>
+<details open><summary>2. Daily report (private, on demand)</summary>
+<form id="rc-report-form"><fieldset disabled>
+<label for="rc-report-date">Local report date</label><input id="rc-report-date" name="date" type="date" required>
+<label for="rc-report-offset">Explicit fixed UTC offset (minutes, +120 for Johannesburg)</label><input id="rc-report-offset" name="offset" type="number" min="-840" max="840" step="1" value="120" required>
+<label for="rc-report-cutoff">History cutoff revision (optional; blank selects all observed events)</label><input id="rc-report-cutoff" name="cutoff" type="number" min="0" step="1">
+<p class="muted small">The report is derived from one server-side event snapshot. Offset is fixed, not DST-aware; reports are never sent to clients automatically.</p>
+<button type="submit">Preview private daily report</button>
+</fieldset></form>
+<button id="rc-report-download" type="button" disabled>Download displayed report JSON</button><div id="rc-report-view" aria-live="polite"></div>
+</details>
+<details open><summary>3. Private export and deletion ledger</summary>
+<p class="muted small">A workflow backup and the newest independent deletion ledger are both required. Re-download the ledger after every deletion. Downloading is not evidence that restore works.</p>
+<button id="rc-export" type="button" disabled>Download backup and deletion ledger</button>
+<button id="rc-ledger-download" type="button" disabled>Download latest ledger only</button>
+<button id="rc-receipt-download" type="button" disabled>Download retained purge receipt again</button>
+</details>
+<details open><summary>4. Restore into an empty workspace</summary>
+<p class="warning">Never restore into existing work. Only use an independently retained, current deletion ledger. The restore checks source deletion barriers; imported timestamps and identity remain user-supplied claims.</p>
+<label for="rc-backup-file">Versioned workflow backup JSON</label><input type="file" id="rc-backup-file" accept="application/json,.json">
+<label for="rc-metadata-file">Newest independent deletion ledger JSON</label><input type="file" id="rc-metadata-file" accept="application/json,.json">
+<label class="rc-checkbox"><input id="rc-restore-confirm" type="checkbox"> I have checked this is the newest independently retained ledger and the destination is empty.</label>
+<button id="rc-restore" type="button" disabled>Restore reviewed backup</button>
+</details>
+<details><summary>5. Deliberate full-workspace purge</summary>
+<p class="warning">This deletes the owner workspace event payloads, rotates its generation and records deletion markers. It does not delete offline copies, database backups or host snapshots. Retain the newest purge receipt independently.</p>
+<label for="rc-purge-phrase">Type DELETE MY RESOLUTION CONTROL DATA exactly</label><input id="rc-purge-phrase" autocomplete="off" spellcheck="false">
+<button id="rc-purge" type="button" disabled>Purge private workspace</button>
+</details>
+</div>
+<p id="rc-recovery-status" role="status" aria-live="polite"></p>
 </section>
 </main></body></html>
