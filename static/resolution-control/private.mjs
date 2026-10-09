@@ -46,10 +46,10 @@ function downloadJson(value,name) {
   setTimeout(()=>URL.revokeObjectURL(url),30000);
 }
 function clearNode(id){$(id).replaceChildren();}
-export function createPrivateUi({getSnapshot,getViewer,getCsrf,getAvailable,notice,refresh,sendRecovery,read}) {
+export function createPrivateUi({getSnapshot,getViewer,getAvailable,notice,sendRecovery,read}) {
   let entries=[],after=0,hasMore=false,historyRevision=null,historyGeneration=null;
   let report=null,reportGeneration=null,receipt=null,receiptOwner=null,receiptGeneration=null;
-  let busy=false,selectedBackup=null,selectedMetadata=null;
+  let busy=false;
   function blocked(){return !getAvailable()||busy;}
   function controls() {
     for(const id of ['rc-history-refresh','rc-report-form','rc-export','rc-ledger-download','rc-restore','rc-purge']) {
@@ -61,7 +61,7 @@ export function createPrivateUi({getSnapshot,getViewer,getCsrf,getAvailable,noti
   }
   function resetPrivate(){
     entries=[];after=0;hasMore=false;historyRevision=null;historyGeneration=null;
-    report=null;reportGeneration=null;receipt=null;receiptOwner=null;receiptGeneration=null;selectedBackup=null;selectedMetadata=null;busy=false;
+    report=null;reportGeneration=null;receipt=null;receiptOwner=null;receiptGeneration=null;busy=false;
     for(const id of ['rc-history-list','rc-report-view','rc-recovery-status'])clearNode(id);
     for(const id of ['rc-backup-file','rc-metadata-file'])$(id).value='';
     $('rc-purge-phrase').value='';$('rc-restore-confirm').checked=false;
@@ -73,7 +73,8 @@ export function createPrivateUi({getSnapshot,getViewer,getCsrf,getAvailable,noti
       // Keep the newly acknowledged purge receipt for a second download.
       const newest=receiptOwner===getViewer()&&receiptGeneration===next.generation?receipt:null;
       resetPrivate();
-      if(newest){receipt=newest;receiptOwner=getViewer();receiptGeneration=next.generation;}
+      if(newest){receipt=newest;receiptOwner=getViewer();receiptGeneration=next.generation;
+        $('rc-recovery-status').textContent='Purge acknowledged. The newest deletion receipt was requested for download; retain it independently.';}
     } else if(previous && previous.revision!==next.revision) {
       // Never offer a report or paged event list as if it reflected newer writes.
       report=null;reportGeneration=null;entries=[];after=0;hasMore=false;
@@ -159,7 +160,11 @@ export function createPrivateUi({getSnapshot,getViewer,getCsrf,getAvailable,noti
     if(!backupShape(backup))throw new Error('Unexpected backup format.');
     const metadata=await read('/recovery-metadata');
     if(!metadataShape(metadata))throw new Error('Unexpected deletion metadata.');
-    if(getSnapshot()?.generation!==observed.generation||getSnapshot()?.revision!==observed.revision)throw new Error('Workspace changed; refresh and repeat both downloads.');
+    const latest=await read('');
+    if(getSnapshot()?.generation!==observed.generation||getSnapshot()?.revision!==observed.revision||
+      latest.view?.generation!==observed.generation||latest.view?.revision!==observed.revision||
+      backup.source_generation!==observed.generation)
+      throw new Error('Workspace changed between reads. Refresh and repeat both downloads; retain newest deletion metadata.');
     downloadJson(backup,'resolution-control-backup.json');
     downloadJson(metadata,'resolution-control-recovery-metadata.json');
     $('rc-recovery-status').textContent='Backup and separate deletion metadata requested as downloads. Store privately; after every purge retain the newest ledger. A downloaded file alone is not a tested restore.';
@@ -173,7 +178,6 @@ export function createPrivateUi({getSnapshot,getViewer,getCsrf,getAvailable,noti
     const recovery_metadata=await fileJson($('rc-metadata-file').files[0],metadataShape);
     if(!confirm('Restore this user-supplied history into this empty workspace? It cannot prove its author or the source data and cannot bypass deletion barriers.'))return;
     sendRecovery('/restore',{backup,recovery_metadata,confirm_recovery_metadata:true},ack=>{
-      selectedBackup=null;selectedMetadata=null;
       $('rc-recovery-status').textContent=`Restore acknowledged at revision ${ack.revision}. All imported events remain user-supplied claims.`;
       $('rc-backup-file').value='';$('rc-metadata-file').value='';$('rc-restore-confirm').checked=false;
     },{generation:observed.generation,revision:observed.revision});
