@@ -1,10 +1,11 @@
 import {text, reference, schedule, plan, displayTime, exactLocal, errorMessage} from './model.mjs';
 import {createReadinessUi} from './readiness.mjs';
+import {createPrivateUi} from './private.mjs';
 const $ = (id) => document.getElementById(id);
 let snapshot = null, csrf = null, viewer = null, ready = false, busy = false, pending = null;
 const forms = ['resolution','commitment','action'];
 const completionDrafts=new Map();
-let readinessUi=null;
+let readinessUi=null, privateUi=null;
 function node(tag, value, className) { const n = document.createElement(tag); if(value != null)n.textContent=value; if(className)n.className=className; return n; }
 function notice(value) { $('notice').textContent=value; }
 function buttons() {
@@ -13,6 +14,7 @@ function buttons() {
   for(const b of document.querySelectorAll('[data-write]'))b.disabled=!ready || busy || !!pending || b.dataset.eligible==='false';
   document.querySelector('.rc').setAttribute('aria-busy',String(busy));
   $('refresh').disabled=busy; $('retry').hidden=!pending; $('retry').disabled=busy || !csrf;
+  privateUi?.controls();
 }
 function button(label, command, eligible=true) {
   const b=node('button',label);b.type='button';b.dataset.write='true';b.dataset.eligible=String(eligible);
@@ -26,15 +28,15 @@ function referenceNode(ref) {
   return node('span',ref?.value ?? 'Not provided','reference');
 }
 function clearPrivate() {
-  snapshot=null;csrf=null;pending=null;ready=false;completionDrafts.clear();readinessUi?.clear();
+  snapshot=null;csrf=null;viewer=null;pending=null;ready=false;completionDrafts.clear();readinessUi?.clear();privateUi?.clear();
   $('current-content').replaceChildren(node('p','Private state is not available.'));
   $('ledger').replaceChildren();$('capacity').textContent='';$('observed').textContent='Not loaded';$('import-notice').hidden=true;
   for(const kind of forms)resetForm(kind);
   $('commitment-resolution').replaceChildren(new Option('Choose resolution',''));
   $('action-commitment').replaceChildren(new Option('Choose commitment',''));
 }
-async function fetchJson(path, options={}) {
-  const controller=new AbortController(), timer=setTimeout(()=>controller.abort(),10000);
+async function fetchJson(path, options={},timeoutMs=10000) {
+  const controller=new AbortController(), timer=setTimeout(()=>controller.abort(),timeoutMs);
   try {
     const response=await fetch(`/api/resolution-control${path}`,{credentials:'same-origin',cache:'no-store',signal:controller.signal,...options});
     let data;try {data=await response.json();} catch {throw new Error('response');}
@@ -50,7 +52,9 @@ async function load() {
   }
   if(!/^github-\d+$/.test(data.viewer) || !data.view?.workspace || !Array.isArray(data.view.workspace.actions) || !Number.isSafeInteger(data.view.revision) || typeof data.csrf!=='string')throw new Error('response');
   if(viewer && viewer!==data.viewer) {clearPrivate();notice('The signed-in account changed. Earlier drafts and displayed state were cleared.');}
+  const previous=snapshot;
   viewer=data.viewer;csrf=data.csrf;snapshot=data.view;ready=true;$('signin').hidden=true;
+  privateUi?.onSnapshot(previous,snapshot);
   $('observed').textContent=`Observed ${displayTime({precision:'instant',value:snapshot.observed_at})}`;
   $('import-notice').hidden=!snapshot.imported_history;
   $('import-notice').textContent=data.import_notice;
@@ -68,7 +72,7 @@ async function sendPending() {
   if(busy || !pending)return;busy=true;buttons();notice('Saving…');
   const attempt=pending;
   try {
-    const {response,data}=await fetchJson('/commands',{method:'POST',headers:{'Content-Type':'application/json','x-resolution-csrf':csrf},body:attempt.body});
+    const {response,data}=await fetchJson(attempt.path || '/commands',{method:'POST',headers:{'Content-Type':'application/json','x-resolution-csrf':csrf},body:attempt.body},attempt.path==='/restore'?30000:10000);
     if(!response.ok) {
       if(response.status>=500 && data.error!=='feature_disabled')throw new Error('uncertain');
       pending=null;
@@ -79,8 +83,10 @@ async function sendPending() {
     }
     // Only a received acknowledgement establishes acceptance. Never update
     // displayed state optimistically or retry automatically.
-    pending=null;const accepted=JSON.parse(attempt.body).command;if(["cancel_action","complete_action","reopen_action"].includes(accepted.type))completionDrafts.delete(accepted.id);attempt.saved?.();
-    try {await load();if(!accepted.type.startsWith('create_'))$('current').focus();notice(data.replayed ? 'The earlier save was confirmed. No duplicate change was recorded.' : 'Saved and refreshed.');}
+    pending=null;const accepted=JSON.parse(attempt.body).command;
+    if(accepted && ["cancel_action","complete_action","reopen_action"].includes(accepted.type))completionDrafts.delete(accepted.id);
+    try {attempt.saved?.(data);}catch{notice('Save accepted but local file preparation failed. Refresh and download the newest deletion ledger.');}
+    try {await load();if(accepted && !accepted.type.startsWith('create_'))$('current').focus();notice(data.replayed ? 'The earlier save was confirmed. No duplicate change was recorded.' : 'Saved and refreshed.');}
     catch {ready=false;notice('Save accepted, but current state could not be refreshed. Refresh before continuing.');}
   } catch {
     ready=false;notice('Save outcome is uncertain. Your draft is retained. Retry the same request; do not capture it again. Keep this tab open.');
@@ -90,6 +96,24 @@ function save(command, saved, base) {
   if(!ready || busy || pending)return;
   pending={body:JSON.stringify({meta:{operation_id:crypto.randomUUID(),generation:base ? base.generation : snapshot.generation,expected_revision:base ? base.revision : snapshot.revision},command}),saved};
   sendPending();
+}
+function sendRecovery(path,payload,saved,base) {
+  if(!ready || busy || pending)return;
+  if(!['/restore','/purge'].includes(path))throw new Error('Unsupported recovery operation.');
+  const meta={operation_id:crypto.randomUUID(),generation:base ? base.generation : snapshot.generation,expected_revision:base ? base.revision : snapshot.revision};
+  pending={path,body:JSON.stringify({meta,...payload}),saved};
+  // A recovery retry must use the identical body and operation id.
+  sendPending();
+}
+async function readPrivate(path) {
+  if(!ready || !snapshot || pending || busy)throw new Error('Refresh the workspace and resolve any uncertain save first.');
+  const {response,data}=await fetchJson(path);
+  if(!response.ok) {
+    if(response.status===401){clearPrivate();$('signin').hidden=false;}
+    if(response.status===403||data.error==='feature_disabled')ready=false;
+    const error=new Error(errorMessage(data.error));error.code=data.error;throw error;
+  }
+  return data;
 }
 function refillSelect(select, records, label, empty) {
   const previous=select.value;select.replaceChildren(new Option(empty,''));
@@ -183,6 +207,8 @@ function editForm(kind, record) {
 }
 function setup() {
   readinessUi=createReadinessUi({getSnapshot:()=>snapshot,save,notice,referenceNode});
+  privateUi=createPrivateUi({getSnapshot:()=>snapshot,getViewer:()=>viewer,getCsrf:()=>csrf,
+    getAvailable:()=>ready && !busy && !pending,notice,refresh,sendRecovery,read:readPrivate});
   for(const kind of forms) {
     const form=$(`${kind}-form`);form.querySelector('.cancel-edit').onclick=()=>resetForm(kind);
     form.addEventListener('input',()=>{form.dataset.dirty='true';});
