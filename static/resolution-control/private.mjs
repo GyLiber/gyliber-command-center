@@ -69,7 +69,18 @@ export function createPrivateUi({getSnapshot,getViewer,getCsrf,getAvailable,noti
     controls();
   }
   function onSnapshot(previous,next,ownerChanged=false) {
-    if(ownerChanged || (previous && previous.generation!==next.generation))resetPrivate();
+    if(ownerChanged || (previous && previous.generation!==next.generation)) {
+      // Keep the newly acknowledged purge receipt for a second download.
+      const newest=receiptOwner===getViewer()&&receiptGeneration===next.generation?receipt:null;
+      resetPrivate();
+      if(newest){receipt=newest;receiptOwner=getViewer();receiptGeneration=next.generation;}
+    } else if(previous && previous.revision!==next.revision) {
+      // Never offer a report or paged event list as if it reflected newer writes.
+      report=null;reportGeneration=null;entries=[];after=0;hasMore=false;
+      historyRevision=null;historyGeneration=null;
+      clearNode('rc-report-view');clearNode('rc-history-list');
+      $('rc-history-note').textContent='Workspace changed. Load history again.';
+    }
     $('rc-workspace-revision').textContent=`Workspace revision ${next.revision}; report times use an explicit fixed UTC offset, not automatic DST.`;
     if(!$('rc-report-date').value) {
       const stamp=Date.parse(next.observed_at);
