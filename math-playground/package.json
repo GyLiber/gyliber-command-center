@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node scripts/verify-curated.mjs && node --test tests/engine.test.mjs tests/curated.test.mjs exhibits/metric-couriers/0.1.0/tests.mjs tests/resolution-control.test.mjs tests/resolution-readiness.test.mjs",
+    "test": "node scripts/verify-curated.mjs && node --test tests/engine.test.mjs tests/curated.test.mjs exhibits/metric-couriers/0.1.0/tests.mjs tests/resolution-control.test.mjs tests/resolution-readiness.test.mjs tests/resolution-private.test.mjs",
     "test:browser": "node --test tests/browser.test.mjs tests/resolution-control.browser.test.mjs"
   },
   "devDependencies": {
