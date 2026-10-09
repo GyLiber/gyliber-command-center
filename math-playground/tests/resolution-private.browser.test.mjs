@@ -30,7 +30,7 @@ const server=createServer(async(req,res)=>{
   const url=new URL(req.url,'http://localhost'),path=url.pathname;
   const send=(status,data,type='application/json')=>{
     res.writeHead(status,{'Content-Type':type,'Cache-Control':'no-store','Content-Security-Policy':"default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'"});
-    res.end(typeof data==='string'?data:JSON.stringify(data));
+    res.end(typeof data==='string'||Buffer.isBuffer(data)?data:JSON.stringify(data));
   };
   try{
     if(staticFiles[path])return send(200,await readFile(resolve(root,staticFiles[path])),path.endsWith('.mjs')?'text/javascript':path.endsWith('.css')?'text/css':'text/html');
