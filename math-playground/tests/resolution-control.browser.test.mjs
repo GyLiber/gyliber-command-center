@@ -247,16 +247,18 @@ test('Deadline overview shows every date once, orders SAST times, navigates to d
     item('earlier', '<img src=x onerror=alert(1)>',at('2026-10-11T12:00:00Z')),
     item('later', 'Following submission',at('2026-10-11T15:00:00Z')),
     item('missing', 'Undated task',null),
+    {...item('internal','A2 internal target',null),schedule:{deadline:null,earliest_finish:date('2026-10-23'),buffer_minutes:null}},
     item('expired','Prior deadline',date('2026-10-09')),
     item('past-hour','Expired exact time',at('2026-10-10T17:30:00Z'))
   ];
   const p=await page();
   try{
     const overview=p.locator('#deadline-overview');
-    assert.equal(await overview.locator('.rc-deadline-item').count(),8);
-    assert.match(await overview.textContent(),/8 recorded obligations/);
+    assert.equal(await overview.locator('.rc-deadline-item').count(),9);
+    assert.match(await overview.textContent(),/9 recorded obligations \(7 hard deadlines, 1 target-only dates\)/);
+    assert.match(await overview.textContent(),/Internal\/preferred finish target · no hard deadline/);
     const titles=await overview.locator('.rc-deadline-group h3').allTextContents();
-    assert.deepEqual(titles,['Overdue · 2','Today · 1','Next 7 days · 3','Later · 1','Date unknown · 1']);
+    assert.deepEqual(titles,['Overdue · 2','Today · 1','Next 7 days · 3','Later · 2','Date unknown · 1']);
     assert.match(await overview.textContent(),/Time not specified/);
     assert.match(await overview.textContent(),/00:05 SAST/);
     assert.equal(await overview.locator('img').count(),0);
