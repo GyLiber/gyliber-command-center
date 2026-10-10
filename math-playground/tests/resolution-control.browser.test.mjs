@@ -228,3 +228,52 @@ test('Resolution Control never rebases a draft from an empty generation across a
     assert.deepEqual(pageErrors,[]);
   }finally{await p.close();}
 });
+
+test('Deadline overview shows every date once, orders SAST times, navigates to details and clears on session loss',async()=>{
+  reset();pageErrors.length=0;
+  view.observed_at='2026-10-10T19:00:00Z'; // 21:00 South Africa
+  view.workspace.resolutions=[{id:'outcome-1',spec:{title:'Schedule check',objective:null,client_reference:null}}];
+  const item=(id,title,deadline,area='CS244')=>({
+    id,resolution:'outcome-1',spec:{title,area,kind:'assessment',source:null},
+    schedule:{deadline,earliest_finish:null,buffer_minutes:null},
+    readiness:{scope_revision:0,scope_identified:false,items:[],blocking_threats:0,verified_finish:null}
+  });
+  const date=value=>({precision:'date_only',value});
+  const at=value=>({precision:'instant',value});
+  view.workspace.commitments=[
+    item('after', 'Later assessment',date('2026-10-22')),
+    item('today', 'Date-only no midnight',date('2026-10-10')),
+    item('midnight', 'Next calendar day',at('2026-10-10T22:05:00Z')),
+    item('earlier', '<img src=x onerror=alert(1)>',at('2026-10-11T12:00:00Z')),
+    item('later', 'Following submission',at('2026-10-11T15:00:00Z')),
+    item('missing', 'Undated task',null),
+    item('expired','Prior deadline',date('2026-10-09')),
+    item('past-hour','Expired exact time',at('2026-10-10T17:30:00Z'))
+  ];
+  const p=await page();
+  try{
+    const overview=p.locator('#deadline-overview');
+    assert.equal(await overview.locator('.rc-deadline-item').count(),8);
+    assert.match(await overview.textContent(),/8 recorded obligations/);
+    const titles=await overview.locator('.rc-deadline-group h3').allTextContents();
+    assert.deepEqual(titles,['Overdue · 2','Today · 1','Next 7 days · 3','Later · 1','Date unknown · 1']);
+    assert.match(await overview.textContent(),/Time not specified/);
+    assert.match(await overview.textContent(),/00:05 SAST/);
+    assert.equal(await overview.locator('img').count(),0);
+    const upcoming=await overview.locator('[data-urgency="soon"] .rc-deadline-info strong').allTextContents();
+    assert.deepEqual(upcoming,['Next calendar day','<img src=x onerror=alert(1)>','Following submission']);
+    await p.getByRole('button',{name:'View obligation: Following submission'}).click();
+    assert.equal(await p.evaluate(()=>document.activeElement?.dataset.commitment),'later');
+    await p.setViewportSize({width:390,height:844});
+    assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+    if(process.env.PLAYGROUND_SCREENSHOT_DIR) {
+      await mkdir(process.env.PLAYGROUND_SCREENSHOT_DIR,{recursive:true});
+      await p.screenshot({path:resolve(process.env.PLAYGROUND_SCREENSHOT_DIR,'resolution-deadline-overview-mobile.png'),fullPage:true});
+    }
+    unauthorized=true;
+    await p.getByRole('button',{name:'Refresh state',exact:true}).click();
+    await p.getByText(/Your session has ended/).waitFor();
+    assert.equal(await overview.textContent(),'');
+    assert.deepEqual(pageErrors,[]);
+  }finally{await p.close();}
+});
