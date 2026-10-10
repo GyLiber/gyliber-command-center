@@ -2,12 +2,28 @@
 
 **Document status:** Active roadmap  
 **Planning date:** 2026-09-30  
-**Last development update:** 2026-10-08
+**Last development update:** 2026-10-09
 **Current release:** v0.3.0 Reviewed Mathematical Playground; maintainer-reported live acceptance
-**Next development line:** Resolution Control, proposed application v0.4.0; member preview in smaller packets, followed by hosted acceptance
+**Next development line:** Resolution Control deadline-only hosted pilot; owner-authenticated import/verification next, v0.4.0 formal release gated
 **Product principle:** maximize useful state and action per unit of human attention.
 
-**Current stopping point:** Sol resumes from verified PR #43/main `b4567c14c615296a94c3e2f8a6a6cc6f9ff0e57a` on `feat/resolution-control-workflow`. This smaller packet implements protected capture/edit controls, obligation ledger, Current Action and explicit failure/retry/conflict behavior with tests. Stop after exact-head CI/Security, screenshot review and merge. Next on `continue`: evidence/threat/history/report and deliberate recovery controls, not deployment. The feature stays disabled; v0.3.0 remains accepted. Storage expiry on 2026-10-30 and private activation/recovery gates remain open.
+**Current stopping point:** See the 2026-10-09 hosted pilot checkpoint below. Feature activation and deployment succeeded; owner-authenticated import has **not** occurred. Next action is member login and empty-state verification; stop on mismatch.
+
+## Current hosted pilot / stopping checkpoint — 2026-10-09
+
+At the maintainer's direction, launch the **deadline-only, disposable member pilot**, not the full personal/private historical case file. The deployed Rust app now includes Resolution Control and is **live on Render** at source `df0721db8dc29ddae7285deb88e0383bb4db5523` (activation deploy `dep-db47a1dg1s2s738gd2d0`, live `2026-10-09T05:01:39Z`), with `RESOLUTION_CONTROL_ENABLED=true`. Existing protected endpoint: `https://gyliber-command-center-1bym.onrender.com/command/resolution-control`. Startup/migration and service-live logs verified; the signed-in owner page and private restore have **not** been personally accepted or verified yet.
+
+The prospective local, non-GitHub import contains **1 generic resolution, 15 actual dated deadlines and 1 separately labelled internal readiness target**, **0 fabricated actions, 0 detailed threats, no verification claims**. The source private document and local JSON **are not repository assets**. This is an intentionally time-limited service trial. There has been **no confirmed authenticated owner import**, no real browser-based recovery test, no v0.4.0 release/tag, and no database durability guarantee.
+
+**Next actions in strict order (begin with the first; pause on mismatch):**
+
+1. **Gyile's first manual action:** Open the member route and sign in; confirm authenticated access, readable/calm dark UI, exact observed revision/generation and whether the workspace is empty. If any earlier records exist, stop and preserve them. Do not purge or overwrite to make room for this import.
+2. **Protected import only after empty-state confirmation:** Independently download/check latest deletion metadata. Select the locally held deadline-only JSON, then the *newest* separately retained recovery-metadata JSON, confirm and restore through the member UI. No direct database insertion, public GitHub upload, browser-script impersonation, fabricated data, or weakened deletion marker handling. A rejected restore is a **failure to investigate**, not grounds to override guards.
+3. **Verify resulting state:** server acknowledgement and refreshed owner-bound view, exactly **16 commitments** (15 scheduled + internal target), 1 generic resolution, no made-up actions, no threats, the correct explicit SA UTC+02:00 clock times, appropriate date-only precision, correct display of the internal target as non-official, and no implicitly verified readiness. Review on mobile/keyboard as possible.
+4. **Recovery custody:** Download the new private workspace export **and** the latest independent deletion ledger, retain both outside Render and source control, test the reported daily snapshot and later reauthentication. The hosted restore/recovery safety case is still incomplete until these steps are evidenced.
+5. **Before promoting or expanding privacy scope:** Resolve the Render free PostgreSQL 18 expiration **2026-10-30T08:00:20Z** with a durable-storage decision or deliberate discard/export before expiry. The empty external SQL IP allowlist blocked direct admin querying; do not weaken it merely to inspect. Gyile's actual utility/eye-comfort acceptance and appropriate backup/recovery evidence are still required before a formal application **v0.4.0 tag/release**.
+
+**Stop for today:** Do not add code, schedule a deploy, import user data, activate another module, publish a tag or modify the database in this checkpoint. v0.3.0 is the last accepted and tagged app release, despite the newer code already hosted.
 
 ## 1. Current position
 

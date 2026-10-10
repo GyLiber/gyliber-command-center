@@ -1,6 +1,16 @@
 # Resolution Control operations
 
-**Implementation checkpoint:** persistence/API packet, 2026-10-08, Sol. Application version remains **0.3.0**. This is preparation for the proposed **0.4.0** member workflow, not hosted acceptance or private activation.
+**Implementation checkpoint:** hosted deadline-only pilot deployed on 2026-10-09. Last accepted/tagged application version remains **0.3.0**; the live source contains unreleased Resolution Control candidate **0.4.0**. Owner import and acceptance remain pending.
+
+## Live disposable deadline-only pilot activation checkpoint — 2026-10-09
+
+**Current runtime, superseding historical disabled/preview instructions below:** Render deployment `dep-db47a1dg1s2s738gd2d0` of `df0721db8dc29ddae7285deb88e0383bb4db5523` was marked `live` at `2026-10-09T05:01:39Z`; the actual feature environment flag is now `RESOLUTION_CONTROL_ENABLED=true`. Startup logs found/checked Resolution Control PostgreSQL schema and reported the web service live. Route: `https://gyliber-command-center-1bym.onrender.com/command/resolution-control`. This is **not** a verified authenticated import, secure backup, usability or release acceptance; the previous passages below describe earlier development stages and must not be treated as today's operational state.
+
+**Minimal data agreement:** Only real dates, times, course/module labels and a clearly marked *internal* target are eligible for this **disposable** pilot: a generic resolution, 15 dated assessment/tutorial items, one internal readiness target (16 commitments total). No detailed threats, livelihood/academic narrative, invented next actions, imported verification evidence or arbitrary readiness assertions. The full source note explicitly bars committing it to public GitHub. Both original data and local import JSON remain outside source control; there is no owner-authenticated import acceptance yet.
+
+**Next safe member procedure:** First sign in as the member at the route and verify whether the workspace is empty (revision 0, no records). If not empty, STOP and preserve the existing state. For an empty workspace only, inspect/download the latest independent deletion ledger; use the protected restore UI with the local deadline-only JSON backup and the newest ledger, review its warnings and confirm the operation. After server acknowledgement/reload verify 1 resolution, 16 commitments and **0** fabricated actions or threats; inspect every deadline and confirm the 23 October target is labelled as internal. Download a fresh private export and the latest independent deletion-ledger file into trusted storage outside the expiring service. Do not use the account owner's raw login cookies, direct SQL bypass, fake positive test reports or public GitHub fixtures with actual schedule details.
+
+**Retention / release boundaries:** The existing Render free PostgreSQL 18 expires `2026-10-30T08:00:20Z`; no independent restore to a second environment has yet been demonstrated, and the Render hosted SQL integration cannot inspect it because its current external IP allowlist is empty. The external restriction remains unchanged. No higher-sensitivity data should be onboarded and no assumption of durability is justified. Application **v0.3.0** remains the last formally accepted/tagged release. New code is already hosted, but v0.4.0 remains proposed until actual member acceptance, backup/recovery and an intentional storage decision. **No work beyond this documentation checkpoint today.**
 
 ## Availability and identity
 
