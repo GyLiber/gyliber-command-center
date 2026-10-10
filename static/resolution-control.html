@@ -4,11 +4,12 @@
 <link rel="stylesheet" href="/static/app.css"><link rel="stylesheet" href="/static/resolution-control/style.css"><script type="module" src="/static/resolution-control/app.mjs"></script></head>
 <body><a class="skip" href="#current">Skip to Current Action</a><main class="shell rc">
 <header class="topbar"><div><span class="eyebrow">GYLIBER / CONFIDENTIAL PREVIEW</span><h1>Resolution Control</h1></div><a class="secondary-btn" href="/command">Command Center</a></header>
-<p class="muted">Synthetic records only until pilot activation. Keep original work in its existing tool; record references here.</p>
+<p class="muted">Private member workspace · time-limited deadline pilot. Keep independent exports outside the hosting service. Readiness requires evidence; a recorded deadline is not a completion claim.</p>
 <div class="rc-toolbar"><button id="refresh" type="button">Refresh state</button><button id="retry" type="button" hidden>Retry the same request</button><a id="signin" href="/login" hidden>Sign in again</a><span id="observed" class="muted">Not loaded</span></div>
 <p id="notice" role="status" aria-live="polite">Loading private state…</p><p id="import-notice" class="warning" hidden></p>
 <noscript><p>JavaScript is required for these controls. No changes have been saved.</p></noscript>
 <section id="current" class="panel rc-current" tabindex="-1" aria-labelledby="current-heading"><span class="eyebrow">ONE CURRENT ACTION</span><h2 id="current-heading">Current Action</h2><div id="current-content"><p>State is not available yet.</p></div></section>
+<section id="deadlines" aria-labelledby="deadlines-heading"><div class="section-heading"><h2 id="deadlines-heading">All deadlines</h2><span class="muted">Chronological · South Africa UTC+02:00</span></div><p class="muted">All recorded dates are listed below, including overdue and unknown dates. Date-only deadlines never imply a particular hour. Refresh to update the observed time and urgency.</p><div id="deadline-overview"><p class="muted">Loading deadlines…</p></div></section>
 <section aria-labelledby="ledger-heading"><div class="section-heading"><h2 id="ledger-heading">Obligation ledger</h2><span id="capacity" class="muted"></span></div><div id="ledger"><p class="muted">Loading…</p></div></section>
 <section aria-labelledby="capture-heading"><h2 id="capture-heading">Capture or refine</h2><p class="muted">Unknown values may stay blank. Completing an action records an output; it does not establish verified readiness. Evidence, private reports and guarded recovery controls are available below. All records remain synthetic until release acceptance.</p>
 <div class="rc-forms">
