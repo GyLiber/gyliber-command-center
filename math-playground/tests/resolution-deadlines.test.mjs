@@ -49,3 +49,19 @@ test('deadline overview is read-only and handles an empty workspace', () => {
   assert.deepEqual(input,{commitments:[]});
   assert.throws(()=>deadlineGroups(input,'not-an-instant'),/authoritative/);
 });
+
+test('target-only internal date is visible, distinguished and never invents an official deadline',()=>{
+  const input={commitments:[
+    {id:'internal',spec:{title:'A2 preparation target',area:'All modules'},schedule:{deadline:null,earliest_finish:date('2026-10-23')}},
+    {id:'real',spec:{title:'Practical test',area:'CS244'},schedule:{deadline:at('2026-10-23T12:00:00Z'),earliest_finish:null}},
+    {id:'still-unknown',spec:{title:'Unscheduled',area:'Other'},schedule:{deadline:null,earliest_finish:null}}
+  ]};
+  const result=deadlineGroups(input,'2026-10-10T17:00:00Z');
+  assert.equal(result.count,3);
+  assert.equal(result.deadlines,1);
+  assert.equal(result.targets,1);
+  assert.deepEqual(locate(result,'later').map(x=>x.id),['internal','real']);
+  assert.equal(locate(result,'later')[0].kind,'target');
+  assert.equal(locate(result,'later')[1].kind,'deadline');
+  assert.deepEqual(locate(result,'unknown').map(x=>x.id),['still-unknown']);
+});
