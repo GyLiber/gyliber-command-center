@@ -37,7 +37,12 @@ export function deadlineGroups(workspace, observedAt) {
   const todayNumber = dayNumber(today);
   const groups = Object.fromEntries(categories.map(([key]) => [key, []]));
   for (const commitment of workspace.commitments) {
-    const fact = parseFact(commitment.schedule?.deadline);
+    // A preferred finish without a hard deadline is a TARGET, never an
+    // institutional due date. Include it by its own date rather than hiding it.
+    const hardDeadline = parseFact(commitment.schedule?.deadline);
+    const targetOnly = !hardDeadline && !!commitment.schedule?.earliest_finish;
+    const fact = hardDeadline || parseFact(commitment.schedule?.earliest_finish);
+    const kind = hardDeadline ? 'deadline' : targetOnly && fact ? 'target' : 'unknown';
     let group = 'unknown';
     if (fact) {
       const distance = dayNumber(fact.day) - todayNumber;
@@ -50,6 +55,7 @@ export function deadlineGroups(workspace, observedAt) {
       id: commitment.id,
       title: commitment.spec.title,
       area: commitment.spec.area || 'Area unspecified',
+      kind,
       day: fact?.day ?? null,
       time: fact?.time ?? null,
       sortTime: fact?.sortTime ?? -1
@@ -62,6 +68,8 @@ export function deadlineGroups(workspace, observedAt) {
     observedAt: localIso(observed).replace('T', ' ').slice(0, 19) + ' SAST (UTC+02:00)',
     today,
     count: workspace.commitments.length,
+    deadlines: Object.values(groups).flat().filter(x=>x.kind==='deadline').length,
+    targets: Object.values(groups).flat().filter(x=>x.kind==='target').length,
     categories: categories.map(([key, label]) => ({key, label, entries: groups[key]}))
   };
 }
@@ -78,7 +86,7 @@ export function renderDeadlineOverview(container, workspace, observedAt) {
   const overview = deadlineGroups(workspace, observedAt);
   container.replaceChildren();
   const summary = element('p', overview.count
-    ? `${overview.count} recorded obligations · as of ${overview.observedAt}. Time groups indicate deadline proximity, not completion or verified readiness.`
+    ? `${overview.count} recorded obligations (${overview.deadlines} hard deadlines, ${overview.targets} target-only dates) · as of ${overview.observedAt}. Time groups indicate due-date or target proximity, not completion or verified readiness.`
     : `No obligations recorded. Observed ${overview.observedAt}.`, 'muted rc-deadline-summary');
   container.append(summary);
   for (const group of overview.categories) {
@@ -93,6 +101,7 @@ export function renderDeadlineOverview(container, workspace, observedAt) {
       item.dataset.urgency = group.key;
       const when = element('div', undefined, 'rc-deadline-when');
       when.append(element('strong', entry.day ?? 'Unknown date'));
+      when.append(element('span', entry.kind==='target' ? 'Internal/preferred finish target · no hard deadline' : entry.kind==='deadline' ? 'Hard deadline' : 'No recorded deadline or target', 'rc-deadline-kind'));
       when.append(element('span', entry.day ? entry.time ?? 'Time not specified' : 'Date and time unknown', 'muted'));
       const info = element('div', undefined, 'rc-deadline-info');
       info.append(element('span', entry.area, 'muted'));
