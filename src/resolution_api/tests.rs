@@ -852,6 +852,7 @@ async fn member_preview_page_requires_authentication_and_initially_disables_cont
     let bytes = to_bytes(response.into_body(), 65536).await.unwrap();
     let html = String::from_utf8(bytes.to_vec()).unwrap();
     assert!(html.contains("<fieldset disabled>"));
-    assert!(html.contains("Synthetic records only"));
+    assert!(html.contains("Private member workspace"));
+    assert!(html.contains("All deadlines"));
     assert!(!html.contains("test-csrf"));
 }

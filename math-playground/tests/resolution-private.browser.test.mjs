@@ -23,6 +23,7 @@ const staticFiles={
   '/static/resolution-control/style.css':'static/resolution-control/style.css',
   '/static/resolution-control/app.mjs':'static/resolution-control/app.mjs',
   '/static/resolution-control/model.mjs':'static/resolution-control/model.mjs',
+  '/static/resolution-control/deadlines.mjs':'static/resolution-control/deadlines.mjs',
   '/static/resolution-control/readiness.mjs':'static/resolution-control/readiness.mjs',
   '/static/resolution-control/private.mjs':'static/resolution-control/private.mjs'
 };

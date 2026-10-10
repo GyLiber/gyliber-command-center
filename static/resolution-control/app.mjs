@@ -1,6 +1,7 @@
 import {text, reference, schedule, plan, displayTime, exactLocal, errorMessage} from './model.mjs';
 import {createReadinessUi} from './readiness.mjs';
 import {createPrivateUi} from './private.mjs';
+import {renderDeadlineOverview} from './deadlines.mjs';
 const $ = (id) => document.getElementById(id);
 let snapshot = null, csrf = null, viewer = null, ready = false, busy = false, pending = null;
 const forms = ['resolution','commitment','action'];
@@ -30,7 +31,7 @@ function referenceNode(ref) {
 function clearPrivate() {
   snapshot=null;csrf=null;viewer=null;pending=null;ready=false;completionDrafts.clear();readinessUi?.clear();privateUi?.clear();
   $('current-content').replaceChildren(node('p','Private state is not available.'));
-  $('ledger').replaceChildren();$('capacity').textContent='';$('observed').textContent='Not loaded';$('import-notice').hidden=true;
+  $('ledger').replaceChildren();$('deadline-overview').replaceChildren();$('capacity').textContent='';$('observed').textContent='Not loaded';$('import-notice').hidden=true;
   for(const kind of forms)resetForm(kind);
   $('commitment-resolution').replaceChildren(new Option('Choose resolution',''));
   $('action-commitment').replaceChildren(new Option('Choose commitment',''));
@@ -159,7 +160,7 @@ function render() {
     const commitments=workspace.commitments.filter(c=>c.resolution===resolution.id);
     if(!commitments.length)group.append(node('p','No commitments captured yet.','muted'));
     for(const commitment of commitments) {
-      const card=node('article',null,'obligation');card.dataset.commitment=commitment.id;card.append(node('h3',commitment.spec.title));
+      const card=node('article',null,'obligation');card.dataset.commitment=commitment.id;card.tabIndex=-1;card.append(node('h3',commitment.spec.title));
       const info=node('dl');addFact(info,'Area / kind',`${commitment.spec.area ?? 'Unknown'} · ${commitment.spec.kind}`);
       addFact(info,'Deadline',displayTime(commitment.schedule.deadline));addFact(info,'Earliest finish',displayTime(commitment.schedule.earliest_finish));
       addFact(info,'Chosen buffer',commitment.schedule.buffer_minutes===null ? 'Unknown' : `${commitment.schedule.buffer_minutes} minutes`);
@@ -179,6 +180,7 @@ function render() {
     }
     ledger.append(group);
   }
+  renderDeadlineOverview($('deadline-overview'),workspace,snapshot.observed_at);
   readinessUi?.render(workspace);
 }
 function setPrecision(name, fact) {
