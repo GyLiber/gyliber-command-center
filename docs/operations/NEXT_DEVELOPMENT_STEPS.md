@@ -2,14 +2,24 @@
 
 **Document status:** Active roadmap  
 **Planning date:** 2026-09-30  
-**Last development update:** 2026-10-09
+**Last development update:** 2026-10-10
 **Current release:** v0.3.0 Reviewed Mathematical Playground; maintainer-reported live acceptance
-**Next development line:** Resolution Control deadline-only hosted pilot; owner-authenticated import/verification next, v0.4.0 formal release gated
+**Next development line:** Resolution Control: 16 commitments visible to maintainer; backup custody, schedule audit and expiring storage are next; v0.4.0 release gated
 **Product principle:** maximize useful state and action per unit of human attention.
 
-**Current stopping point:** See the 2026-10-09 hosted pilot checkpoint below. Feature activation and deployment succeeded; owner-authenticated import has **not** occurred. Next action is member login and empty-state verification; stop on mismatch.
+**Current stopping point:** See the 2026-10-10 owner-confirmed 16-commitment checkpoint below. Do **not** import a second time; preserve existing records and verify independent backup/deletion ledger, exact dates and storage disposition before formal release.
 
-## Current checkpoint — 2026-10-10: actual dates onboarding, pending member restore
+## Current stopping checkpoint — 2026-10-10: 16 live commitments visible (maintainer-reported)
+
+**Owner acceptance report:** Gyile confirmed **"16 commitments visible"** after following the authenticated deadline-only import instructions. This establishes maintainer-observed visibility of the intended commitment count in the live member UI; Sol did **not** observe the private owner session, inspect the underlying event stream or independently verify all dates, the 1-resolution/17-event counts, export files or the restoration acknowledgement. Do not represent these additional checks as complete.
+
+**Deployed and verified source:** All-Deadlines PR #51 merged as `f11cfd619e7844821d003794dde8f7702f7ba4f9`, then target-only-label correction PR #52 merged as `670848721f86fe6c33eab217385b58573be8a6ec` after its exact-head CI and Security passed ([CI](https://github.com/GyLiber/gyliber-command-center/actions/runs/38073409312), [Security](https://github.com/GyLiber/gyliber-command-center/actions/runs/38073409362)). Render deployment `dep-db57nuajnfac739hb3q0` reported **live** at `2026-10-10T17:57:58.293325Z`, with existing Resolution Control PostgreSQL tables checked during startup. The module remains behind existing GitHub-member authentication. The expected scope is **15 user-supplied hard deadlines and 1 separately labelled 23 October internal/preferred finish target**; never claim the latter is an official university deadline. Private source Markdown and import JSON were never committed to GitHub.
+
+**Next owner tasks, before formal v0.4.0 acceptance:** (1) Verify the real visible dates, exact SAST clock times and the target-only badge against the owner's source notices; report any discrepancy. (2) If not already securely retained, use **Download backup and deletion ledger** to save **both** unencrypted JSON files independently of Render and public GitHub; never publish them. (3) Verify one fresh signed-in refresh, navigation and readability. (4) Before the **2026-10-30T08:00:20Z** free PostgreSQL expiry, choose deliberate discard/export or durable replacement, and demonstrate recovery if records must survive. Record the actual backup custody and recovery proof separately. Keep higher-sensitivity records out of this disposable pilot.
+
+**Release boundary and stop:** The feature is live and the 16-count has been confirmed by the maintainer, but comprehensive authenticated/recovery acceptance has not yet been independently established. **v0.3.0 remains the last formally accepted/tagged application release; no v0.4.0 tag or production deployment is part of this documentation-only batch.** On resumption, begin with backup custody/date review and the storage-expiry decision; do not repeat an import or purge an existing workspace. **Stop for today.**
+
+## Previous checkpoint — 2026-10-10: actual dates onboarding, pending member restore
 
 The prior [All-Deadlines feature PR #51](https://github.com/GyLiber/gyliber-command-center/pull/51) merged at `f11cfd619e7844821d003794dde8f7702f7ba4f9`; Render [deploy `dep-db57grjbc2fs73ejlij0`](https://dashboard.render.com/web/srv-dau0307lot8c7395m6vg) reports **live** at `2026-10-10T17:42:57.604914Z`. Gyile personally confirmed the member **All deadlines** section appears but contains **no deadline records**. A page existing is not evidence that actual records are populated. No release tag change.
 
