@@ -6,10 +6,10 @@ import {resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {chromium} from 'playwright';
 const root=fileURLToPath(new URL('../../',import.meta.url));
-let view,writes,operations,interrupt,disabled,unauthorized;
+let view,writes,operations,interrupt,disabled,unauthorized,reads;
 function reset() {
   view={generation:null,revision:0,observed_at:'2026-10-08T18:00:07Z',workspace:{resolutions:[],commitments:[],actions:[],threats:[],current_action:null},buffers:[],imported_history:false};
-  writes=[];operations=new Map();interrupt=false;disabled=false;unauthorized=false;
+  writes=[];operations=new Map();interrupt=false;disabled=false;unauthorized=false;reads=0;
 }
 reset();
 const server=createServer(async(req,res)=>{
@@ -19,7 +19,7 @@ const server=createServer(async(req,res)=>{
     const files={'/command/resolution-control':'static/resolution-control.html','/static/app.css':'static/app.css','/static/resolution-control/style.css':'static/resolution-control/style.css','/static/resolution-control/app.mjs':'static/resolution-control/app.mjs','/static/resolution-control/model.mjs':'static/resolution-control/model.mjs',
   '/static/resolution-control/deadlines.mjs':'static/resolution-control/deadlines.mjs','/static/resolution-control/readiness.mjs':'static/resolution-control/readiness.mjs','/static/resolution-control/private.mjs':'static/resolution-control/private.mjs'};
     if(files[path])return send(200,await readFile(resolve(root,files[path])),path.endsWith('.mjs')?'text/javascript':path.endsWith('.css')?'text/css':'text/html');
-    if(path==='/api/resolution-control')return unauthorized?send(401,{error:'authentication_required'}):disabled?send(503,{error:'feature_disabled'}):send(200,{viewer:'github-1',csrf:'test-csrf',view,limits:{events:2048},import_notice:'Imported history is a user-supplied claim.'});
+    if(path==='/api/resolution-control'){reads++;return unauthorized?send(401,{error:'authentication_required'}):disabled?send(503,{error:'feature_disabled'}):send(200,{viewer:'github-1',csrf:'test-csrf',view,limits:{events:2048},import_notice:'Imported history is a user-supplied claim.'});}
     if(path==='/api/resolution-control/commands' && req.method==='POST') {
       assert.equal(req.headers['x-resolution-csrf'],'test-csrf');
       let body='';for await(const chunk of req)body+=chunk;
@@ -264,18 +264,53 @@ test('Deadline overview shows every date once, orders SAST times, navigates to d
     assert.equal(await overview.locator('img').count(),0);
     const upcoming=await overview.locator('[data-urgency="soon"] .rc-deadline-info strong').allTextContents();
     assert.deepEqual(upcoming,['Next calendar day','<img src=x onerror=alert(1)>','Following submission']);
+    const original=structuredClone(view), beforeReads=reads;
+    const search=p.getByRole('searchbox',{name:'Find an obligation'});
+    await search.fill('following cs244');
+    assert.equal(await overview.locator('.rc-deadline-item').count(),1);
+    assert.match(await p.locator('#deadline-filter-status').textContent(),/1 of 9/);
+    await p.getByLabel('Time group filter',{exact:true}).selectOption('today');
+    assert.equal(await overview.locator('.rc-deadline-item').count(),0);
+    assert.match(await overview.textContent(),/No obligations match/);
+    assert.equal(await p.locator('#ledger .obligation').count(),9); // Only overview is filtered.
+    await p.getByRole('button',{name:'Show all obligations',exact:true}).click();
+    assert.equal(await overview.locator('.rc-deadline-item').count(),9);
+    assert.equal(await search.evaluate(n=>document.activeElement===n),true);
+    await search.fill('<img');
+    assert.equal(await overview.locator('.rc-deadline-item').count(),1);
+    assert.equal(await overview.locator('img').count(),0);
+    await p.getByRole('button',{name:'Show all obligations',exact:true}).click();
+    await p.getByLabel('Module / area filter',{exact:true}).selectOption('CS244');
+    await p.getByLabel('Time group filter',{exact:true}).selectOption('soon');
+    assert.equal(await overview.locator('.rc-deadline-item').count(),3);
+    assert.deepEqual(view,original);assert.equal(writes.length,0);assert.equal(reads,beforeReads);
+    assert.equal(await p.evaluate(()=>location.search+location.hash),'');
+    assert.equal(await p.evaluate(()=>localStorage.length+sessionStorage.length),0);
+    await p.getByRole('button',{name:'Refresh state',exact:true}).click();
+    await p.getByText('State refreshed. No changes were made.',{exact:true}).waitFor();
+    assert.equal(await p.getByLabel('Time group filter',{exact:true}).inputValue(),'soon');
+    assert.equal(await overview.locator('.rc-deadline-item').count(),3);
     await p.getByRole('button',{name:'View obligation: Following submission'}).click();
     assert.equal(await p.evaluate(()=>document.activeElement?.dataset.commitment),'later');
+    await p.getByRole('button',{name:'Show all obligations',exact:true}).click();
+    if(process.env.PLAYGROUND_SCREENSHOT_DIR) {
+      await mkdir(process.env.PLAYGROUND_SCREENSHOT_DIR,{recursive:true});
+      await p.screenshot({path:resolve(process.env.PLAYGROUND_SCREENSHOT_DIR,'resolution-deadline-overview-desktop.png'),fullPage:true});
+    }
     await p.setViewportSize({width:390,height:844});
     assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
     if(process.env.PLAYGROUND_SCREENSHOT_DIR) {
       await mkdir(process.env.PLAYGROUND_SCREENSHOT_DIR,{recursive:true});
       await p.screenshot({path:resolve(process.env.PLAYGROUND_SCREENSHOT_DIR,'resolution-deadline-overview-mobile.png'),fullPage:true});
     }
+    await search.fill('following');
     unauthorized=true;
     await p.getByRole('button',{name:'Refresh state',exact:true}).click();
     await p.getByText(/Your session has ended/).waitFor();
     assert.equal(await overview.textContent(),'');
+    assert.equal(await search.inputValue(),'');assert.equal(await search.isDisabled(),true);
+    assert.equal(await p.locator('#deadline-area option').count(),1);
+    assert.equal(await p.locator('#deadline-filter-status').textContent(),'');
     assert.deepEqual(pageErrors,[]);
   }finally{await p.close();}
 });

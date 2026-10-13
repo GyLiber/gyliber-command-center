@@ -2,12 +2,26 @@
 
 **Document status:** Active roadmap  
 **Planning date:** 2026-09-30  
-**Last development update:** 2026-10-10
+**Last development update:** 2026-10-12
 **Current release:** v0.3.0 Reviewed Mathematical Playground; maintainer-reported live acceptance
 **Next development line:** Resolution Control: 16 commitments visible to maintainer; backup custody, schedule audit and expiring storage are next; v0.4.0 release gated
 **Product principle:** maximize useful state and action per unit of human attention.
 
-**Current stopping point:** See the 2026-10-10 owner-confirmed 16-commitment checkpoint below. Do **not** import a second time; preserve existing records and verify independent backup/deletion ledger, exact dates and storage disposition before formal release.
+**Current packet:** Polish the existing deadline view, verify/deploy one bounded unit, then stop. Do **not** import again; preserve the maintainer-confirmed 16 commitments and verify independent backup/deletion ledger, dates and storage disposition before formal release.
+
+## Current polish and return plan — 2026-10-12
+
+The complete core/readiness/report/recovery interfaces exist. The 16-commitment maintainer report is preserved by merged PR #53; start from `48360465acaee95c0555809f7a17a590a84cbd90`. Polish only All deadlines: local search/module/time-group filters, shown/total counts, clear reset/empty state, preserved ledger and observed-session clearing. Correct outdated synthetic-only wording. This is read-only presentation polish, not a new data model or release.
+
+After exact-head CI/Security and synthetic desktop/mobile review, merge/deploy the existing service, verify source/health/assets/authentication boundary, document evidence and **stop**. Once live, ask Gyile to open Resolution Control, Refresh state, check all 16 with filters clear, search a known module/date, narrow a time group, View obligation, then Show all obligations. No import, capture, purge or restore is needed for this check. Synthetic tests cannot certify personal comfort or owner dates.
+
+Remaining work on return, as separate bounded packets:
+
+1. Record owner filter/date/SAST/target-label acceptance and independently retained **both** backup and latest deletion ledger. Keep those files out of public PRs. Correct only evidenced discrepancies; infer no missing actions, dates or readiness.
+2. Demonstrate independent clean-database recovery with newest deletion metadata and deleted-source rejection; decide storage disposition before **2026-10-30T08:00:20Z** (10:00:20 SAST). Use disposable synthetic records for engineering tests; never reset the populated live workspace as a test.
+3. Only after scoped hosted/recovery/storage acceptance, prepare the formal v0.4.0 version/release/tag and verify publication. v0.3.0 remains the accepted/tagged release until then.
+
+Do not extend other modules or start Mathematical Experiment Bench in this packet. View filters require no paid infrastructure or signup.
 
 ## Current stopping checkpoint — 2026-10-10: 16 live commitments visible (maintainer-reported)
 
