@@ -5,6 +5,10 @@
 **Continuing AI engineering collaborator:** Sol
 **Inherited checkpoint:** PR #22, `fix/include-migrations-in-docker`
 
+## Current checkpoint — 2026-10-13: v0.4.0 published and deployed
+
+Owner authorized completing the existing feature polish and formal v0.4.0 release. PR #54 merged as `204c678c74eff80f0d0899150f473ae9c9434c45`; Render deployment `dep-db6p4n8m7kps73aprnpg` went live. Gyile reported the signed-in read-only deadline checks passed with 16 commitments, and later reported both backup and newest deletion-ledger files retained privately. PR #55 merged as `520fae7cbfc02d4c0927629778f9d50b06596f3a`, documenting those reports and disposable pilot decision A. PR #56 aligned Cargo.toml/Cargo.lock version 0.4.0 and release notes, checked head `783e400ef0ae3c9d19b72ba522957bf26bf67d67` passed CI/Security, and merged as `36854dca1a4ab72d5175267abf7489bf684cecc9`. Render deployment `dep-db6pnrjl550s739jsbr0` reported live at 2026-10-13T02:50:56Z. Owner published GitHub [v0.4.0](https://github.com/GyLiber/gyliber-command-center/releases/tag/v0.4.0) at 2026-10-13T02:58:05Z. Verified remote lightweight tag SHA equals that merge/deployed commit. No private actual-export restore was observed. Database expires 2026-10-30T08:00:20Z; no paid extension is authorized. Follow [Next Steps](../operations/NEXT_DEVELOPMENT_STEPS.md#publication-and-next-actions--2026-10-13), and stop.
+
 ## Current packet — 2026-10-12: polish existing deadline workflow
 
 Gyile requested end-to-end polish under the bounded batch protocol. Sol first merged documentation [PR #53](https://github.com/GyLiber/gyliber-command-center/pull/53) as `48360465acaee95c0555809f7a17a590a84cbd90` after exact-head [CI 38074770345](https://github.com/GyLiber/gyliber-command-center/actions/runs/38074770345) and [Security 38074770347](https://github.com/GyLiber/gyliber-command-center/actions/runs/38074770347) passed. Preserve the existing 16 commitments; do not re-import.
