@@ -5,7 +5,17 @@
 **Continuing AI engineering collaborator:** Sol
 **Inherited checkpoint:** PR #22, `fix/include-migrations-in-docker`
 
-## Current stopping checkpoint — 2026-10-10: 16 live commitments visible (maintainer-reported)
+## Current packet — 2026-10-12: polish existing deadline workflow
+
+Gyile requested end-to-end polish under the bounded batch protocol. Sol first merged documentation [PR #53](https://github.com/GyLiber/gyliber-command-center/pull/53) as `48360465acaee95c0555809f7a17a590a84cbd90` after exact-head [CI 38074770345](https://github.com/GyLiber/gyliber-command-center/actions/runs/38074770345) and [Security 38074770347](https://github.com/GyLiber/gyliber-command-center/actions/runs/38074770347) passed. Preserve the existing 16 commitments; do not re-import.
+
+On `polish/resolution-deadlines-2026-10-12`, add combined tab-local search and module/time-group filters, shown/total counts, empty-match guidance and Show all obligations. Keep chronological/SAST/date-only/internal-target semantics and the full ledger. Filters use the last observed snapshot without network requests, writes or browser-URL/persistent storage; clear search/options on observed session loss/account change. Correct outdated synthetic-only README/page wording. No database, migration, private schedule, permission, dependency or version/tag change.
+
+Record exact-head CI/Security and screenshot evidence in the implementation PR before merge/deployment. Local Chromium download is unavailable; CI supplies synthetic browser execution and desktop/mobile review. Deploy the existing Render service in Gyile's previously confirmed My Workspace (auto-deploy off); verify its deployed source, health, public assets and anonymous access boundary. Gyile's signed-in 16-record filter/readability check remains manual; no private owner-session access is claimed.
+
+Update the deployment/checkpoint evidence, then **stop**. No additional feature packet, import, purge or formal v0.4.0 release belongs here. Backup/latest deletion-ledger custody, date audit, actual recovery and database expiry remain gates in [Next Steps](../operations/NEXT_DEVELOPMENT_STEPS.md#current-polish-and-return-plan--2026-10-12).
+
+## Previous checkpoint — 2026-10-10: 16 live commitments visible (maintainer-reported)
 
 **Owner acceptance report:** Gyile confirmed **"16 commitments visible"** after following the authenticated deadline-only import instructions. This establishes maintainer-observed visibility of the intended commitment count in the live member UI; Sol did **not** observe the private owner session, inspect the underlying event stream or independently verify all dates, the 1-resolution/17-event counts, export files or the restoration acknowledgement. Do not represent these additional checks as complete.
 

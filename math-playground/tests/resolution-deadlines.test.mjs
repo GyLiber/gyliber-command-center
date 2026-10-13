@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {deadlineGroups} from '../../static/resolution-control/deadlines.mjs';
+import {deadlineGroups, filterDeadlineGroups} from '../../static/resolution-control/deadlines.mjs';
 
 const record = (id, deadline, title = id, area = 'MATH') =>
   ({id, spec:{title,area},schedule:{deadline}});
@@ -64,4 +64,26 @@ test('target-only internal date is visible, distinguished and never invents an o
   assert.equal(locate(result,'later')[0].kind,'target');
   assert.equal(locate(result,'later')[1].kind,'deadline');
   assert.deepEqual(locate(result,'unknown').map(x=>x.id),['still-unknown']);
+});
+
+test('deadline filters combine literal search, module and time group without changing facts or hiding the total',()=>{
+  const input={commitments:[
+    record('metric',date('2026-10-14'),'Metric TEST','MATH365'),
+    record('other',date('2026-10-14'),'Metric test','MATH344'),
+    record('unknown',null,'Unscheduled work',null),
+    {...record('target',null,'Internal finish','MATH365'),schedule:{deadline:null,earliest_finish:date('2026-10-23')}}
+  ]};
+  const original=structuredClone(input);
+  const overview=deadlineGroups(input,'2026-10-12T12:00:00Z');
+  const before=structuredClone(overview);
+  const filtered=filterDeadlineGroups(overview,{query:'ｍｅｔｒｉｃ 2026-10-14',area:'MATH365',period:'soon'});
+  assert.equal(filtered.count,4);assert.equal(filtered.shown,1);
+  assert.deepEqual(locate(filtered,'soon').map(x=>x.id),['metric']);
+  assert.equal(filtered.deadlines,2);assert.equal(filtered.targets,1);
+  assert.equal(filterDeadlineGroups(overview,{query:'<img src=x>'}).shown,0);
+  assert.equal(filterDeadlineGroups(overview,{query:'nothing matches'}).shown,0);
+  assert.equal(filterDeadlineGroups(overview,{area:'Area unspecified',period:'unknown'}).shown,1);
+  assert.equal(locate(filterDeadlineGroups(overview,{query:'internal',period:'later'}),'later')[0].kind,'target');
+  assert.equal(filterDeadlineGroups(overview).shown,4);
+  assert.deepEqual(overview,before);assert.deepEqual(input,original);
 });

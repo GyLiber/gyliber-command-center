@@ -1,12 +1,13 @@
 import {text, reference, schedule, plan, displayTime, exactLocal, errorMessage} from './model.mjs';
 import {createReadinessUi} from './readiness.mjs';
 import {createPrivateUi} from './private.mjs';
-import {renderDeadlineOverview} from './deadlines.mjs';
+import {createDeadlineUi} from './deadlines.mjs';
 const $ = (id) => document.getElementById(id);
 let snapshot = null, csrf = null, viewer = null, ready = false, busy = false, pending = null;
 const forms = ['resolution','commitment','action'];
 const completionDrafts=new Map();
 let readinessUi=null, privateUi=null;
+const deadlineUi=createDeadlineUi();
 function node(tag, value, className) { const n = document.createElement(tag); if(value != null)n.textContent=value; if(className)n.className=className; return n; }
 function notice(value) { $('notice').textContent=value; }
 function buttons() {
@@ -31,7 +32,7 @@ function referenceNode(ref) {
 function clearPrivate() {
   snapshot=null;csrf=null;viewer=null;pending=null;ready=false;completionDrafts.clear();readinessUi?.clear();privateUi?.clear();
   $('current-content').replaceChildren(node('p','Private state is not available.'));
-  $('ledger').replaceChildren();$('deadline-overview').replaceChildren();$('capacity').textContent='';$('observed').textContent='Not loaded';$('import-notice').hidden=true;
+  $('ledger').replaceChildren();deadlineUi.clear();$('capacity').textContent='';$('observed').textContent='Not loaded';$('import-notice').hidden=true;
   for(const kind of forms)resetForm(kind);
   $('commitment-resolution').replaceChildren(new Option('Choose resolution',''));
   $('action-commitment').replaceChildren(new Option('Choose commitment',''));
@@ -180,7 +181,7 @@ function render() {
     }
     ledger.append(group);
   }
-  renderDeadlineOverview($('deadline-overview'),workspace,snapshot.observed_at);
+  deadlineUi.render(workspace,snapshot.observed_at);
   readinessUi?.render(workspace);
 }
 function setPrecision(name, fact) {

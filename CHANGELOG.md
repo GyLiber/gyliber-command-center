@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Sol polished the existing Resolution Control deadline overview with tab-local title/module/date search, combined module/time-group filters, shown/total counts, an empty-match message and keyboard-accessible Show all obligations. Filtering preserves the ledger and makes no API requests/writes; observed session loss clears private filter values/options. Corrected outdated synthetic-only page/README wording to reflect the maintainer-confirmed disposable 16-commitment pilot. No version/tag, persistence, permissions or private schedule change.
+
 - Sol backfilled and verified application v0.1.0, v0.2.0 and v0.3.0 lightweight tags and GitHub Release notes on 2026-10-04 at the reviewed historical commits. See [tag provenance](docs/operations/RELEASE_TAGS.md); this documentation-only publication record requires no redeployment.
 
 - Future operational hardening, actual course-source review, bounded recipe import and exhibit proof support remain separate planned work. None is implied by the v0.3.0 application release.

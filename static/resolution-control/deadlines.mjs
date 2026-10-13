@@ -81,14 +81,26 @@ function element(tag, content, className) {
   return el;
 }
 
+// Filtering preserves the authoritative observation and group order. It never
+// mutates the source, infers missing dates or searches outside this tab.
+export function filterDeadlineGroups(overview, {query = '', area = '', period = 'all'} = {}) {
+  const terms = query.trim().normalize('NFKC').toLowerCase().split(/\s+/u).filter(Boolean);
+  const filtered = overview.categories.map(group => ({...group, entries: group.entries.filter(entry => {
+    const searchable = `${entry.title} ${entry.area} ${entry.day ?? ''}`.normalize('NFKC').toLowerCase();
+    return (period === 'all' || period === group.key) && (!area || area === entry.area) && terms.every(term => searchable.includes(term));
+  })}));
+  return {...overview, categories: filtered, shown: filtered.reduce((sum, group) => sum + group.entries.length, 0)};
+}
+
 // DOM is constructed with textContent only. No fetched record becomes HTML.
-export function renderDeadlineOverview(container, workspace, observedAt) {
-  const overview = deadlineGroups(workspace, observedAt);
+export function renderDeadlineOverview(container, workspace, observedAt, filters = {}) {
+  const overview = filterDeadlineGroups(deadlineGroups(workspace, observedAt), filters);
   container.replaceChildren();
   const summary = element('p', overview.count
     ? `${overview.count} recorded obligations (${overview.deadlines} hard deadlines, ${overview.targets} target-only dates) · as of ${overview.observedAt}. Time groups indicate due-date or target proximity, not completion or verified readiness.`
     : `No obligations recorded. Observed ${overview.observedAt}.`, 'muted rc-deadline-summary');
   container.append(summary);
+  if (overview.count && !overview.shown) container.append(element('p', 'No obligations match these filters. Choose Show all obligations to return to the complete overview.', 'muted'));
   for (const group of overview.categories) {
     if (!group.entries.length) continue;
     const section = element('section', undefined, 'rc-deadline-group');
@@ -123,4 +135,43 @@ export function renderDeadlineOverview(container, workspace, observedAt) {
     section.append(list);
     container.append(section);
   }
+  return overview;
+}
+
+export function createDeadlineUi() {
+  const get = id => document.getElementById(id);
+  const search = get('deadline-search'), area = get('deadline-area'), period = get('deadline-period');
+  const reset = get('deadline-reset'), status = get('deadline-filter-status'), container = get('deadline-overview');
+  let workspace = null, observedAt = null;
+  function display() {
+    if (!workspace) return;
+    const overview = renderDeadlineOverview(container, workspace, observedAt, {query:search.value, area:area.value, period:period.value});
+    const active = !!search.value.trim() || !!area.value || period.value !== 'all';
+    status.textContent = active ? `Filtered view: ${overview.shown} of ${overview.count} obligations shown. The ledger is unchanged.` : `All ${overview.count} recorded obligations shown.`;
+    reset.disabled = !active;
+  }
+  search.addEventListener('input', display);
+  area.addEventListener('change', display);
+  period.addEventListener('change', display);
+  reset.addEventListener('click', () => {search.value=''; area.value=''; period.value='all'; display(); search.focus();});
+  return {
+    render(nextWorkspace, nextObservedAt) {
+      // Build selectable areas from the same complete snapshot, before filters.
+      const previousArea = area.value;
+      const areas = [...new Set(nextWorkspace.commitments.map(c => c.spec.area || 'Area unspecified'))].sort((a,b)=>a.localeCompare(b));
+      area.replaceChildren(new Option('All modules / areas', ''));
+      for (const name of areas) area.add(new Option(name, name));
+      if (areas.includes(previousArea)) area.value = previousArea;
+      workspace = nextWorkspace; observedAt = nextObservedAt;
+      search.disabled = area.disabled = period.disabled = false;
+      display();
+    },
+    clear() {
+      workspace = observedAt = null;
+      search.value = ''; period.value = 'all';
+      area.replaceChildren(new Option('All modules / areas', ''));
+      search.disabled = area.disabled = period.disabled = reset.disabled = true;
+      container.replaceChildren(); status.textContent = '';
+    }
+  };
 }

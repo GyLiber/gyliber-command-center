@@ -24,6 +24,10 @@
 @media(max-width:950px){.rc #rc-private .rc-evidence-grid{grid-template-columns:1fr}}
 
 /* Read-only deadline overview. No color-only urgency indicators. */
+.rc .rc-deadline-filters{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,1fr) auto;gap:14px;align-items:end}
+.rc .rc-deadline-filters>div{min-width:0}.rc #deadline-filter-status{min-height:24px;overflow-wrap:anywhere}
+@media(max-width:950px){.rc .rc-deadline-filters{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:500px){.rc .rc-deadline-filters{grid-template-columns:1fr}.rc .rc-deadline-filters button{justify-self:start}}
 .rc #deadlines{margin:24px 0 30px;border-top:1px solid #526677;padding-top:14px}
 .rc .rc-deadline-group{margin:15px 0 22px}
 .rc .rc-deadline-group h3{font-size:1.06rem;margin:8px 0}

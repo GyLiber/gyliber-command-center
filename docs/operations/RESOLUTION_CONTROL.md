@@ -24,6 +24,14 @@ The prior [All-Deadlines feature PR #51](https://github.com/GyLiber/gyliber-comm
 
 **Next engineering gate:** Observe Gyile's actual import, signed-in dashboard, keyboard/mobile comfort, correct SAST calendar/time and refreshed sessions; investigate any guard/replay/checksum error rather than bypass it. Formal v0.4.0 tagging/release awaits accepted end-to-end functionality plus intentional disposition of the expiring free PostgreSQL 18 database (expires `2026-10-30T08:00:20Z`). Until that deadline, keep this strictly disposable and independently backed up. Do not import high-value privacy records. After the documentation and deployment checkpoint, **stop for today**.
 
+## Deadline-view polish — 2026-10-12
+
+Use **Find an obligation** for case-insensitive title, module/area or ISO date fragments; separate words must all match the same obligation. Module / area and Time group filters combine with search. **Show all obligations** clears filters and returns keyboard focus to search. Shown/total counts distinguish a filtered view from missing data; no-match and empty-workspace messages differ. The ledger stays complete and View obligation focuses its original card.
+
+Filtering uses the last server-observed snapshot in this tab: no requests/writes, URL parameters, browser storage, invented dates, action selection or completion changes. Filters survive ordinary refresh; an area no longer present resets to All modules / areas. Observed session loss/account change clears search, options and results. Failed refresh retains the prior observation with the existing stale/error notice; filtering never makes it fresh. Refresh remains deliberate. Targets remain distinct and date-only facts never imply midnight.
+
+Model/browser tests cover combined/no-match/reset filtering, no network/write/storage side effects, ledger focus, refresh preservation, mobile overflow and session clearing. CI screenshots support visual review; Gyile must still check real 16-record usability/comfort. The implementation PR and [handoff](../governance/DEVELOPMENT_HANDOFF.md) record deployment evidence. Do not import or purge to test filters; broader private data and v0.4.0 promotion remain recovery/storage gated.
+
 ## Deadline overview — 2026-10-10 UI batch
 
 The member view now includes **All deadlines** between Current Action and the obligation ledger. It reads the same owner-bound bootstrap workspace; **no new endpoint, database table, private import, action command or permissions** are added. Each recorded commitment appears exactly once, grouped as **Overdue, Today, Next 7 days, Later, Date unknown**. Dated groups sort ascending by South African local calendar day and then by recorded exact time; date-only records show **Time not specified**, sort before known times on the same day, and are never interpreted as midnight. Unknown dates are retained and never assigned invented deadlines.
