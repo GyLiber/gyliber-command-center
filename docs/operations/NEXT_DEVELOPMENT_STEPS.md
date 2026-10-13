@@ -13,7 +13,9 @@
 
 After merge of [PR #54](https://github.com/GyLiber/gyliber-command-center/pull/54) as `204c678c74eff80f0d0899150f473ae9c9434c45` and [Render deployment `dep-db6p4n8m7kps73aprnpg`](https://dashboard.render.com/web/srv-dau0307lot8c7395m6vg) reporting `live` at 2026-10-13T02:10:09Z, the maintainer reported **"checks passed"** in response to the prescribed signed-in read-only check (refresh, 16 commitments, search/filter, Show all, readability). This is **maintainer-reported acceptance**, not independent inspection of the private member session or separate source-notice date audit. No new import, reset, purge, or restoration was part of this check.
 
-**Still gated:** independent custody of both the current workflow backup and newest deletion ledger, clean disposable database recovery/deletion-barrier demonstration, and owner decision on the free PostgreSQL database expiring 2026-10-30T08:00:20Z. Do not tag/publish v0.4.0 or assert durable storage until these gates have evidence. Accepted application version remains v0.3.0.
+**Custody update — 2026-10-13:** Following the earlier read-only UI check, Gyile explicitly reported **"both files successfully downloaded and saved"** (workflow backup and separate deletion ledger). This confirms *maintainer-reported independent file retention*; the assistant has not inspected the bytes, validated the export pair's generation/checksums, verified encryption or tested restoration. Never put either file in public GitHub or logs.
+
+**Still gated:** clean disposable database recovery/deletion-barrier demonstration, owner review of exact dates and owner decision on the free PostgreSQL database expiring 2026-10-30T08:00:20Z. Do not tag/publish v0.4.0 or assert durable storage until these gates have evidence. Accepted application version remains v0.3.0.
 
 ## Current polish and return plan — 2026-10-12
 
