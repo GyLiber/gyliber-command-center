@@ -1,6 +1,6 @@
 # Resolution Control operations
 
-**Implementation checkpoint:** 2026-10-10; owner reports 16 commitments visible on the live, authenticated deadline-only pilot. Last accepted/tagged application version remains **0.3.0**; the live source contains the unreleased Resolution Control **0.4.0** candidate. Date-by-date and recovery acceptance remain pending.
+**Current release checkpoint:** 2026-10-13; [v0.4.0](https://github.com/GyLiber/gyliber-command-center/releases/tag/v0.4.0) published at source `36854dca1a4ab72d5175267abf7489bf684cecc9` and Render marked that source live. Owner reports signed-in filtering/16-commitment checks passed and both private recovery files retained; this is a disposable pilot, with no independent owner-export restore or persistent storage guarantee. Review each date against source notices separately. Historical notes below retain earlier development state; do not treat old "unreleased" statements as current.
 
 ## Current stopping checkpoint — 2026-10-10: 16 live commitments visible (maintainer-reported)
 
