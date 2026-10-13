@@ -4,7 +4,7 @@
 >
 > **Ever Toward Liberation.**
 
-![Status](https://img.shields.io/badge/release-v0.3.0--live-slate)
+![Status](https://img.shields.io/badge/release-v0.4.0--live-slate)
 ![Backend](https://img.shields.io/badge/backend-Rust-orange)
 
 ## 1. Product
@@ -18,6 +18,12 @@ The interface is deliberately calm, dark and information-forward. Its design tar
 > **more useful state and action per unit of human attention.**
 
 ## 2. Current release
+
+### v0.4.0 Resolution Control — disposable pilot
+
+[GitHub v0.4.0 release](https://github.com/GyLiber/gyliber-command-center/releases/tag/v0.4.0) verified at exact deployed source `36854dca1a4ab72d5175267abf7489bf684cecc9` (Render `dep-db6pnrjl550s739jsbr0`, live on 2026-10-13). Provides private Resolution Control obligations, current-action workflow, chronological SAST deadlines and explicit target labels, search/filter/ledger navigation, readiness and evidence distinctions, reports, and guarded export/restore/deletion-barrier interfaces. Gyile reported 16 commitments visible, read-only interface acceptance and private custody of backup plus separate deletion ledger; no independent restoration of owner exports or indefinite storage is claimed. The temporary PostgreSQL database expires **2026-10-30**; the owner chose disposable storage and did not approve a paid replacement. See [next actions](docs/operations/NEXT_DEVELOPMENT_STEPS.md#publication-and-next-actions--2026-10-13).
+
+### Earlier release — v0.3.0 Reviewed mathematical playground
 
 ### v0.3.0 Reviewed mathematical playground
 
