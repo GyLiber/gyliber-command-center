@@ -293,7 +293,10 @@ test('Deadline overview shows every date once, orders SAST times, navigates to d
     await p.getByRole('button',{name:'View obligation: Following submission'}).click();
     assert.equal(await p.evaluate(()=>document.activeElement?.dataset.commitment),'later');
     await p.getByRole('button',{name:'Show all obligations',exact:true}).click();
-    if(process.env.PLAYGROUND_SCREENSHOT_DIR)await p.screenshot({path:resolve(process.env.PLAYGROUND_SCREENSHOT_DIR,'resolution-deadline-overview-desktop.png'),fullPage:true});
+    if(process.env.PLAYGROUND_SCREENSHOT_DIR) {
+      await mkdir(process.env.PLAYGROUND_SCREENSHOT_DIR,{recursive:true});
+      await p.screenshot({path:resolve(process.env.PLAYGROUND_SCREENSHOT_DIR,'resolution-deadline-overview-desktop.png'),fullPage:true});
+    }
     await p.setViewportSize({width:390,height:844});
     assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
     if(process.env.PLAYGROUND_SCREENSHOT_DIR) {
