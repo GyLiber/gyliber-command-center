@@ -2,12 +2,22 @@
 
 **Document status:** Active roadmap  
 **Planning date:** 2026-09-30  
-**Last development update:** 2026-10-12
+**Last development update:** 2026-10-13
 **Current release:** v0.3.0 Reviewed Mathematical Playground; maintainer-reported live acceptance
 **Next development line:** Resolution Control: 16 commitments visible to maintainer; backup custody, schedule audit and expiring storage are next; v0.4.0 release gated
 **Product principle:** maximize useful state and action per unit of human attention.
 
 **Current packet:** Polish the existing deadline view, verify/deploy one bounded unit, then stop. Do **not** import again; preserve the maintainer-confirmed 16 commitments and verify independent backup/deletion ledger, dates and storage disposition before formal release.
+
+## Owner read-only UI acceptance — 2026-10-13
+
+After merge of [PR #54](https://github.com/GyLiber/gyliber-command-center/pull/54) as `204c678c74eff80f0d0899150f473ae9c9434c45` and [Render deployment `dep-db6p4n8m7kps73aprnpg`](https://dashboard.render.com/web/srv-dau0307lot8c7395m6vg) reporting `live` at 2026-10-13T02:10:09Z, the maintainer reported **"checks passed"** in response to the prescribed signed-in read-only check (refresh, 16 commitments, search/filter, Show all, readability). This is **maintainer-reported acceptance**, not independent inspection of the private member session or separate source-notice date audit. No new import, reset, purge, or restoration was part of this check.
+
+**Custody update — 2026-10-13:** Following the earlier read-only UI check, Gyile explicitly reported **"both files successfully downloaded and saved"** (workflow backup and separate deletion ledger). This confirms *maintainer-reported independent file retention*; the assistant has not inspected the bytes, validated the export pair's generation/checksums, verified encryption or tested restoration. Never put either file in public GitHub or logs.
+
+**Storage disposition — owner choice A, 2026-10-13:** Gyile selected **disposable pilot**, not paid/persistent hosting. Continue using the current live free PostgreSQL only until its expiry on **2026-10-30T08:00:20Z**; do not auto-upgrade, provision a paid database, or promise uninterrupted storage. Treat the downloaded workflow backup and separately retained latest deletion ledger as the owner's private export artifacts. The original 16 records must not be purged, overwritten, re-imported or reset for testing. Before expiry, explicitly warn the owner to retain and safeguard both files, and record that service continuity and data accessibility may be interrupted or lost. Future restoration requires an empty migrated replacement workspace, newest valid deletion metadata, authenticated owner review and a demonstrated restore; an export alone is not proof of recoverability. Changing to persistent storage requires a separate owner decision.
+
+**Still gated:** synthetic clean disposable database recovery and deletion-barrier demonstration, and owner review of exact recorded dates/SAST and the internal-target classification. The application remains formally at v0.3.0; v0.4.0 must not be tagged until its remaining release criteria are evidenced. Do not tag/publish v0.4.0 or assert durable storage until these gates have evidence. Accepted application version remains v0.3.0.
 
 ## Current polish and return plan — 2026-10-12
 
