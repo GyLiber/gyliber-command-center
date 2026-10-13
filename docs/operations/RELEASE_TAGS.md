@@ -4,6 +4,10 @@ Prepared by **Sol**, continuing Luna's foundation, on 2026-10-04 at Gyile's expl
 
 **Publication status: complete on 2026-10-04.** Sol published all three tags and GitHub Release listings through GitHub’s authenticated release interface at Gyile’s explicit instruction. Remote Git refs were read back and matched the exact targets below. All three are **lightweight tags** (`object.type=commit`), not annotated or signed tags; the accompanying release notes preserve scope and provenance. Creation was not backdated. Tagging changes no application code and requires no Render deployment.
 
+## v0.4.0 publication verification — 2026-10-13
+
+GitHub release [v0.4.0 — Resolution Control](https://github.com/GyLiber/gyliber-command-center/releases/tag/v0.4.0) was independently read back: published 2026-10-13T02:58:05Z, not draft or prerelease; remote lightweight `refs/tags/v0.4.0` points to `36854dca1a4ab72d5175267abf7489bf684cecc9`, equal to release merge PR #56, then-current `main` and Render live deployment `dep-db6pnrjl550s739jsbr0` (2026-10-13T02:50:56Z). Cargo manifest and lockfile are 0.4.0. Exact candidate head `783e400ef0ae3c9d19b72ba522957bf26bf67d67` passed [CI 38338217248](https://github.com/GyLiber/gyliber-command-center/actions/runs/38338217248) and [Security 38338206477](https://github.com/GyLiber/gyliber-command-center/actions/runs/38338206477). The tagged merge includes that tested tree plus the merge metadata. The owner reported 16 commitments, successful signed-in read-only acceptance and private retention of workflow backup plus deletion ledger. No independent owner-export restoration or long-lived storage is claimed. The database expiry is 2026-10-30T08:00:20Z. Version tag is lightweight (not signed). Release notes published by maintainer.
+
 ## Published targets
 
 | Application tag | Exact commit | Reason for this release boundary |
@@ -11,6 +15,7 @@ Prepared by **Sol**, continuing Luna's foundation, on 2026-10-04 at Gyile's expl
 | `v0.1.0` | `c8546dbb786f1a865de2ba12086f6dcd89126655` | PR #4's verified original foundation, before subsequent module development. A retrospective source-release milestone; independent historical hosted acceptance is not established. |
 | `v0.2.0` | `b134635a7b781e9e3f05721e54be8959f6a6fab8` | PR #19's final documented live-product/canonical-identity checkpoint, including the CA-certificate deployment correction and package version 0.2.0. The subsequent contracts/session/playground development belongs to the next line. |
 | `v0.3.0` | `ae80a6d04b0753dd4f6bd6a90f75dc003ec37d3d` | PR #34's final release-evidence commit: the exact deployment Gyile confirmed Live with passing playground tests, health/Live State version 0.3.0 and health status ok. PR #35 later records that acceptance. |
+| `v0.4.0` | `36854dca1a4ab72d5175267abf7489bf684cecc9` | PR #56 versioned Resolution Control; CI/Security, Render live, owner-reported pilot acceptance; explicitly disposable storage. |
 
 Each target is on main's ancestry, its Cargo version matches its application tag, and its complete tree equals the corresponding successfully checked PR head. Targets are ordered ancestors of one another. Do not use today's main for all three tags, infer additional minor releases from feature commits, or confuse exhibit/capability versions with application releases.
 
