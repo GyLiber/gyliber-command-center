@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+## [0.4.0] — Resolution Control disposable pilot
+
+- Added an owner-protected Resolution Control workspace with typed obligations, action workflow, readiness distinctions, report/history and guarded backup/restore/deletion metadata.
+- Added chronological South Africa deadline/target presentation and tab-local filtering; no search state or records are sent or modified by filters.
+- Scoped live acceptance: maintainer reports 16 commitments visible and read-only refresh/filter/navigation checks passed; these observations are not independently inspected source-notice audits.
+- Storage deliberately **disposable**: no paid database or continuity guarantee; the current PostgreSQL instance expires 2026-10-30. Owner reports independent custody of a workflow backup and separate latest deletion ledger. Recovery tests use synthetic database fixtures; those tests do not verify the owner's private export bytes or restore them to a new hosted service.
+- Release evidence, version deployment and source tag must be verified separately; no private pilot records are included in the repository.
+
+
 - Sol polished the existing Resolution Control deadline overview with tab-local title/module/date search, combined module/time-group filters, shown/total counts, an empty-match message and keyboard-accessible Show all obligations. Filtering preserves the ledger and makes no API requests/writes; observed session loss clears private filter values/options. Corrected outdated synthetic-only page/README wording to reflect the maintainer-confirmed disposable 16-commitment pilot. No version/tag, persistence, permissions or private schedule change.
 
 - Sol backfilled and verified application v0.1.0, v0.2.0 and v0.3.0 lightweight tags and GitHub Release notes on 2026-10-04 at the reviewed historical commits. See [tag provenance](docs/operations/RELEASE_TAGS.md); this documentation-only publication record requires no redeployment.
