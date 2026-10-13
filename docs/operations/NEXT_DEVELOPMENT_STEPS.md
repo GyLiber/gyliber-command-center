@@ -3,11 +3,19 @@
 **Document status:** Active roadmap  
 **Planning date:** 2026-09-30  
 **Last development update:** 2026-10-13
-**Current release:** v0.3.0 Reviewed Mathematical Playground; maintainer-reported live acceptance
-**Next development line:** Resolution Control: 16 commitments visible to maintainer; backup custody, schedule audit and expiring storage are next; v0.4.0 release gated
+**Current release:** v0.4.0 Resolution Control — verified GitHub tag and live Render source; disposable pilot
+**Next development line:** After v0.4.0: verify private-export recoverability without touching production, audit source notices, and plan a bounded Mathematical Experiment Bench release.
 **Product principle:** maximize useful state and action per unit of human attention.
 
-**Current packet:** Polish the existing deadline view, verify/deploy one bounded unit, then stop. Do **not** import again; preserve the maintainer-confirmed 16 commitments and verify independent backup/deletion ledger, dates and storage disposition before formal release.
+**Current packet:** v0.4.0 has been published and deployed. Documentation closure only; stop after the repository checkpoint. Do not re-import, reset or purge the 16 commitments.
+
+## Publication and next actions — 2026-10-13
+
+The [v0.4.0 release](https://github.com/GyLiber/gyliber-command-center/releases/tag/v0.4.0) is published and its lightweight tag resolves to `36854dca1a4ab72d5175267abf7489bf684cecc9`, the same source Render marked live in `dep-db6pnrjl550s739jsbr0`. CI and Security passed for PR #56's exact head. Owner UI acceptance and retention of both private recovery files are maintainer reports, not independent recovery of the actual exports.
+
+**Next independently bounded packets, in order:** (1) Before the **2026-10-30T08:00:20Z** database expiry, recheck retained current backup **and newest separate deletion ledger** securely; review each visible official date/time against owner notices and ensure the internal target remains clearly non-official. No high-sensitivity records. (2) Establish reproducible empty disposable database restore with synthetic records, latest deletion metadata, rejection of deleted source and controlled error responses; preserve run IDs and restoration evidence. Existing CI synthetic PostgreSQL tests cover mechanisms, but are not proof of the owner's export bytes or successor-host continuity. (3) Separately decide whether/how to instantiate an empty replacement pilot after expiry; do not create paid storage or assume continuous uptime. (4) When explicitly authorized, scope one demonstrable Mathematical Experiment Bench slice from its v1.0.0 design, with a precise mathematical contract, reproducible inputs/results and tests; only then consider a next minor version. (5) Continue to document verified source, deployed source, owner acceptance and tag separately at each subsequent release. No implicit automatic publication.
+
+**Stop point:** no additional feature or infrastructure action in this documentation-only closure.
 
 ## Owner read-only UI acceptance — 2026-10-13
 
